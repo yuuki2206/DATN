@@ -106,7 +106,12 @@ class HybridNLPRouter:
             f"Bài giảng chi tiết:"
         )
 
-        model_name = getattr(settings, "GEMINI_MODEL", "gemini-flash-latest")
+        raw_model = getattr(settings, "GEMINI_MODEL", "gemini-flash-latest")
+        model_name = (
+            "gemini-flash-latest"
+            if raw_model in ("", "gemini-3.5-flash-lite", "gemini-1.5-flash")
+            else raw_model
+        )
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={gemini_key}"
         body = {"contents": [{"parts": [{"text": prompt}]}]}
 
