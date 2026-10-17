@@ -15,7 +15,7 @@ class Settings:
     
     # Gemini API Key (Được nạp từ .env hoặc biến môi trường)
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
-    GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
+    GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "gemini-flash-latest")
     
     # Hugging Face Settings (Mô hình nguồn mở tối ưu cho Tiếng Việt)
     HF_TOKEN: str = os.getenv("HF_TOKEN", "")

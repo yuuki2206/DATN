@@ -94,19 +94,19 @@ class HybridNLPRouter:
         clean_q = re.sub(r"^\s*\d{2,}\s+|\s+\d{2,}\s*$", "", query).strip()
 
         prompt = (
-            f"Bạn là trợ lý Lịch sử lớp 7. Dựa chặt chẽ vào tư liệu lịch sử gốc và nội dung chuẩn bên dưới, "
-            f"hãy trình bày câu trả lời thật rõ ràng, súc tích, đúng trọng tâm câu hỏi của học sinh.\n"
-            f"QUY TẮC BẮT BUỘC:\n"
-            f"- Đi thẳng vào nội dung trả lời, KHÔNG chào hỏi rườm rà, KHÔNG tự xưng tên trong ngoặc đơn và KHÔNG lặp lại nguyên văn câu hỏi của học sinh.\n"
-            f"- TUYỆT ĐỐI KHÔNG bịa đặt thêm ngày tháng, con số hay sự kiện ngoài tư liệu gốc.\n"
-            f"- Nếu câu hỏi yêu cầu nêu nhiều ý (ví dụ: 2 ý, 3 nguyên nhân), hãy đánh số 1., 2., 3. rõ ràng.\n\n"
-            f"Tư liệu lịch sử gốc:\n{fact_chunk}\n\n"
-            f"Nội dung chuẩn:\n{local_answer}\n\n"
+            f"Bạn là gia sư Lịch sử lớp 7 uyên bác và truyền cảm hứng. Dựa trên Tư liệu lịch sử và Nội dung bài giảng chuẩn bên dưới, "
+            f"hãy giải thích thật đầy đủ, chi tiết, sâu sắc và sinh động để học sinh hiểu rõ bản chất lịch sử (bối cảnh, nguyên nhân, diễn biến, ý nghĩa).\n"
+            f"QUY TẮC:\n"
+            f"- Giữ đầy đủ chiều sâu kiến thức và các luận điểm giải thích trong Nội dung bài giảng chuẩn, KHÔNG tóm tắt cụt lủn.\n"
+            f"- Không tự xưng tên trong dấu ngoặc đơn và không lặp lại nguyên văn câu hỏi của học sinh ở câu mở đầu.\n"
+            f"- Không bịa đặt thêm ngày tháng hay sự kiện sai lệch với tư liệu.\n\n"
+            f"Tư liệu lịch sử:\n{fact_chunk}\n\n"
+            f"Nội dung bài giảng chuẩn (cần giữ đủ độ sâu và chi tiết):\n{local_answer}\n\n"
             f"Câu hỏi của học sinh: {clean_q}\n"
-            f"Câu trả lời:"
+            f"Bài giảng chi tiết:"
         )
 
-        model_name = getattr(settings, "GEMINI_MODEL", "gemini-3.5-flash-lite")
+        model_name = getattr(settings, "GEMINI_MODEL", "gemini-flash-latest")
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={gemini_key}"
         body = {"contents": [{"parts": [{"text": prompt}]}]}
 
