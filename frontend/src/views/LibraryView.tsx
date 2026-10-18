@@ -261,11 +261,11 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
   }
 
   return (
-    <div className="flex-1 flex min-h-0 bg-white overflow-hidden" onClick={() => setActiveMenuId(null)}>
+    <div className="flex-1 flex flex-col lg:flex-row min-h-0 bg-white overflow-hidden" onClick={() => setActiveMenuId(null)}>
       {/* ======================================================== */}
       {/* 1. Sub-Sidebar bên trái Thư viện (Khớp chuẩn Ảnh 1, 2, 3) */}
       {/* ======================================================== */}
-      <div className="w-60 bg-[#fbfbfe] border-r border-slate-200/80 flex flex-col justify-between shrink-0 select-none">
+      <div className="w-full lg:w-60 max-h-[178px] lg:max-h-none overflow-y-auto bg-white border-b lg:border-b-0 lg:border-r border-[#e9e9e9] flex flex-col justify-between shrink-0 select-none">
         <div className="p-3 space-y-1">
           {/* Mục 1: Quiz (Kahoot style) */}
           <button
@@ -275,14 +275,14 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
             }}
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition ${
               activeCategory === 'quiz' && selectedFolderId === null
-                ? 'bg-[#ebf3fe] text-[#1368ce]'
+                ? 'bg-[#ddf4ff] text-[#1899d6]'
                 : 'text-slate-700 hover:bg-slate-100/80'
             }`}
           >
             {/* Icon 4 ô vuông Kahoot style */}
             <div className="w-5 h-5 grid grid-cols-2 gap-0.5 shrink-0">
               <div className="bg-[#e21b3c] rounded-[2px]" />
-              <div className="bg-[#1368ce] rounded-[2px]" />
+              <div className="bg-[#58cc02] rounded-[2px]" />
               <div className="bg-[#d89e00] rounded-[2px]" />
               <div className="bg-[#26890c] rounded-[2px]" />
             </div>
@@ -300,7 +300,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
             }}
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition ${
               activeCategory === 'story' && selectedFolderId === null
-                ? 'bg-[#ebf3fe] text-[#1368ce]'
+                ? 'bg-[#ddf4ff] text-[#1899d6]'
                 : 'text-slate-700 hover:bg-slate-100/80'
             }`}
           >
@@ -319,7 +319,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
             }}
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition ${
               activeCategory === 'course' && selectedFolderId === null
-                ? 'bg-[#ebf3fe] text-[#1368ce]'
+                ? 'bg-[#ddf4ff] text-[#1899d6]'
                 : 'text-slate-700 hover:bg-slate-100/80'
             }`}
           >
@@ -394,7 +394,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                       }}
                       className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium transition text-left group ${
                         isSelected
-                          ? 'bg-[#ebf3fe] text-[#1368ce] font-bold'
+                          ? 'bg-[#ddf4ff] text-[#1899d6] font-bold'
                           : 'text-slate-600 hover:bg-slate-100'
                       }`}
                     >
@@ -442,13 +442,13 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
 
         {/* Nút hỗ trợ nhanh bên dưới sub-sidebar */}
         <div className="p-3 border-t border-slate-100">
-          <div className="bg-purple-50/70 border border-purple-200/60 rounded-xl p-2.5 text-center">
+          <div className="bg-[#e7eddf] border border-[#cbd8c3] rounded-xl p-2.5 text-center">
             <span className="text-[11px] font-bold text-purple-900 block mb-1">
               Soạn đề tự động?
             </span>
             <button
               onClick={onOpenAiQuizModal}
-              className="w-full py-1.5 bg-[#46178f] hover:bg-[#381075] text-white rounded-lg text-[11px] font-bold transition flex items-center justify-center gap-1 shadow-2xs"
+              className="w-full py-1.5 bg-[#205344] hover:bg-[#1b4236] text-white rounded-lg text-[11px] font-bold transition flex items-center justify-center gap-1 shadow-2xs"
             >
               <Sparkles className="w-3 h-3 text-amber-300" />
               <span>Dùng AI tạo đề</span>
@@ -460,12 +460,12 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
       {/* ======================================================== */}
       {/* 2. Vùng hiển thị nội dung chính bên phải */}
       {/* ======================================================== */}
-      <div className="flex-1 flex flex-col min-w-0 h-full overflow-y-auto bg-white">
+      <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-y-auto bg-white">
         {/* ======================================================== */}
         {/* VIEW A: Quiz (Khớp chuẩn Ảnh 1) */}
         {/* ======================================================== */}
         {activeCategory === 'quiz' && (
-          <div className="p-8 max-w-6xl w-full mx-auto space-y-6">
+          <div className="p-4 sm:p-6 lg:p-8 max-w-6xl w-full mx-auto space-y-6">
             {/* Thanh Tab: Gần đây, Bản nháp, Yêu thích + Công tắc Grid/List */}
             <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-3">
               <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
@@ -503,7 +503,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
 
               <div className="flex items-center gap-3">
                 {/* Search */}
-                <div className="relative w-64">
+                <div className="relative w-36 sm:w-64">
                   <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                   <input
                     type="text"
@@ -551,7 +551,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                     setEditingQuiz(null);
                     setIsQuizCreatorOpen(true);
                   }}
-                  className="px-4 py-2 bg-[#1368ce] text-white rounded-xl text-xs font-bold shadow-xs transition"
+                  className="px-4 py-2 bg-[#58cc02] text-white rounded-xl text-xs font-bold shadow-xs transition"
                 >
                   Tạo bài Quiz mới
                 </button>
@@ -602,7 +602,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                         )}
 
                         <div className="flex items-start justify-between gap-1">
-                          <h4 className="font-extrabold text-xs text-slate-900 line-clamp-2 leading-snug group-hover:text-[#1368ce] transition">
+                          <h4 className="font-extrabold text-xs text-slate-900 line-clamp-2 leading-snug group-hover:text-[#b34f34] transition">
                             {quiz.title}
                           </h4>
 
@@ -639,7 +639,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                                   }}
                                   className="w-full px-3 py-1.5 text-left text-slate-700 hover:bg-slate-50 flex items-center gap-2 font-medium"
                                 >
-                                  <Edit3 className="w-3.5 h-3.5 text-[#1368ce]" />
+                                  <Edit3 className="w-3.5 h-3.5 text-[#b34f34]" />
                                   <span>Chỉnh sửa câu hỏi</span>
                                 </button>
                                 <button
@@ -675,7 +675,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                         <span className="truncate max-w-[120px]">{quiz.author}</span>
                         <button
                           onClick={() => onLaunchLesson(quiz.title)}
-                          className="px-2.5 py-1 bg-[#1368ce] hover:bg-[#0f52a5] text-white rounded-lg font-bold text-[10px] flex items-center gap-1 transition shadow-2xs"
+                          className="px-2.5 py-1 bg-[#58cc02] hover:bg-[#58a700] text-white rounded-lg font-bold text-[10px] flex items-center gap-1 transition shadow-2xs"
                         >
                           <Play className="w-3 h-3 fill-white" />
                           <span>Bắt đầu</span>
@@ -723,7 +723,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                     <div className="flex items-center gap-2 shrink-0">
                       <button
                         onClick={() => onLaunchLesson(quiz.title)}
-                        className="px-3 py-1.5 bg-[#1368ce] hover:bg-[#0f52a5] text-white rounded-lg text-xs font-bold transition flex items-center gap-1"
+                        className="px-3 py-1.5 bg-[#58cc02] hover:bg-[#58a700] text-white rounded-lg text-xs font-bold transition flex items-center gap-1"
                       >
                         <Play className="w-3 h-3 fill-white" /> Bắt đầu
                       </button>
@@ -739,7 +739,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
         {/* VIEW B: Câu chuyện (Story - Khớp chuẩn Ảnh 2) */}
         {/* ======================================================== */}
         {activeCategory === 'story' && (
-          <div className="p-8 max-w-6xl w-full mx-auto space-y-6">
+          <div className="p-4 sm:p-6 lg:p-8 max-w-6xl w-full mx-auto space-y-6">
             {/* Header row: Tìm kiếm (trái) và Sắp xếp theo [ Cũ nhất / Mới nhất ] + Grid/List (phải) */}
             <div className="flex flex-wrap items-center justify-between gap-4">
               {/* Search bar matching Image 2 */}
@@ -803,7 +803,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                     setEditingStory(null);
                     setIsStoryCreatorOpen(true);
                   }}
-                  className="px-4 py-2 bg-[#1368ce] text-white rounded-xl text-xs font-bold shadow-xs transition"
+                  className="px-4 py-2 bg-[#58cc02] text-white rounded-xl text-xs font-bold shadow-xs transition"
                 >
                   Tạo câu chuyện mới
                 </button>
@@ -818,7 +818,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                   >
                     {/* Header nhỏ trên đầu card (Khớp ảnh 2: icon + "Câu chuyện") */}
                     <div className="px-3 py-1.5 bg-slate-50 border-b border-slate-100 flex items-center gap-1.5 text-[11px] text-slate-500 font-medium">
-                      <BookOpen className="w-3.5 h-3.5 text-[#46178f]" />
+                      <BookOpen className="w-3.5 h-3.5 text-[#58a700]" />
                       <span>Câu chuyện</span>
                     </div>
 
@@ -855,7 +855,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                         )}
 
                         <div className="flex items-start justify-between gap-1">
-                          <h4 className="font-extrabold text-xs text-slate-900 line-clamp-2 leading-snug group-hover:text-[#46178f] transition">
+                          <h4 className="font-extrabold text-xs text-slate-900 line-clamp-2 leading-snug group-hover:text-[#58a700] transition">
                             {story.title}
                           </h4>
 
@@ -948,7 +948,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
         {/* VIEW C: Khoá học (Course) */}
         {/* ======================================================== */}
         {activeCategory === 'course' && (
-          <div className="p-8 max-w-6xl w-full mx-auto space-y-6">
+          <div className="p-4 sm:p-6 lg:p-8 max-w-6xl w-full mx-auto space-y-6">
             <div className="flex items-center justify-between border-b border-slate-200 pb-4">
               <div>
                 <h2 className="text-base font-extrabold text-slate-900">Khoá học Lịch sử</h2>
@@ -958,7 +958,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
               </div>
               <button
                 onClick={() => onShowToast('🎓 Tính năng tạo khoá học chuyên sâu đã sẵn sàng.')}
-                className="px-4 py-2 bg-[#1368ce] hover:bg-[#0f52a5] text-white rounded-xl text-xs font-bold shadow-xs transition"
+                className="px-4 py-2 bg-[#58cc02] hover:bg-[#58a700] text-white rounded-xl text-xs font-bold shadow-xs transition"
               >
                 + Tạo khoá học mới
               </button>
@@ -977,7 +977,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                   />
                   <div className="flex-1 flex flex-col justify-between">
                     <div>
-                      <span className="text-[10px] bg-blue-100 text-[#1368ce] font-bold px-2 py-0.5 rounded-full inline-block mb-1">
+                      <span className="text-[10px] bg-blue-100 text-[#b34f34] font-bold px-2 py-0.5 rounded-full inline-block mb-1">
                         Chuyên đề lớp 7
                       </span>
                       <h4 className="font-extrabold text-sm text-slate-900 leading-snug">
@@ -991,7 +991,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                       <span>{c.chapterCount} chương • {c.duration}</span>
                       <button
                         onClick={() => onLaunchLesson(c.title)}
-                        className="text-[#1368ce] font-bold hover:underline"
+                        className="text-[#b34f34] font-bold hover:underline"
                       >
                         Vào học →
                       </button>
@@ -1007,7 +1007,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
         {/* VIEW D: Thư mục của bạn / Chi tiết Thư mục (Khớp Ảnh 3) */}
         {/* ======================================================== */}
         {activeCategory === 'folders' && (
-          <div className="p-8 max-w-6xl w-full mx-auto space-y-6">
+          <div className="p-4 sm:p-6 lg:p-8 max-w-6xl w-full mx-auto space-y-6">
             {/* Header: Tiêu đề Thư mục + Nút "+ Mới" (Xanh dương như ảnh 3) */}
             <div className="flex items-center justify-between">
               <div>
@@ -1030,7 +1030,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                       setIsCreateFolderOpen(true);
                     }
                   }}
-                  className="flex items-center gap-1.5 px-4 py-2 bg-[#1368ce] hover:bg-[#0f52a5] text-white rounded-lg text-xs font-bold shadow-md shadow-blue-500/20 active:scale-95 transition"
+                  className="flex items-center gap-1.5 px-4 py-2 bg-[#58cc02] hover:bg-[#58a700] text-white rounded-lg text-xs font-bold shadow-md shadow-blue-500/20 active:scale-95 transition"
                 >
                   <Plus className="w-4 h-4 stroke-[2.5]" />
                   <span>Mới</span>
@@ -1109,7 +1109,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                         </div>
 
                         <div>
-                          <h4 className="font-extrabold text-sm text-slate-900 group-hover:text-[#46178f] transition line-clamp-1">
+                          <h4 className="font-extrabold text-sm text-slate-900 group-hover:text-[#58a700] transition line-clamp-1">
                             {folder.name}
                           </h4>
                           <p className="text-xs text-slate-400 mt-0.5 line-clamp-1">
@@ -1119,7 +1119,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
 
                         <div className="flex items-center justify-between text-[11px] text-slate-500 pt-2 border-t border-slate-100">
                           <span>{qCount} Quiz • {sCount} Câu chuyện</span>
-                          <span className="text-[#1368ce] font-bold group-hover:translate-x-0.5 transition flex items-center">
+                          <span className="text-[#b34f34] font-bold group-hover:translate-x-0.5 transition flex items-center">
                             Mở <ChevronRight className="w-3.5 h-3.5" />
                           </span>
                         </div>
@@ -1134,7 +1134,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                 {/* Thanh điều hướng quay lại danh sách thư mục */}
                 <button
                   onClick={() => setSelectedFolderId(null)}
-                  className="text-xs font-bold text-[#1368ce] hover:underline flex items-center gap-1 mb-4"
+                  className="text-xs font-bold text-[#b34f34] hover:underline flex items-center gap-1 mb-4"
                 >
                   ← Quay lại tất cả thư mục
                 </button>
@@ -1160,7 +1160,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                       <div className="absolute -top-1 left-6 w-6 h-6 rounded-full bg-[#e21b3c] text-white text-[11px] font-black flex items-center justify-center shadow-xs z-20">
                         ?
                       </div>
-                      <div className="absolute -top-3 right-16 w-5 h-5 rounded-full bg-[#1368ce] text-white text-[10px] font-black flex items-center justify-center shadow-xs z-20">
+                      <div className="absolute -top-3 right-16 w-5 h-5 rounded-full bg-[#58cc02] text-white text-[10px] font-black flex items-center justify-center shadow-xs z-20">
                         ?
                       </div>
                       <div className="absolute -bottom-2 right-8 w-6 h-6 rounded-full bg-[#26890c] text-white text-[11px] font-black flex items-center justify-center shadow-xs z-20">
@@ -1184,7 +1184,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                           setEditingQuiz(null);
                           setIsQuizCreatorOpen(true);
                         }}
-                        className="px-4 py-2 bg-[#1368ce] hover:bg-[#0f52a5] text-white rounded-xl text-xs font-bold shadow-xs transition"
+                        className="px-4 py-2 bg-[#58cc02] hover:bg-[#58a700] text-white rounded-xl text-xs font-bold shadow-xs transition"
                       >
                         + Tạo Quiz vào thư mục
                       </button>
@@ -1193,7 +1193,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                           setEditingStory(null);
                           setIsStoryCreatorOpen(true);
                         }}
-                        className="px-4 py-2 bg-[#46178f] hover:bg-[#381075] text-white rounded-xl text-xs font-bold shadow-xs transition"
+                        className="px-4 py-2 bg-[#205344] hover:bg-[#1b4236] text-white rounded-xl text-xs font-bold shadow-xs transition"
                       >
                         + Tạo Câu chuyện
                       </button>
@@ -1228,7 +1228,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                                     <span>{quiz.questionCount} câu hỏi</span>
                                     <button
                                       onClick={() => onLaunchLesson(quiz.title)}
-                                      className="text-[#1368ce] font-bold hover:underline"
+                                      className="text-[#b34f34] font-bold hover:underline"
                                     >
                                       Bắt đầu →
                                     </button>
@@ -1270,7 +1270,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({
                                   </h5>
                                   <div className="flex items-center justify-between text-[11px] text-slate-500 mt-2 pt-2 border-t border-slate-100">
                                     <span>{story.author}</span>
-                                    <span className="text-[#46178f] font-bold">Đọc ngay →</span>
+                                    <span className="text-[#58a700] font-bold">Đọc ngay →</span>
                                   </div>
                                 </div>
                               </div>

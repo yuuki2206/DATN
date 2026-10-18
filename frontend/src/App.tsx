@@ -6,7 +6,7 @@ import { StudentView } from './views/StudentView';
 import { CheckCircle2 } from 'lucide-react';
 
 export function App() {
-  const [currentRole, setCurrentRole] = useState<UserRole>('teacher');
+  const [currentRole, setCurrentRole] = useState<UserRole>('student');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
@@ -26,7 +26,7 @@ export function App() {
   };
 
   return (
-    <div className="h-screen w-screen flex flex-col overflow-hidden font-sans bg-[#f4f5fa]">
+    <div className="h-dvh w-full flex flex-col overflow-hidden font-sans bg-white">
       {/* Thanh phân quyền & chuyển đổi góc nhìn Giảng viên / Học sinh */}
       <RoleSwitcher
         currentRole={currentRole}
@@ -44,8 +44,8 @@ export function App() {
 
       {/* Toast thông báo toàn cục */}
       {toastMessage && (
-        <div className="fixed bottom-5 right-5 z-50 bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-xl flex items-center gap-2.5 text-xs font-bold border border-slate-700 animate-slide-up">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+        <div className="fixed bottom-5 right-5 z-[90] max-w-[min(420px,calc(100vw-32px))] bg-[#58cc02] text-white px-5 py-3.5 rounded-[17px] shadow-xl flex items-center gap-3 text-xs font-black border-b-4 border-[#58a700] animate-slide-up">
+          <CheckCircle2 className="w-4 h-4 text-white shrink-0" />
           <span>{toastMessage}</span>
         </div>
       )}

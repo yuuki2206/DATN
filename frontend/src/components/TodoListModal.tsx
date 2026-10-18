@@ -269,7 +269,7 @@ export const TodoListModal: React.FC<TodoListModalProps> = ({
                   {task.status === 'skipped' && (
                     <button
                       onClick={() => onRestoreTask(task.id)}
-                      className="flex items-center gap-1 px-3 py-1.5 bg-white hover:bg-slate-100 text-[#1368ce] border border-slate-200 rounded-xl text-xs font-bold transition shadow-2xs"
+                      className="flex items-center gap-1 px-3 py-1.5 bg-white hover:bg-slate-100 text-[#b34f34] border border-slate-200 rounded-xl text-xs font-bold transition shadow-2xs"
                     >
                       <RotateCcw className="w-3.5 h-3.5" />
                       <span>Khôi phục</span>

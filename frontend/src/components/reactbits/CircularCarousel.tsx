@@ -39,35 +39,35 @@ interface CircularCarouselProps {
 const ACCENT_STYLES = {
   amber: {
     border: 'border-amber-400/60',
-    glow: 'shadow-[0_0_45px_-10px_rgba(245,158,11,0.55)]',
+    glow: 'shadow-[0_12px_40px_-16px_rgba(211,166,93,0.35)]',
     badge: 'bg-amber-400 text-slate-950',
     pill: 'bg-amber-500/20 text-amber-300 border-amber-400/40',
     btn: 'bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 hover:from-amber-300 hover:to-orange-400',
   },
   emerald: {
     border: 'border-emerald-400/60',
-    glow: 'shadow-[0_0_45px_-10px_rgba(16,185,129,0.55)]',
+    glow: 'shadow-[0_12px_40px_-16px_rgba(98,151,120,0.35)]',
     badge: 'bg-emerald-400 text-slate-950',
     pill: 'bg-emerald-500/20 text-emerald-300 border-emerald-400/40',
     btn: 'bg-gradient-to-r from-emerald-400 to-teal-500 text-slate-950 hover:from-emerald-300 hover:to-teal-400',
   },
   purple: {
     border: 'border-purple-400/60',
-    glow: 'shadow-[0_0_45px_-10px_rgba(168,85,247,0.55)]',
+    glow: 'shadow-[0_12px_40px_-16px_rgba(98,151,120,0.35)]',
     badge: 'bg-purple-400 text-slate-950',
     pill: 'bg-purple-500/20 text-purple-200 border-purple-400/40',
     btn: 'bg-gradient-to-r from-purple-500 to-indigo-600 text-white hover:from-purple-400 hover:to-indigo-500',
   },
   rose: {
     border: 'border-rose-400/60',
-    glow: 'shadow-[0_0_45px_-10px_rgba(244,63,94,0.55)]',
+    glow: 'shadow-[0_12px_40px_-16px_rgba(174,83,58,0.35)]',
     badge: 'bg-rose-400 text-slate-950',
     pill: 'bg-rose-500/20 text-rose-200 border-rose-400/40',
     btn: 'bg-gradient-to-r from-rose-500 to-amber-500 text-white hover:from-rose-400 hover:to-amber-400',
   },
   sky: {
     border: 'border-sky-400/60',
-    glow: 'shadow-[0_0_45px_-10px_rgba(56,189,248,0.55)]',
+    glow: 'shadow-[0_12px_40px_-16px_rgba(100,145,124,0.35)]',
     badge: 'bg-sky-400 text-slate-950',
     pill: 'bg-sky-500/20 text-sky-200 border-sky-400/40',
     btn: 'bg-gradient-to-r from-sky-400 to-blue-600 text-white hover:from-sky-300 hover:to-blue-500',
@@ -192,13 +192,13 @@ export const CircularCarousel: React.FC<CircularCarouselProps> = ({
 
   return (
     <div
-      className="relative w-full rounded-3xl overflow-hidden bg-gradient-to-br from-[#090d16] via-[#131129] to-[#1e1035] text-white border border-white/10 shadow-2xl select-none"
+      className="relative w-full rounded-3xl overflow-hidden bg-gradient-to-br from-[#173b32] via-[#1c4237] to-[#18372f] text-white border border-white/10 shadow-2xl select-none"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Ambient Awwwards Aurora Glows */}
-      <div className="pointer-events-none absolute -top-28 -left-24 w-96 h-96 rounded-full bg-amber-500/15 blur-3xl animate-pulse" />
-      <div className="pointer-events-none absolute -bottom-28 -right-24 w-96 h-96 rounded-full bg-purple-600/20 blur-3xl" />
+      <div className="pointer-events-none absolute -top-28 -left-24 w-96 h-96 rounded-full bg-amber-500/10 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-28 -right-24 w-96 h-96 rounded-full bg-[#69937b]/10 blur-3xl" />
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.06]"
         style={{
@@ -211,18 +211,18 @@ export const CircularCarousel: React.FC<CircularCarouselProps> = ({
       {/* Top Bar: Header & Controls */}
       <div className="relative z-20 px-6 pt-5 pb-2 flex flex-wrap items-center justify-between gap-3 border-b border-white/10 bg-white/[0.02] backdrop-blur-md">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-400 to-orange-500 text-slate-950 flex items-center justify-center shadow-lg shadow-amber-500/25 font-black">
+          <div className="w-9 h-9 rounded-xl bg-[#d1b07b] text-[#17382f] flex items-center justify-center shadow-lg shadow-amber-500/25 font-black">
             <Compass className="w-5 h-5" />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-300">
                 {variant === 'student'
-                  ? 'SA BÀN TƯƠNG TÁC 3D • HÀO KHÍ ĐÔNG A'
-                  : 'SA BÀN TRỰC QUAN HÓA CHIẾN DỊCH 3D'}
+                  ? 'HÀNH TRÌNH ĐÔNG A • 3D'
+                  : 'SA BÀN LỊCH SỬ • 3D'}
               </span>
               <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-emerald-300 border border-emerald-400/30">
-                360° Circular Gallery
+                Thư viện chiến dịch
               </span>
             </div>
             <h3 className="text-sm sm:text-base font-black tracking-tight text-white">
@@ -270,7 +270,7 @@ export const CircularCarousel: React.FC<CircularCarouselProps> = ({
 
       {/* 3D Circular Stage */}
       <div
-        className={`relative h-[320px] sm:h-[340px] w-full flex items-center justify-center overflow-hidden ${
+        className={`relative h-[320px] sm:h-[320px] w-full flex items-center justify-center overflow-hidden ${
           isDragging ? 'cursor-grabbing' : 'cursor-grab'
         }`}
         style={{ perspective: '1200px' }}
@@ -323,7 +323,7 @@ export const CircularCarousel: React.FC<CircularCarouselProps> = ({
                 zIndex,
                 transformStyle: 'preserve-3d',
               }}
-              className={`absolute w-[250px] sm:w-[275px] h-[270px] rounded-2xl overflow-hidden border transition-shadow duration-300 ${
+              className={`absolute w-[250px] sm:w-[275px] h-[270px] rounded-xl overflow-hidden border transition-shadow duration-300 ${
                 isCenter
                   ? `${itemAccent.border} ${itemAccent.glow} ring-1 ring-white/30`
                   : 'border-white/15 hover:border-white/35'
@@ -387,7 +387,7 @@ export const CircularCarousel: React.FC<CircularCarouselProps> = ({
       </div>
 
       {/* Bottom Active Inspector & Quick Actions Bar */}
-      <div className="relative z-20 px-6 py-4 bg-slate-950/80 backdrop-blur-xl border-t border-white/10 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div className="relative z-20 px-6 py-4 bg-[#142e28]/90 backdrop-blur-xl border-t border-white/10 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div className="space-y-1 max-w-2xl">
           <div className="flex flex-wrap items-center gap-2">
             <span
@@ -425,6 +425,8 @@ export const CircularCarousel: React.FC<CircularCarouselProps> = ({
                     : 'w-2 bg-white/25 hover:bg-white/50'
                 }`}
                 title={it.title}
+                aria-label={`Chọn chặng: ${it.title}`}
+                aria-current={idx === activeIndex ? 'step' : undefined}
               />
             ))}
           </div>

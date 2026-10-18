@@ -9,8 +9,8 @@ interface CreateFolderModalProps {
 }
 
 const COLOR_OPTIONS = [
-  { label: 'Tím Đông A', value: '#46178f' },
-  { label: 'Xanh Lam', value: '#1368ce' },
+  { label: 'Tím Đông A', value: '#205344' },
+  { label: 'Xanh Lam', value: '#b34f34' },
   { label: 'Xanh Lá', value: '#059669' },
   { label: 'Cam Hổ Phách', value: '#d97706' },
   { label: 'Đỏ San Hô', value: '#e11d48' },
@@ -82,7 +82,7 @@ export const CreateFolderModal: React.FC<CreateFolderModalProps> = ({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="VD: Lịch sử lớp 7A1 - Kháng chiến 1285"
-              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#46178f]/20 focus:border-[#46178f] transition"
+              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#205344]/20 focus:border-[#205344] transition"
               autoFocus
             />
           </div>
@@ -96,7 +96,7 @@ export const CreateFolderModal: React.FC<CreateFolderModalProps> = ({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Ghi chú ngắn về mục đích hoặc chuyên đề của thư mục..."
-              className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#46178f]/20 focus:border-[#46178f] transition resize-none"
+              className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#205344]/20 focus:border-[#205344] transition resize-none"
             />
           </div>
 
@@ -134,7 +134,7 @@ export const CreateFolderModal: React.FC<CreateFolderModalProps> = ({
             <button
               type="submit"
               disabled={!name.trim()}
-              className="px-5 py-2 bg-[#1368ce] hover:bg-[#0f52a5] disabled:opacity-50 text-white rounded-xl text-xs font-bold shadow-xs active:scale-95 transition"
+              className="px-5 py-2 bg-[#b34f34] hover:bg-[#963e28] disabled:opacity-50 text-white rounded-xl text-xs font-bold shadow-xs active:scale-95 transition"
             >
               Tạo thư mục
             </button>

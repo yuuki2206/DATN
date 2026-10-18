@@ -81,7 +81,7 @@ export const QuestWorldMapView: React.FC<QuestWorldMapViewProps> = ({ onShowToas
           {/* Nút Tạo nhiệm vụ mới (+) màu xanh lá */}
           <button
             onClick={handleCreateNewQuest}
-            className="w-8 h-8 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center transition shadow-xs active:scale-95"
+            className="w-8 h-8 rounded-xl bg-[#58cc02] hover:bg-[#58a700] text-white flex items-center justify-center transition shadow-xs active:scale-95"
             title="Tạo nhiệm vụ mới trên bản đồ"
           >
             <Plus className="w-4 h-4 stroke-[3]" />
@@ -112,7 +112,7 @@ export const QuestWorldMapView: React.FC<QuestWorldMapViewProps> = ({ onShowToas
                     setIsFilterDropdownOpen(false);
                   }}
                   className={`w-full text-left px-3 py-2 hover:bg-slate-50 ${
-                    filterType === 'all' ? 'text-emerald-600 font-black' : 'text-slate-700'
+                    filterType === 'all' ? 'text-[#58a700] font-black' : 'text-slate-700'
                   }`}
                 >
                   Tất cả nhiệm vụ ({quests.length})
@@ -123,7 +123,7 @@ export const QuestWorldMapView: React.FC<QuestWorldMapViewProps> = ({ onShowToas
                     setIsFilterDropdownOpen(false);
                   }}
                   className={`w-full text-left px-3 py-2 hover:bg-slate-50 ${
-                    filterType === 'active' ? 'text-emerald-600 font-black' : 'text-slate-700'
+                    filterType === 'active' ? 'text-[#58a700] font-black' : 'text-slate-700'
                   }`}
                 >
                   Đang diễn ra ({quests.filter((q) => q.status === 'active').length})
@@ -134,7 +134,7 @@ export const QuestWorldMapView: React.FC<QuestWorldMapViewProps> = ({ onShowToas
                     setIsFilterDropdownOpen(false);
                   }}
                   className={`w-full text-left px-3 py-2 hover:bg-slate-50 ${
-                    filterType === 'completed' ? 'text-emerald-600 font-black' : 'text-slate-700'
+                    filterType === 'completed' ? 'text-[#58a700] font-black' : 'text-slate-700'
                   }`}
                 >
                   Đã hoàn thành (0)
@@ -170,11 +170,11 @@ export const QuestWorldMapView: React.FC<QuestWorldMapViewProps> = ({ onShowToas
                 onClick={() => setSelectedQuest(q)}
               >
                 {/* Vòng tròn gợn sóng phát sáng (Glowing Ping Pulse) */}
-                <span className="absolute -inset-4 rounded-full bg-emerald-400 animate-ping opacity-60 pointer-events-none" />
-                <span className="absolute -inset-2 rounded-full bg-emerald-500/30 animate-pulse pointer-events-none" />
+                <span className="absolute -inset-4 rounded-full bg-[#7be548] animate-ping opacity-60 pointer-events-none" />
+                <span className="absolute -inset-2 rounded-full bg-[#58cc02]/30 animate-pulse pointer-events-none" />
 
                 {/* Biểu tượng Ghim nhiệm vụ màu xanh lá (Khớp chuẩn Ảnh 1) */}
-                <div className="relative w-12 h-12 rounded-full bg-gradient-to-b from-emerald-400 to-emerald-600 border-[3px] border-white flex items-center justify-center text-white shadow-2xl transition-transform duration-200 group-hover:scale-125 group-active:scale-95">
+                <div className="relative w-12 h-12 rounded-full bg-gradient-to-b from-[#72df1d] to-[#58cc02] border-[3px] border-white flex items-center justify-center text-white shadow-2xl transition-transform duration-200 group-hover:scale-125 group-active:scale-95">
                   <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
                     <MapPin className="w-5 h-5 fill-white text-white drop-shadow-md" />
                   </div>

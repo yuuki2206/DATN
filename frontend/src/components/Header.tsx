@@ -88,7 +88,7 @@ export const Header = ({ onOpenAiModal, onLaunchBattle }: HeaderProps) => {
         {/* Start Lesson Button */}
         <button
           onClick={onLaunchBattle}
-          className="flex items-center gap-2 bg-[#1368ce] hover:bg-[#0f52a5] text-white px-4 py-2 rounded-xl font-bold text-xs shadow-md shadow-blue-500/20 active:scale-95 transition"
+          className="flex items-center gap-2 bg-[#b34f34] hover:bg-[#963e28] text-white px-4 py-2 rounded-xl font-bold text-xs shadow-md shadow-blue-500/20 active:scale-95 transition"
         >
           <Rocket className="w-4 h-4" />
           <span>Bắt đầu bài học</span>

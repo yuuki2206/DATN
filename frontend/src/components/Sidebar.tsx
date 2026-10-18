@@ -1,177 +1,58 @@
 import React, { useState } from 'react';
-import {
-  Home,
-  Compass,
-  FolderOpen,
-  BarChart2,
-  Users,
-  Sparkles,
-  HelpCircle,
-  ChevronLeft,
-  ChevronRight,
-  MapPin,
-} from 'lucide-react';
+import { Home, Compass, FolderOpen, BarChart2, Users, Sparkles, HelpCircle, ChevronLeft, ChevronRight, MapPin, X, BookOpen, Crown } from 'lucide-react';
 
 interface SidebarProps {
   activeTab: string;
   onSelectTab: (tabId: string) => void;
   onOpenAiModal: () => void;
+  mobileOpen?: boolean;
+  onCloseMobile?: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({
-  activeTab,
-  onSelectTab,
-  onOpenAiModal,
-}) => {
+export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onSelectTab, onOpenAiModal, mobileOpen = false, onCloseMobile }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-
   const navItems = [
-    {
-      id: 'home',
-      label: 'Trang chủ 3D',
-      icon: Home,
-    },
-    {
-      id: 'quests',
-      label: 'Bản đồ Nhiệm vụ',
-      icon: MapPin,
-      badge: 'Mới',
-      badgeColor: 'bg-emerald-100 text-emerald-800',
-    },
-    {
-      id: 'discover',
-      label: 'Khám phá bài học',
-      icon: Compass,
-    },
-    {
-      id: 'library',
-      label: 'Thư viện',
-      icon: FolderOpen,
-    },
-    {
-      id: 'reports',
-      label: 'Báo cáo',
-      icon: BarChart2,
-    },
-    {
-      id: 'groups',
-      label: 'Nhóm lớp',
-      icon: Users,
-      badge: 'Lớp 7A1',
-    },
-    {
-      id: 'ai_tools',
-      label: 'Học liệu AI',
-      icon: Sparkles,
-      isAi: true,
-      badge: 'AI',
-    },
+    { id: 'home', label: 'Tổng quan', icon: Home },
+    { id: 'discover', label: 'Khám phá bài học', icon: Compass },
+    { id: 'quests', label: 'Bản đồ nhiệm vụ', icon: MapPin },
+    { id: 'library', label: 'Thư viện học liệu', icon: FolderOpen },
+    { id: 'reports', label: 'Báo cáo & thống kê', icon: BarChart2 },
+    { id: 'groups', label: 'Học sinh & lớp học', icon: Users },
   ];
-
+  const choose = (id: string) => { onSelectTab(id); onCloseMobile?.(); };
   return (
-    <aside
-      className={`bg-white/95 backdrop-blur-xl border-r border-slate-200/80 flex flex-col justify-between transition-all duration-300 z-40 shrink-0 ${
-        isCollapsed ? 'w-20' : 'w-60'
-      } h-full shadow-xs`}
-    >
-      <div>
-        {/* Logo / Header Branding */}
-        <div className="p-4 border-b border-slate-100 flex items-center justify-between">
-          {!isCollapsed ? (
-            <div className="flex items-center gap-2.5">
-              <div className="flex items-center gap-1 bg-gradient-to-br from-[#46178f] to-indigo-800 text-white px-2.5 py-1.5 rounded-xl font-black text-sm tracking-tight shadow-md shadow-purple-900/15">
-                <span>Đông A</span>
-                <span className="bg-gradient-to-r from-[#ff3355] to-amber-500 text-[9px] px-1.5 py-0.5 rounded-md font-black uppercase tracking-wider">
-                  EDU
-                </span>
-              </div>
-              <div className="leading-tight">
-                <span className="text-xs font-extrabold text-slate-900 block">Lịch sử 7</span>
-                <span className="text-[10px] text-slate-400 font-semibold">Command Center</span>
-              </div>
-            </div>
-          ) : (
-            <div className="mx-auto flex items-center justify-center w-10 h-10 bg-gradient-to-br from-[#46178f] to-indigo-800 text-white rounded-xl font-black text-sm shadow-md">
-              ĐA
-            </div>
-          )}
-
-          {/* Nút thu gọn / mở rộng */}
-          <button
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition hidden md:block"
-            title={isCollapsed ? 'Mở rộng menu' : 'Thu gọn menu'}
-          >
-            {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-          </button>
+    <>
+      {mobileOpen && <button className="fixed inset-0 bg-slate-900/40 z-[65] lg:hidden" onClick={onCloseMobile} aria-label="Đóng menu điều hướng" />}
+      <aside className={`app-sidebar mobile-sidepanel flex flex-col justify-between shrink-0 transition-[width,transform] duration-300 ${isCollapsed ? 'lg:w-[90px]' : 'lg:w-[254px]'} w-[260px] ${mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} overflow-y-auto`}>
+        <div>
+          <div className="px-4 pt-6 pb-5 flex items-center justify-between gap-2">
+            {!isCollapsed && <span className="sidebar-caption">DÀNH CHO GIÁO VIÊN</span>}
+            <button className="lg:hidden p-2 text-[#777] rounded-xl" aria-label="Đóng menu" onClick={onCloseMobile}><X className="w-5 h-5" /></button>
+            <button className="hidden lg:flex p-2 text-[#777] hover:bg-[#f4f4f4] rounded-xl ml-auto" onClick={() => setIsCollapsed(!isCollapsed)} title={isCollapsed ? 'Mở rộng menu' : 'Thu gọn menu'}>{isCollapsed ? <ChevronRight className="w-5 h-5"/> : <ChevronLeft className="w-5 h-5"/>}</button>
+          </div>
+          <nav aria-label="Điều hướng giáo viên" className="px-3 space-y-1.5">
+            {navItems.map(({id,label,icon:Icon}) => <button key={id} type="button" onClick={() => choose(id)} aria-current={activeTab === id ? 'page' : undefined} title={isCollapsed ? label : undefined} className="app-nav-item w-full flex items-center gap-3 px-3 py-3 text-[13px] font-extrabold tracking-wide">
+              <Icon className="w-[21px] h-[21px] shrink-0" strokeWidth={2.5} />{!isCollapsed && <span className="truncate">{label}</span>}
+            </button>)}
+          </nav>
+          <div className="mx-3 mt-5 pt-4 border-t border-[#e9e9e9]">
+            <button type="button" onClick={() => {onOpenAiModal(); onCloseMobile?.();}} title="Tạo học liệu AI" className="app-nav-item w-full flex items-center gap-3 px-3 py-3 text-[13px] font-extrabold text-[#8a54d6]">
+              <Sparkles className="w-[21px] h-[21px] shrink-0" />{!isCollapsed && <span>Trợ lý AI giáo viên</span>}
+            </button>
+          </div>
         </div>
-
-        {/* Danh sách mục menu chính */}
-        <nav className="p-2.5 space-y-1 mt-1">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
-
-            return (
-              <button
-                key={item.id}
-                onClick={() => {
-                  if (item.isAi) {
-                    onOpenAiModal();
-                  } else {
-                    onSelectTab(item.id);
-                  }
-                }}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 group relative ${
-                  isActive
-                    ? 'bg-gradient-to-r from-[#46178f] to-indigo-700 text-white shadow-md shadow-purple-900/20'
-                    : item.isAi
-                    ? 'bg-purple-50/70 text-purple-800 hover:bg-purple-100/80 border border-purple-200/60'
-                    : 'text-slate-600 hover:bg-slate-100/90 hover:text-slate-900'
-                }`}
-                title={isCollapsed ? item.label : undefined}
-              >
-                <Icon
-                  className={`w-4 h-4 shrink-0 transition-transform duration-200 group-hover:scale-110 ${
-                    isActive ? 'text-white' : item.isAi ? 'text-purple-600' : 'text-slate-500'
-                  }`}
-                />
-
-                {!isCollapsed && (
-                  <div className="flex-1 flex items-center justify-between text-left">
-                    <span className="truncate">{item.label}</span>
-                    {item.badge && (
-                      <span
-                        className={`text-[10px] px-1.5 py-0.5 rounded-md font-extrabold ${
-                          isActive
-                            ? 'bg-white/20 text-white'
-                            : item.isAi
-                            ? 'bg-purple-600 text-white'
-                            : 'bg-slate-100 text-slate-600'
-                        }`}
-                      >
-                        {item.badge}
-                      </span>
-                    )}
-                  </div>
-                )}
-              </button>
-            );
-          })}
-        </nav>
-      </div>
-
-      {/* Chân trang Sidebar (Trợ giúp) */}
-      <div className="p-3 border-t border-slate-100">
-        <button
-          onClick={() => onSelectTab('help')}
-          className="w-full flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl text-xs font-semibold transition"
-          title={isCollapsed ? 'Trợ giúp' : undefined}
-        >
-          <HelpCircle className="w-4 h-4 text-slate-400 shrink-0" />
-          {!isCollapsed && <span>Trợ giúp & SGK 7</span>}
-        </button>
-      </div>
-    </aside>
+        <div className="px-3 pb-6 pt-4 space-y-3">
+          {!isCollapsed && <div className="sidebar-promo">
+            <div className="text-3xl mb-2" aria-hidden="true">🏆</div>
+            <p className="text-[14px] font-extrabold text-[#4b4b4b]">Lan tỏa tình yêu lịch sử!</p>
+            <p className="text-[11px] leading-relaxed text-[#818181] mt-1">Mỗi bài học là một hành trình chinh phục mới.</p>
+            <div className="mt-3 rounded-full h-2 bg-[#e6e6e6] overflow-hidden"><div className="h-full bg-[#58cc02] w-[72%] rounded-full" /></div>
+            <span className="block mt-2 text-[10px] font-bold text-[#58a700]">Tiến độ lớp 7A1 · 72%</span>
+          </div>}
+          <button onClick={() => choose('help')} className="app-nav-item w-full flex items-center gap-3 px-3 py-3 text-[13px] font-extrabold" title="Trợ giúp & SGK 7"><HelpCircle className="w-[21px] h-[21px] shrink-0" />{!isCollapsed && <span>Trợ giúp & SGK 7</span>}</button>
+          {!isCollapsed && <div className="flex items-center gap-2 px-3 text-[10px] text-[#aaa] font-bold"><BookOpen className="w-3.5 h-3.5"/><span>ĐÔNG A EDU • LỊCH SỬ 7</span><Crown className="w-3.5 h-3.5 ml-auto text-[#ffc800]"/></div>}
+        </div>
+      </aside>
+    </>
   );
 };

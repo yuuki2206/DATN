@@ -31,7 +31,7 @@ export const MoveToFolderModal: React.FC<MoveToFolderModalProps> = ({
         {/* Header */}
         <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-[#1368ce]">
+            <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-[#b34f34]">
               <Folder className="w-5 h-5" />
             </div>
             <div>
@@ -66,7 +66,7 @@ export const MoveToFolderModal: React.FC<MoveToFolderModalProps> = ({
               </div>
               <span className="text-xs font-bold text-slate-800">Không đưa vào thư mục (Chung)</span>
             </div>
-            {selectedFolderId === null && <Check className="w-4 h-4 text-[#1368ce]" />}
+            {selectedFolderId === null && <Check className="w-4 h-4 text-[#b34f34]" />}
           </div>
 
           {/* List of folders */}
@@ -98,7 +98,7 @@ export const MoveToFolderModal: React.FC<MoveToFolderModalProps> = ({
                     )}
                   </div>
                 </div>
-                {isSelected && <Check className="w-4 h-4 text-[#1368ce]" />}
+                {isSelected && <Check className="w-4 h-4 text-[#b34f34]" />}
               </div>
             );
           })}
@@ -119,7 +119,7 @@ export const MoveToFolderModal: React.FC<MoveToFolderModalProps> = ({
               onMoveToFolder(selectedFolderId);
               onClose();
             }}
-            className="px-5 py-2 bg-[#1368ce] hover:bg-[#0f52a5] text-white rounded-xl text-xs font-bold shadow-xs active:scale-95 transition"
+            className="px-5 py-2 bg-[#b34f34] hover:bg-[#963e28] text-white rounded-xl text-xs font-bold shadow-xs active:scale-95 transition"
           >
             Xác nhận chuyển
           </button>

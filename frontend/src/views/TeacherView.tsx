@@ -15,6 +15,7 @@ import {
   ArrowRight,
   Bell,
   Layers,
+  Menu,
 } from 'lucide-react';
 import { AiQuizModal } from '../components/AiQuizModal';
 import { TextbookModal } from '../components/TextbookModal';
@@ -31,7 +32,6 @@ import {
   CircularCarousel,
   SpotlightCard,
   TiltedCard,
-  ShinyText,
   MagneticButton,
   DONG_A_CAROUSEL_ITEMS,
 } from '../components/reactbits';
@@ -108,8 +108,9 @@ interface TeacherViewProps {
 
 export const TeacherView: React.FC<TeacherViewProps> = ({ onShowToast }) => {
   const [activeTab, setActiveTab] = useState<string>('home');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeCourseTab, setActiveCourseTab] = useState<'session' | 'course'>('session');
-  const [show3DCarousel, setShow3DCarousel] = useState<boolean>(true);
+  const [show3DCarousel, setShow3DCarousel] = useState<boolean>(false);
   const [isAiModalOpen, setIsAiModalOpen] = useState(false);
   const [isTextbookModalOpen, setIsTextbookModalOpen] = useState(false);
   const [isCreateQuizOpen, setIsCreateQuizOpen] = useState(false);
@@ -204,9 +205,11 @@ export const TeacherView: React.FC<TeacherViewProps> = ({ onShowToast }) => {
   };
 
   return (
-    <div className="flex flex-1 min-h-0 overflow-hidden font-sans text-slate-800 bg-[#f6f7fb] awwwards-dot-grid">
+    <div className="page-shell flex flex-1 min-h-0 overflow-hidden font-sans text-slate-800">
       {/* 1. Sidebar bên trái */}
       <Sidebar
+        mobileOpen={mobileMenuOpen}
+        onCloseMobile={() => setMobileMenuOpen(false)}
         activeTab={activeTab}
         onSelectTab={(tabId) => {
           setActiveTab(tabId);
@@ -232,28 +235,29 @@ export const TeacherView: React.FC<TeacherViewProps> = ({ onShowToast }) => {
       {/* 2. Vùng nội dung chính */}
       <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
         {/* Header trên cùng */}
-        <header className="bg-white/90 backdrop-blur-xl border-b border-slate-200/80 px-6 py-2.5 flex items-center justify-between sticky top-0 z-30 shadow-2xs shrink-0">
-          <div className="flex items-center gap-3">
-            <h1 className="text-sm font-extrabold text-slate-900 tracking-tight">
+        <header className="app-header border-b px-4 sm:px-6 py-3 flex items-center justify-between gap-3 sticky top-0 z-30 shrink-0">
+          <div className="flex items-center gap-3 min-w-0">
+            <button type="button" className="lg:hidden p-2 -ml-1 rounded-lg text-[#214639] hover:bg-[#f0e7d8]" aria-label="Mở menu" onClick={() => setMobileMenuOpen(true)}><Menu className="w-5 h-5" /></button>
+            <h1 className="text-[13px] sm:text-[14px] font-extrabold text-[#253a31] tracking-tight truncate">
               {activeTab === 'library'
                 ? 'Thư viện Học liệu Số'
                 : activeTab === 'quests'
                 ? 'Bản đồ Nhiệm vụ (Quests)'
                 : 'Bảng điều khiển Giảng viên'}
             </h1>
-            <span className="bg-purple-100 text-[#46178f] text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-purple-200/60">
+            <span className="hidden sm:inline-flex bg-[#eef0e5] text-[#47634e] text-[10px] font-bold px-2.5 py-1 rounded-md border border-[#d6dfd1]">
               Lớp 7A1
             </span>
           </div>
 
-          <div className="flex items-center gap-3.5">
+          <div className="flex items-center gap-2 sm:gap-3.5 shrink-0">
             {/* Search Bar */}
             <div className="relative w-64 hidden md:block">
               <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
                 placeholder="Tìm bài giảng, câu hỏi, tài liệu..."
-                className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#46178f]/20 transition"
+                className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#205344]/20 transition"
               />
             </div>
 
@@ -333,40 +337,26 @@ export const TeacherView: React.FC<TeacherViewProps> = ({ onShowToast }) => {
           />
         ) : (
           /* GIAO DIỆN TRANG CHỦ DASHBOARD GIẢNG VIÊN NÂNG CẤP (ReactBits + Awwwards) */
-          <main className="flex-1 p-6 lg:p-8 max-w-6xl w-full mx-auto space-y-6 overflow-y-auto">
-            {/* Banner quảng bá trên cùng với SpotlightCard & MagneticButton */}
-            <SpotlightCard
-              spotlightColor="rgba(124, 58, 237, 0.14)"
-              className="bg-white/95 backdrop-blur-md border-2 border-purple-200/80 rounded-3xl p-5 shadow-sm"
-            >
-              <div className="flex flex-wrap items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#46178f] to-indigo-700 text-white flex items-center justify-center shrink-0 shadow-md shadow-purple-900/20">
-                    <Sparkles className="w-6 h-6 text-amber-300" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2 mb-0.5">
-                      <span className="text-[10px] font-black uppercase tracking-widest text-purple-700 bg-purple-100 px-2 py-0.5 rounded-full">
-                         <ShinyText text="AI LEARNING STUDIO • GDPT 2018" className="text-purple-800" />
-                      </span>
-                    </div>
-                    <h2 className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
-                      Nâng cao kết quả học tập Lịch sử 7 cùng Đông A EDU
-                    </h2>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      Bộ học liệu tương tác 3D, RAG AI chuẩn SGK Kết Nối Tri Thức và phân tích năng lực BKT theo thời gian thực.
-                    </p>
-                  </div>
+          <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-[1480px] w-full mx-auto space-y-7 overflow-y-auto">
+            <section className="duo-teacher-hero animate-slide-up">
+              <div className="duo-teacher-hero-copy">
+                <span className="duo-teacher-eyebrow">👋 CHÀO MỪNG THẦY CÔ TRỞ LẠI!</span>
+                <h2>Học Sử thật vui,<br/><span>dạy Sử thật hay!</span></h2>
+                <p>Khơi dậy hào khí Đông A qua những bài học tương tác, trò chơi và trợ lý AI thông minh.</p>
+                <div className="flex flex-wrap gap-3 mt-6">
+                  <button type="button" onClick={() => setIsAiModalOpen(true)} className="duo-white-button"><Sparkles size={18}/> TẠO BÀI HỌC AI</button>
+                  <button type="button" onClick={() => setActiveTab('library')} className="duo-outline-white-button"><BookOpen size={18}/> THƯ VIỆN HỌC LIỆU</button>
                 </div>
-                <MagneticButton
-                  onClick={() => setIsAiModalOpen(true)}
-                  className="px-5 py-2.5 bg-gradient-to-r from-[#46178f] to-indigo-700 hover:from-[#381075] hover:to-indigo-800 text-white rounded-xl text-xs font-bold shadow-md shadow-purple-900/20 active:scale-95 transition whitespace-nowrap flex items-center gap-2 cursor-pointer"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                  <span>Khám phá Trình tạo AI</span>
-                </MagneticButton>
               </div>
-            </SpotlightCard>
+              <div className="duo-teacher-art" aria-hidden="true"><span className="duo-teacher-spark-one">✦</span><span className="duo-teacher-art-emoji">📚</span><span className="duo-teacher-spark-two">✳</span><span className="duo-teacher-art-dragon">🐉</span></div>
+            </section>
+
+            <section aria-label="Tổng quan lớp học" className="grid grid-cols-2 xl:grid-cols-4 gap-4">
+              <div className="stat-tile stat-tile-blue"><div className="stat-icon">👩‍🎓</div><div className="stat-kicker">Học sinh trong lớp</div><strong>35 <small>học sinh</small></strong></div>
+              <div className="stat-tile stat-tile-green"><div className="stat-icon">✅</div><div className="stat-kicker">Đã hoàn thành bài tập</div><strong>32/35 <small>lượt học</small></strong></div>
+              <div className="stat-tile stat-tile-yellow"><div className="stat-icon">🎯</div><div className="stat-kicker">Tỷ lệ trả lời đúng</div><strong>85% <small>bài gần nhất</small></strong></div>
+              <div className="stat-tile stat-tile-purple"><div className="stat-icon">🏆</div><div className="stat-kicker">Hành trình khám phá</div><strong>13 <small>chặng</small></strong></div>
+            </section>
 
             {/* ReactBits 3D Circular Carousel cho Giảng viên */}
             {show3DCarousel && (
@@ -387,31 +377,27 @@ export const TeacherView: React.FC<TeacherViewProps> = ({ onShowToast }) => {
 
             {/* Hàng 4 thẻ công cụ cho nhà giáo dục với ReactBits TiltedCard 3D */}
             <div>
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="font-extrabold text-slate-800 text-sm tracking-tight">
-                  Thanh công cụ tương tác cho nhà giáo dục
-                </h3>
-                <span className="text-[11px] text-slate-400 font-medium">
-                  Di chuột lên thẻ để trải nghiệm hiệu ứng 3D Tilt
-                </span>
+              <div className="flex flex-wrap items-end justify-between gap-2 mb-4">
+                <div><p className="app-section-label mb-1.5">KHÔNG GIAN LÀM VIỆC</p><h3 className="font-editorial font-bold text-[#3c3c3c] text-[22px]">Công cụ dành cho thầy cô</h3></div>
+                <span className="text-[11px] text-[#7b8577] font-medium">Chọn một công cụ để bắt đầu <ArrowRight className="inline w-3.5 h-3.5" /></span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* Thẻ 1: Trình tạo AI */}
                 <TiltedCard
                   onClick={() => setIsAiModalOpen(true)}
-                  className="bg-gradient-to-br from-[#381075] to-[#24094e] text-white p-4.5 rounded-2xl cursor-pointer shadow-md border border-white/10 h-38 group"
+                  className="duo-tool-card duo-tool-purple p-5 cursor-pointer group"
                 >
                   <div className="flex flex-col justify-between h-full">
                     <div>
-                      <div className="w-8 h-8 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center mb-2.5">
-                        <Sparkles className="w-4 h-4 text-amber-300" />
+                      <div className="duo-tool-icon flex items-center justify-center mb-3">
+                        <Sparkles className="w-5 h-5" />
                       </div>
-                      <h4 className="font-extrabold text-xs mb-1">Trình tạo AI</h4>
-                      <p className="text-[11px] text-purple-200 leading-snug line-clamp-2">
+                      <h4 className="font-extrabold text-[14px] text-[#4b4b4b] mb-1">Trình tạo AI</h4>
+                      <p className="text-[11px] text-[#888] leading-[1.6] line-clamp-2">
                         Tiết kiệm thời gian và tạo đề trắc nghiệm bằng AI chuẩn SGK 7.
                       </p>
                     </div>
-                    <span className="text-[11px] font-bold text-amber-300 flex items-center gap-1 group-hover:translate-x-1 transition">
+                    <span className="text-[11px] font-black text-[#1cb0f6] flex items-center gap-1 group-hover:translate-x-1 transition">
                       Bắt đầu ngay <ArrowRight className="w-3 h-3" />
                     </span>
                   </div>
@@ -420,19 +406,19 @@ export const TeacherView: React.FC<TeacherViewProps> = ({ onShowToast }) => {
                 {/* Thẻ 2: Khám phá Bản đồ Nhiệm vụ */}
                 <TiltedCard
                   onClick={() => setActiveTab('quests')}
-                  className="bg-gradient-to-br from-[#46178f] to-[#311068] text-white p-4.5 rounded-2xl cursor-pointer shadow-md border border-white/10 h-38 group"
+                  className="duo-tool-card duo-tool-yellow p-5 cursor-pointer group"
                 >
                   <div className="flex flex-col justify-between h-full">
                     <div>
-                      <div className="w-8 h-8 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center mb-2.5">
-                        <Compass className="w-4 h-4 text-emerald-300" />
+                      <div className="duo-tool-icon flex items-center justify-center mb-3">
+                        <Compass className="w-5 h-5" />
                       </div>
-                      <h4 className="font-extrabold text-xs mb-1">Bản đồ Nhiệm vụ</h4>
-                      <p className="text-[11px] text-purple-200 leading-snug line-clamp-2">
+                      <h4 className="font-extrabold text-[14px] text-[#4b4b4b] mb-1">Bản đồ Nhiệm vụ</h4>
+                      <p className="text-[11px] text-[#888] leading-[1.6] line-clamp-2">
                         Khám phá hành trình 13 ải Tháp Pha Lê và theo dõi tiến độ cả lớp.
                       </p>
                     </div>
-                    <span className="text-[11px] font-bold text-emerald-300 flex items-center gap-1 group-hover:translate-x-1 transition">
+                    <span className="text-[11px] font-black text-[#1cb0f6] flex items-center gap-1 group-hover:translate-x-1 transition">
                       Mở bản đồ <ArrowRight className="w-3 h-3" />
                     </span>
                   </div>
@@ -441,19 +427,19 @@ export const TeacherView: React.FC<TeacherViewProps> = ({ onShowToast }) => {
                 {/* Thẻ 3: Thư viện Sử liệu */}
                 <TiltedCard
                   onClick={() => setActiveTab('library')}
-                  className="bg-gradient-to-br from-[#51239c] to-[#391675] text-white p-4.5 rounded-2xl cursor-pointer shadow-md border border-white/10 h-38 group"
+                  className="duo-tool-card duo-tool-blue p-5 cursor-pointer group"
                 >
                   <div className="flex flex-col justify-between h-full">
                     <div>
-                      <div className="w-8 h-8 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center mb-2.5">
-                        <BookOpen className="w-4 h-4 text-sky-300" />
+                      <div className="duo-tool-icon flex items-center justify-center mb-3">
+                        <BookOpen className="w-5 h-5" />
                       </div>
-                      <h4 className="font-extrabold text-xs mb-1">Thư viện Sử liệu</h4>
-                      <p className="text-[11px] text-purple-200 leading-snug line-clamp-2">
+                      <h4 className="font-extrabold text-[14px] text-[#4b4b4b] mb-1">Thư viện Sử liệu</h4>
+                      <p className="text-[11px] text-[#888] leading-[1.6] line-clamp-2">
                         Tra cứu nhanh bài Quiz, câu chuyện và thư mục tài liệu.
                       </p>
                     </div>
-                    <span className="text-[11px] font-bold text-sky-300 flex items-center gap-1 group-hover:translate-x-1 transition">
+                    <span className="text-[11px] font-black text-[#1cb0f6] flex items-center gap-1 group-hover:translate-x-1 transition">
                       Mở thư viện <ArrowRight className="w-3 h-3" />
                     </span>
                   </div>
@@ -462,19 +448,19 @@ export const TeacherView: React.FC<TeacherViewProps> = ({ onShowToast }) => {
                 {/* Thẻ 4: Báo cáo Lớp học */}
                 <TiltedCard
                   onClick={handleExportExcel}
-                  className="bg-gradient-to-br from-[#240046] to-[#140028] text-white p-4.5 rounded-2xl cursor-pointer shadow-md border border-white/10 h-38 group"
+                  className="duo-tool-card duo-tool-green p-5 cursor-pointer group"
                 >
                   <div className="flex flex-col justify-between h-full">
                     <div>
-                      <div className="w-8 h-8 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center mb-2.5">
-                        <BarChart2 className="w-4 h-4 text-pink-300" />
+                      <div className="duo-tool-icon flex items-center justify-center mb-3">
+                        <BarChart2 className="w-5 h-5" />
                       </div>
-                      <h4 className="font-extrabold text-xs mb-1">Báo cáo lớp học</h4>
-                      <p className="text-[11px] text-purple-200 leading-snug line-clamp-2">
+                      <h4 className="font-extrabold text-[14px] text-[#4b4b4b] mb-1">Báo cáo lớp học</h4>
+                      <p className="text-[11px] text-[#888] leading-[1.6] line-clamp-2">
                         Theo dõi tỷ lệ đúng/sai và mức độ hiểu bài của 35 học sinh.
                       </p>
                     </div>
-                    <span className="text-[11px] font-bold text-pink-300 flex items-center gap-1 group-hover:translate-x-1 transition">
+                    <span className="text-[11px] font-black text-[#1cb0f6] flex items-center gap-1 group-hover:translate-x-1 transition">
                       Xem báo cáo <ArrowRight className="w-3 h-3" />
                     </span>
                   </div>
@@ -485,7 +471,7 @@ export const TeacherView: React.FC<TeacherViewProps> = ({ onShowToast }) => {
             {/* Danh sách việc cần làm với SpotlightCard */}
             <SpotlightCard
               spotlightColor="rgba(16, 185, 129, 0.08)"
-              className="bg-white rounded-3xl border border-slate-200/90 p-5 shadow-xs"
+              className="surface-card p-5"
             >
               <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-2">
                 <div className="flex items-center gap-2">
@@ -499,7 +485,7 @@ export const TeacherView: React.FC<TeacherViewProps> = ({ onShowToast }) => {
                 </div>
                 <button
                   onClick={() => setIsTodoListModalOpen(true)}
-                  className="text-xs font-bold text-[#46178f] hover:underline"
+                  className="text-xs font-bold text-[#205344] hover:underline"
                 >
                   Xem tất cả các đầu việc
                 </button>
@@ -523,7 +509,7 @@ export const TeacherView: React.FC<TeacherViewProps> = ({ onShowToast }) => {
                             className={`w-6 h-6 rounded-full border-2 flex items-center justify-center cursor-pointer transition shrink-0 ${
                               isDone
                                 ? 'border-emerald-500 bg-emerald-500 text-white'
-                                : 'border-slate-300 bg-white hover:border-[#46178f]'
+                                : 'border-slate-300 bg-white hover:border-[#205344]'
                             }`}
                             title={isDone ? 'Đánh dấu chưa hoàn thành' : 'Đánh dấu hoàn thành'}
                           >
@@ -548,7 +534,7 @@ export const TeacherView: React.FC<TeacherViewProps> = ({ onShowToast }) => {
                         </div>
                         <button
                           onClick={() => handleExecuteAction(task.actionType)}
-                          className="w-8 h-8 rounded-full bg-slate-100 hover:bg-[#46178f] hover:text-white text-slate-500 flex items-center justify-center transition shrink-0"
+                          className="w-8 h-8 rounded-full bg-slate-100 hover:bg-[#205344] hover:text-white text-slate-500 flex items-center justify-center transition shrink-0"
                           title={task.actionLabel || 'Chi tiết'}
                         >
                           <ChevronRight className="w-4 h-4" />
@@ -564,7 +550,7 @@ export const TeacherView: React.FC<TeacherViewProps> = ({ onShowToast }) => {
               {/* Cột trái 8 phần: Phiên khoá học & Bài giảng của bạn */}
               <SpotlightCard
                 spotlightColor="rgba(70, 23, 143, 0.08)"
-                className="lg:col-span-8 bg-white rounded-3xl border border-slate-200/90 p-5 shadow-xs"
+                className="lg:col-span-8 surface-card p-5"
               >
                 {/* Tab Header */}
                 <div className="flex items-center gap-4 border-b border-slate-200 pb-2 mb-4 text-xs font-bold">
@@ -572,7 +558,7 @@ export const TeacherView: React.FC<TeacherViewProps> = ({ onShowToast }) => {
                     onClick={() => setActiveCourseTab('session')}
                     className={`pb-2 transition border-b-2 ${
                       activeCourseTab === 'session'
-                        ? 'border-[#46178f] text-[#46178f] font-black'
+                        ? 'border-[#205344] text-[#205344] font-black'
                         : 'border-transparent text-slate-500 hover:text-slate-800'
                     }`}
                   >
@@ -582,7 +568,7 @@ export const TeacherView: React.FC<TeacherViewProps> = ({ onShowToast }) => {
                     onClick={() => setActiveCourseTab('course')}
                     className={`pb-2 transition border-b-2 ${
                       activeCourseTab === 'course'
-                        ? 'border-[#46178f] text-[#46178f] font-black'
+                        ? 'border-[#205344] text-[#205344] font-black'
                         : 'border-transparent text-slate-500 hover:text-slate-800'
                     }`}
                   >
@@ -612,7 +598,7 @@ export const TeacherView: React.FC<TeacherViewProps> = ({ onShowToast }) => {
 
                   <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 mb-5 font-medium">
                     <span className="flex items-center gap-1.5">
-                      <Users className="w-3.5 h-3.5 text-[#46178f]" />
+                      <Users className="w-3.5 h-3.5 text-[#205344]" />
                       Lớp 7A1 (35 học sinh)
                     </span>
                     <span>•</span>
@@ -625,7 +611,7 @@ export const TeacherView: React.FC<TeacherViewProps> = ({ onShowToast }) => {
                   <div className="flex flex-wrap items-center gap-2.5 pt-3 border-t border-slate-200">
                     <MagneticButton
                       onClick={() => handleLaunchLesson()}
-                      className="flex items-center gap-2 bg-[#1368ce] hover:bg-[#0f52a5] text-white px-5 py-2.5 rounded-xl font-bold text-xs shadow-md shadow-blue-500/20 active:scale-95 transition cursor-pointer"
+                      className="primary-cta flex items-center gap-2 px-5 py-2.5 text-xs"
                     >
                       <Play className="w-4 h-4 fill-white" />
                       <span>Bắt đầu bài giảng</span>
@@ -644,7 +630,7 @@ export const TeacherView: React.FC<TeacherViewProps> = ({ onShowToast }) => {
 
                     <button
                       onClick={() => setIsAiModalOpen(true)}
-                      className="flex items-center gap-1.5 px-4 py-2.5 bg-purple-50 hover:bg-purple-100 border border-purple-200 text-[#46178f] rounded-xl text-xs font-bold transition"
+                      className="flex items-center gap-1.5 px-4 py-2.5 bg-purple-50 hover:bg-purple-100 border border-purple-200 text-[#205344] rounded-xl text-xs font-bold transition"
                     >
                       <Sparkles className="w-3.5 h-3.5 text-purple-600" />
                       <span>Tạo đề bằng AI</span>
@@ -658,7 +644,7 @@ export const TeacherView: React.FC<TeacherViewProps> = ({ onShowToast }) => {
                 {/* Box 1: Tạo bài trắc nghiệm mới */}
                 <SpotlightCard
                   spotlightColor="rgba(19, 104, 206, 0.1)"
-                  className="bg-white rounded-3xl border border-slate-200/90 p-5 shadow-xs text-center"
+                  className="surface-card p-5 text-center"
                 >
                   <h4 className="font-extrabold text-xs text-slate-900 mb-1">
                     Bài giảng của bạn
@@ -668,7 +654,7 @@ export const TeacherView: React.FC<TeacherViewProps> = ({ onShowToast }) => {
                   </p>
                   <button
                     onClick={() => setIsCreateQuizOpen(true)}
-                    className="w-full py-2.5 bg-[#1368ce] hover:bg-[#0f52a5] text-white rounded-xl text-xs font-bold shadow-xs active:scale-95 transition"
+                    className="primary-cta w-full py-2.5 text-xs"
                   >
                     Tạo bài giảng mới
                   </button>
@@ -677,7 +663,7 @@ export const TeacherView: React.FC<TeacherViewProps> = ({ onShowToast }) => {
                 {/* Box 2: Báo cáo mới nhất */}
                 <SpotlightCard
                   spotlightColor="rgba(16, 185, 129, 0.1)"
-                  className="bg-white rounded-3xl border border-slate-200/90 p-5 shadow-xs"
+                  className="surface-card p-5"
                 >
                   <div className="flex items-center justify-between mb-3">
                     <h4 className="font-extrabold text-xs text-slate-900">
@@ -685,7 +671,7 @@ export const TeacherView: React.FC<TeacherViewProps> = ({ onShowToast }) => {
                     </h4>
                     <button
                       onClick={handleExportExcel}
-                      className="text-[11px] font-bold text-[#46178f] hover:underline"
+                      className="text-[11px] font-bold text-[#205344] hover:underline"
                     >
                       Xem tất cả (1)
                     </button>

@@ -181,7 +181,7 @@ export const QuizCreatorView: React.FC<QuizCreatorViewProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-[#1e1b4b] text-slate-800 font-sans select-none overflow-hidden animate-in fade-in duration-150">
+    <div className="fixed inset-0 z-50 flex flex-col bg-[#f7f7f7] text-slate-800 font-sans select-none overflow-hidden animate-in fade-in duration-150">
       {/* ======================================================== */}
       {/* 1. Header trên cùng (Khớp chuẩn Ảnh 1 & 2) */}
       {/* ======================================================== */}
@@ -189,7 +189,7 @@ export const QuizCreatorView: React.FC<QuizCreatorViewProps> = ({
         {/* Left: Brand + Title input + Settings + Save status */}
         <div className="flex items-center gap-3.5">
           {/* Logo Đông A EDU */}
-          <div className="flex items-center gap-1 bg-[#46178f] text-white px-2.5 py-1 rounded-lg font-black text-xs tracking-tight shadow-2xs">
+          <div className="flex items-center gap-1 bg-[#58cc02] text-white px-2.5 py-1 rounded-lg font-black text-xs tracking-tight shadow-2xs">
             <span>Đông A</span>
             <span className="bg-[#ff3355] text-[9px] px-1 py-0.2 rounded font-bold uppercase">
               EDU
@@ -203,7 +203,7 @@ export const QuizCreatorView: React.FC<QuizCreatorViewProps> = ({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Nhập tiêu đề quiz..."
-              className="px-3 py-1 bg-slate-50 hover:bg-slate-100/80 focus:bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#46178f]/20 w-64 md:w-80 transition"
+              className="px-3 py-1 bg-slate-50 hover:bg-slate-100/80 focus:bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#205344]/20 w-64 md:w-80 transition"
             />
             <button
               onClick={() => {
@@ -255,7 +255,7 @@ export const QuizCreatorView: React.FC<QuizCreatorViewProps> = ({
           {/* Lưu Quiz (Xanh dương như ảnh 1) */}
           <button
             onClick={handleSave}
-            className="px-4 py-1.5 bg-[#1368ce] hover:bg-[#0f52a5] text-white rounded-lg text-xs font-bold shadow-md shadow-blue-500/20 active:scale-95 transition"
+            className="px-4 py-1.5 bg-[#58cc02] hover:bg-[#58a700] text-white rounded-lg text-xs font-bold shadow-md shadow-blue-500/20 active:scale-95 transition"
           >
             Lưu
           </button>
@@ -280,7 +280,7 @@ export const QuizCreatorView: React.FC<QuizCreatorViewProps> = ({
                   onClick={() => setActiveQuestionIndex(idx)}
                   className={`p-2 rounded-xl cursor-pointer transition border-2 flex flex-col gap-1 relative group ${
                     isActive
-                      ? 'border-[#1368ce] bg-blue-50/50 shadow-xs'
+                      ? 'border-[#58a700] bg-blue-50/50 shadow-xs'
                       : 'border-slate-200 bg-white hover:border-slate-300'
                   }`}
                 >
@@ -335,7 +335,7 @@ export const QuizCreatorView: React.FC<QuizCreatorViewProps> = ({
           <div className="p-2.5 border-t border-slate-100 space-y-2">
             <button
               onClick={() => handleAddQuestion('quiz')}
-              className="w-full py-2 bg-[#1368ce] hover:bg-[#0f52a5] text-white rounded-xl text-xs font-bold shadow-xs active:scale-95 transition flex items-center justify-center gap-1.5"
+              className="w-full py-2 bg-[#58cc02] hover:bg-[#58a700] text-white rounded-xl text-xs font-bold shadow-xs active:scale-95 transition flex items-center justify-center gap-1.5"
             >
               <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
               <span>Thêm</span>
@@ -350,7 +350,7 @@ export const QuizCreatorView: React.FC<QuizCreatorViewProps> = ({
                   handleAddQuestion('quiz');
                 }
               }}
-              className="w-full py-2 bg-white hover:bg-purple-50 text-[#46178f] border border-purple-300 rounded-xl text-xs font-bold shadow-2xs active:scale-95 transition flex items-center justify-center gap-1.5"
+              className="w-full py-2 bg-white hover:bg-purple-50 text-[#58a700] border border-purple-300 rounded-xl text-xs font-bold shadow-2xs active:scale-95 transition flex items-center justify-center gap-1.5"
             >
               <Sparkles className="w-3.5 h-3.5 text-purple-600 animate-pulse" />
               <span>Tạo</span>
@@ -401,14 +401,14 @@ export const QuizCreatorView: React.FC<QuizCreatorViewProps> = ({
                 className="bg-white/80 hover:bg-white backdrop-blur-md border-2 border-dashed border-slate-300 hover:border-purple-400 rounded-2xl p-6 text-center cursor-pointer shadow-lg transition flex flex-col items-center justify-center gap-2 group"
               >
                 {/* Icon phương tiện */}
-                <div className="w-12 h-12 rounded-2xl bg-purple-100 group-hover:bg-purple-200 text-[#46178f] flex items-center justify-center transition">
+                <div className="w-12 h-12 rounded-2xl bg-purple-100 group-hover:bg-purple-200 text-[#58a700] flex items-center justify-center transition">
                   <Plus className="w-6 h-6 stroke-[2.5]" />
                 </div>
                 <h4 className="font-extrabold text-xs text-slate-800 mt-1">
                   Tìm và chèn phương tiện truyền thông
                 </h4>
                 <p className="text-[11px] text-slate-500">
-                  <span className="text-[#1368ce] font-bold underline">Tải tệp tin lên</span> hoặc bấm để chọn ảnh sử liệu mẫu
+                  <span className="text-[#b34f34] font-bold underline">Tải tệp tin lên</span> hoặc bấm để chọn ảnh sử liệu mẫu
                 </p>
               </div>
             )}
@@ -488,7 +488,7 @@ export const QuizCreatorView: React.FC<QuizCreatorViewProps> = ({
                 }`}
               >
                 {/* Shape Lam */}
-                <div className="w-10 h-10 rounded-xl bg-[#1368ce] flex items-center justify-center shrink-0 text-white font-black shadow-xs">
+                <div className="w-10 h-10 rounded-xl bg-[#58cc02] flex items-center justify-center shrink-0 text-white font-black shadow-xs">
                   <span className="text-sm">◆</span>
                 </div>
                 <input
@@ -651,7 +651,7 @@ export const QuizCreatorView: React.FC<QuizCreatorViewProps> = ({
                       setQuestions((prev) => prev.map((q) => ({ ...q, timeLimit: currentQ.timeLimit })));
                       onShowToast(`⏱️ Đã áp dụng ${currentQ.timeLimit}s cho tất cả câu hỏi!`);
                     }}
-                    className="text-[11px] text-[#1368ce] hover:underline font-bold mt-1 inline-block"
+                    className="text-[11px] text-[#b34f34] hover:underline font-bold mt-1 inline-block"
                   >
                     Áp dụng cho tất cả câu hỏi
                   </button>
@@ -736,7 +736,7 @@ export const QuizCreatorView: React.FC<QuizCreatorViewProps> = ({
                           key={t.id}
                           onClick={() => setThemeId(t.id)}
                           className={`rounded-xl overflow-hidden cursor-pointer border-2 transition relative ${
-                            themeId === t.id ? 'border-[#1368ce] ring-2 ring-blue-300' : 'border-slate-200 hover:border-slate-400'
+                            themeId === t.id ? 'border-[#58a700] ring-2 ring-blue-300' : 'border-slate-200 hover:border-slate-400'
                           }`}
                         >
                           <div className={`h-12 w-full ${t.bgGradient}`} />
@@ -762,7 +762,7 @@ export const QuizCreatorView: React.FC<QuizCreatorViewProps> = ({
                           key={t.id}
                           onClick={() => setThemeId(t.id)}
                           className={`rounded-xl overflow-hidden cursor-pointer border-2 transition relative ${
-                            themeId === t.id ? 'border-[#1368ce] ring-2 ring-blue-300' : 'border-slate-200 hover:border-slate-400'
+                            themeId === t.id ? 'border-[#58a700] ring-2 ring-blue-300' : 'border-slate-200 hover:border-slate-400'
                           }`}
                         >
                           <div className={`h-12 w-full ${t.bgGradient}`} />
@@ -783,7 +783,7 @@ export const QuizCreatorView: React.FC<QuizCreatorViewProps> = ({
           <button
             onClick={() => setRightPanelTab(rightPanelTab === 'theme' ? null : 'theme')}
             className={`p-2 rounded-xl transition flex flex-col items-center gap-1 ${
-              rightPanelTab === 'theme' ? 'bg-[#ebf3fe] text-[#1368ce]' : 'text-slate-500 hover:bg-slate-100'
+              rightPanelTab === 'theme' ? 'bg-[#ebf3fe] text-[#b34f34]' : 'text-slate-500 hover:bg-slate-100'
             }`}
             title="Giao diện"
           >
@@ -794,7 +794,7 @@ export const QuizCreatorView: React.FC<QuizCreatorViewProps> = ({
           <button
             onClick={() => setRightPanelTab(rightPanelTab === 'properties' ? null : 'properties')}
             className={`p-2 rounded-xl transition flex flex-col items-center gap-1 ${
-              rightPanelTab === 'properties' ? 'bg-[#ebf3fe] text-[#1368ce]' : 'text-slate-500 hover:bg-slate-100'
+              rightPanelTab === 'properties' ? 'bg-[#ebf3fe] text-[#b34f34]' : 'text-slate-500 hover:bg-slate-100'
             }`}
             title="Thuộc tính"
           >
