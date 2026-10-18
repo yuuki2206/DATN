@@ -114,7 +114,7 @@ export const CreateQuizModal: React.FC<CreateQuizModalProps> = ({
         {/* Header */}
         <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-purple-100 flex items-center justify-center text-[#46178f]">
+            <div className="w-9 h-9 rounded-xl bg-purple-100 flex items-center justify-center text-[#205344]">
               <HelpCircle className="w-5 h-5" />
             </div>
             <div>
@@ -143,7 +143,7 @@ export const CreateQuizModal: React.FC<CreateQuizModalProps> = ({
                 onClose();
                 onOpenAiGenerator();
               }}
-              className="px-3 py-1.5 bg-[#46178f] hover:bg-[#381075] text-white rounded-lg text-xs font-bold shrink-0 transition"
+              className="px-3 py-1.5 bg-[#205344] hover:bg-[#1b4236] text-white rounded-lg text-xs font-bold shrink-0 transition"
             >
               Dùng AI tạo đề
             </button>
@@ -159,7 +159,7 @@ export const CreateQuizModal: React.FC<CreateQuizModalProps> = ({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="VD: Bài 13: Ba lần kháng chiến chống Mông - Nguyên..."
-              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#46178f]/20 focus:border-[#46178f] transition"
+              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#205344]/20 focus:border-[#205344] transition"
               autoFocus
             />
           </div>
@@ -173,7 +173,7 @@ export const CreateQuizModal: React.FC<CreateQuizModalProps> = ({
               <select
                 value={selectedFolderId}
                 onChange={(e) => setSelectedFolderId(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#46178f]/20 transition"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#205344]/20 transition"
               >
                 <option value="">-- Chưa phân loại --</option>
                 {folders.map((f) => (
@@ -191,7 +191,7 @@ export const CreateQuizModal: React.FC<CreateQuizModalProps> = ({
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value as 'draft' | 'ready')}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#46178f]/20 transition"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#205344]/20 transition"
               >
                 <option value="ready">Sẵn sàng giảng dạy</option>
                 <option value="draft">Bản nháp</option>
@@ -208,7 +208,7 @@ export const CreateQuizModal: React.FC<CreateQuizModalProps> = ({
               <button
                 type="button"
                 onClick={handleAddQuestion}
-                className="flex items-center gap-1 text-xs font-bold text-[#1368ce] hover:underline"
+                className="flex items-center gap-1 text-xs font-bold text-[#b34f34] hover:underline"
               >
                 <Plus className="w-3.5 h-3.5" /> Thêm câu hỏi
               </button>
@@ -282,7 +282,7 @@ export const CreateQuizModal: React.FC<CreateQuizModalProps> = ({
             <button
               type="submit"
               disabled={!title.trim()}
-              className="px-5 py-2 bg-[#1368ce] hover:bg-[#0f52a5] disabled:opacity-50 text-white rounded-xl text-xs font-bold shadow-xs active:scale-95 transition"
+              className="px-5 py-2 bg-[#b34f34] hover:bg-[#963e28] disabled:opacity-50 text-white rounded-xl text-xs font-bold shadow-xs active:scale-95 transition"
             >
               Lưu bài Quiz
             </button>

@@ -101,7 +101,7 @@ export const QuestDetailMapView: React.FC<QuestDetailMapViewProps> = ({
           {/* Nút thêm ải mới (+) */}
           <button
             onClick={handleAddNewObjective}
-            className="w-8 h-8 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center transition shadow-xs"
+            className="w-8 h-8 rounded-xl bg-[#58cc02] hover:bg-[#58a700] text-white flex items-center justify-center transition shadow-xs"
             title="Thêm ải thử thách mới"
           >
             <Plus className="w-4 h-4 stroke-[3]" />
@@ -243,7 +243,7 @@ export const QuestDetailMapView: React.FC<QuestDetailMapViewProps> = ({
               >
                 {/* Hiệu ứng xung nhịp (Pulse) nếu là ải hiện tại */}
                 {isCurrent && (
-                  <span className="absolute -inset-3 rounded-full bg-emerald-400 animate-ping opacity-60 pointer-events-none" />
+                  <span className="absolute -inset-3 rounded-full bg-[#7be548] animate-ping opacity-60 pointer-events-none" />
                 )}
 
                 {/* Vòng tròn Icon Ải (Khớp chuẩn viền xanh lá & icon trắng như ảnh 2) */}
@@ -254,7 +254,7 @@ export const QuestDetailMapView: React.FC<QuestDetailMapViewProps> = ({
                       : obj.type === 'boss'
                       ? 'bg-amber-500 text-white'
                       : isCompleted
-                      ? 'bg-emerald-500 text-white'
+                      ? 'bg-[#58cc02] text-white'
                       : 'bg-[#10b981] text-white'
                   }`}
                 >
@@ -269,7 +269,7 @@ export const QuestDetailMapView: React.FC<QuestDetailMapViewProps> = ({
 
                 {/* Dấu Checkmark xanh nhỏ gắn góc phải nếu ải đã xong */}
                 {isCompleted && (
-                  <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-white text-emerald-600 border border-emerald-500 flex items-center justify-center shadow-xs">
+                  <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-white text-[#58a700] border border-emerald-500 flex items-center justify-center shadow-xs">
                     <Check className="w-2.5 h-2.5 stroke-[3]" />
                   </div>
                 )}

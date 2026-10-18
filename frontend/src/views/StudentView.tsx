@@ -19,7 +19,8 @@ import {
   Flame,
   Gem,
   RotateCcw,
-  Layers,
+  Menu,
+  X,
 } from 'lucide-react';
 import { StudentQuizModal } from '../components/StudentQuizModal';
 import { QuestsModal } from '../components/QuestsModal';
@@ -29,7 +30,6 @@ import { QuestWorldMapView } from './QuestWorldMapView';
 import {
   CircularCarousel,
   SpotlightCard,
-  TiltedCard,
   ShinyText,
   MagneticButton,
   DONG_A_CAROUSEL_ITEMS,
@@ -121,7 +121,9 @@ export const StudentView: React.FC<StudentViewProps> = ({ onShowToast }) => {
   const [activeTab, setActiveTab] = useState<
     'learn' | 'quests' | 'bkt_path' | 'shop' | 'profile' | 'leaderboard' | 'ai_chat'
   >('learn');
-  const [show3DCarousel, setShow3DCarousel] = useState(true);
+  const [show3DCarousel, setShow3DCarousel] = useState(false);
+  const [lessonFinished, setLessonFinished] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isQuizModalOpen, setIsQuizModalOpen] = useState(false);
   const [isQuestsModalOpen, setIsQuestsModalOpen] = useState(false);
   const [isShopModalOpen, setIsShopModalOpen] = useState(false);
@@ -340,403 +342,133 @@ export const StudentView: React.FC<StudentViewProps> = ({ onShowToast }) => {
 
   const handleQuizComplete = (score: number) => {
     setStudentPoints((prev) => prev + score * 60);
+    if (score >= 2) setLessonFinished(true);
     onShowToast(
       `🎉 Tuyệt vời! Em đã đạt ${score}/3 câu đúng và nhận thêm +${score * 60} điểm!`
     );
   };
 
   return (
-    <div className="flex flex-1 min-h-0 overflow-hidden font-sans text-slate-800 bg-[#f6f7fb] awwwards-dot-grid">
-      {/* 1. Student Sidebar */}
-      <aside className="w-64 bg-white/95 backdrop-blur-xl border-r border-slate-200/80 flex flex-col justify-between shrink-0 h-full shadow-xs">
+    <div className="page-shell flex flex-1 min-h-0 overflow-hidden font-sans text-slate-800">
+      {/* Điều hướng học sinh: phong cách học tập desktop */}
+      {mobileMenuOpen && <button className="fixed inset-0 z-[65] lg:hidden bg-slate-900/40" aria-label="Đóng menu" onClick={() => setMobileMenuOpen(false)} />}
+      <aside className={`app-sidebar mobile-sidepanel w-[260px] lg:w-[254px] ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} transition-transform duration-300 flex flex-col justify-between shrink-0 overflow-y-auto`}>
         <div>
-          {/* Brand Header */}
-          <div className="p-4 border-b border-slate-100 flex items-center gap-2.5">
-            <div className="flex items-center gap-1 bg-gradient-to-br from-emerald-600 to-teal-700 text-white px-2.5 py-1.5 rounded-xl font-black text-sm shadow-md shadow-emerald-900/15">
-              <span>Đông A</span>
-              <span className="bg-amber-400 text-slate-950 text-[9px] px-1.5 py-0.5 rounded-md font-black uppercase">
-                EDU
-              </span>
-            </div>
-            <div>
-              <span className="text-xs font-extrabold text-slate-900 block">Lịch sử 7</span>
-              <span className="text-[10px] text-emerald-700 font-bold bg-emerald-50 border border-emerald-200/60 px-1.5 py-0.5 rounded-md">
-                Interactive Hub
-              </span>
-            </div>
-          </div>
-
-          {/* Navigation Menu */}
-          <nav className="p-2.5 space-y-1.5 mt-1">
-            {navItems.map((item) => {
+          <div className="px-6 pt-8 pb-5 flex items-center justify-between gap-2"><span className="sidebar-caption">HỌC TẬP MỖI NGÀY</span><button type="button" className="lg:hidden p-2 rounded-xl" aria-label="Đóng menu" onClick={() => setMobileMenuOpen(false)}><X size={20}/></button></div>
+          <nav className="px-3 space-y-1.5" aria-label="Điều hướng học sinh">
+            {navItems.map(item => {
               const Icon = item.icon;
-              const isActive = activeTab === item.id;
-
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => {
-                    setActiveTab(item.id as typeof activeTab);
-                    if (item.id === 'quests') setIsQuestsModalOpen(true);
-                    if (item.id === 'shop') setIsShopModalOpen(true);
-                    if (item.id === 'profile') setIsProfileModalOpen(true);
-                  }}
-                  className={`w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-2xl text-xs font-black uppercase tracking-wider transition-all duration-200 group relative ${
-                    isActive
-                      ? 'border-2 border-sky-400 bg-sky-50/90 text-sky-700 shadow-xs'
-                      : 'border-2 border-transparent text-slate-700 hover:bg-slate-100/80 hover:text-slate-900'
-                  }`}
-                >
-                  <div className="w-6 h-6 flex items-center justify-center shrink-0">
-                    <Icon className="w-5 h-5 transition-transform duration-200 group-hover:scale-110" />
-                  </div>
-
-                  <div className="flex-1 flex items-center justify-between text-left">
-                    <span className="truncate">{item.label}</span>
-                    {item.badge && (
-                      <span
-                        className={`text-[10px] px-1.5 py-0.5 rounded-md font-bold tracking-normal ${
-                          item.badgeColor || 'bg-slate-100 text-slate-600'
-                        }`}
-                      >
-                        {item.badge}
-                      </span>
-                    )}
-                  </div>
-                </button>
-              );
+              return <button key={item.id} type="button" aria-current={activeTab === item.id ? 'page' : undefined}
+                onClick={() => {setActiveTab(item.id as typeof activeTab); if (item.id === 'quests') setIsQuestsModalOpen(true); if (item.id === 'shop') setIsShopModalOpen(true); if (item.id === 'profile') setIsProfileModalOpen(true); setMobileMenuOpen(false);}}
+                className="app-nav-item w-full flex items-center gap-3 px-3 py-3 text-[13px] font-extrabold tracking-wide">
+                <Icon className="w-[22px] h-[22px] shrink-0"/>
+                <span className="flex-1 truncate text-left">{item.id === 'learn' ? 'Học ngay' : item.id === 'bkt_path' ? 'Luyện tập cá nhân' : item.id === 'quests' ? 'Nhiệm vụ' : item.id === 'leaderboard' ? 'Bảng xếp hạng' : item.id === 'shop' ? 'Cửa hàng' : item.id === 'profile' ? 'Hồ sơ của em' : 'Trợ lý AI'}</span>
+                {item.id === 'ai_chat' && <span className="duo-nav-new">AI</span>}
+              </button>;
             })}
           </nav>
         </div>
-
-        {/* Student Mini Card at Bottom */}
-        <div className="p-3 border-t border-slate-100">
-          <TiltedCard
-            maxTilt={6}
-            onClick={() => setIsProfileModalOpen(true)}
-            className="p-3 bg-gradient-to-br from-emerald-50 to-teal-50/70 border border-emerald-200/80 rounded-2xl cursor-pointer shadow-2xs"
-          >
-            <div className="flex items-center gap-3">
-              <img
-                src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=100&q=80"
-                alt="Nguyễn Văn Long"
-                className="w-10 h-10 rounded-xl object-cover border-2 border-emerald-500 shadow-xs"
-              />
-              <div className="leading-tight">
-                <span className="font-extrabold text-xs text-slate-900 block truncate">
-                  Nguyễn Văn Long
-                </span>
-                <span className="text-[10px] text-emerald-800 font-bold block">
-                  Lớp 7A1 • Hạng 1 tuần
-                </span>
-              </div>
-            </div>
-          </TiltedCard>
+        <div className="px-3 pb-6 pt-5 space-y-3">
+          <div className="sidebar-promo"><div className="flex items-center justify-between"><span className="text-3xl" aria-hidden="true">🔥</span><span className="text-[#ff9600] font-black text-xl">{studentStreak} ngày</span></div><strong className="block mt-2 text-[13px] text-[#4b4b4b]">Chuỗi ngày chăm chỉ</strong><p className="text-[11px] text-[#888] mt-1 leading-relaxed">Đừng bỏ lỡ bài học hôm nay để giữ ngọn lửa nhé!</p><div className="flex gap-1.5 mt-3">{['T2','T3','T4','T5','T6','T7','CN'].map((d,i)=><span key={d} className={`duo-streak-day ${i<6 ? 'is-done':''}`}>{i<6 ? '✓':d}</span>)}</div></div>
+          <button type="button" onClick={() => setIsProfileModalOpen(true)} className="duo-profile-tile"><span className="duo-avatar">L</span><span className="flex-1 min-w-0 text-left"><strong className="block truncate">Nguyễn Văn Long</strong><small>Học sinh · Lớp 7A1</small></span><ChevronRight size={16}/></button>
         </div>
       </aside>
 
       {/* 2. Main Student Area */}
       <div className="flex-1 flex flex-col min-w-0 h-full overflow-y-auto">
-        {/* Student Top Stats Header */}
-        <header className="bg-white/90 backdrop-blur-xl border-b border-slate-200/80 px-6 py-3 flex items-center justify-between sticky top-0 z-30 shadow-2xs">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-extrabold text-slate-900 tracking-tight">
-                Bài 13: Ba lần kháng chiến chống Mông - Nguyên
-              </span>
-              <span className="bg-emerald-100 text-emerald-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-emerald-200/60">
-                Lớp 7A1
-              </span>
-            </div>
+        {/* Thanh thành tích luôn hiển thị trên desktop */}
+        <header className="app-header border-b px-4 lg:px-8 py-3 sticky top-0 z-30 flex items-center justify-between gap-4 shrink-0">
+          <div className="flex items-center gap-3 min-w-0">
+            <button className="lg:hidden p-2 text-[#777]" onClick={() => setMobileMenuOpen(true)} aria-label="Mở menu"><Menu size={20}/></button>
+            <span className="text-[22px]" aria-hidden="true">📜</span>
+            <div className="min-w-0"><strong className="block truncate text-[13px] font-black text-[#4b4b4b]">Lịch sử 7 · Hào khí Đông A</strong><span className="hidden sm:block text-[10px] font-bold text-[#aaa]">Ba lần kháng chiến chống Mông – Nguyên</span></div>
           </div>
-
-          {/* Game Status Counters (Hearts, Streak, Gems) */}
-          <div className="flex items-center gap-3">
-            {activeTab === 'learn' && (
-              <button
-                type="button"
-                onClick={() => setShow3DCarousel((v) => !v)}
-                className={`hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-xs border transition ${
-                  show3DCarousel
-                    ? 'bg-amber-50 border-amber-300 text-amber-800'
-                    : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
-                }`}
-              >
-                <Layers className="w-3.5 h-3.5 text-amber-600" />
-                <span>{show3DCarousel ? 'Ẩn Sa bàn 3D' : 'Hiện Sa bàn 3D'}</span>
-              </button>
-            )}
-
-            {/* Streak */}
-            <div
-              className="flex items-center gap-1.5 bg-orange-50 border border-orange-200 px-3 py-1.5 rounded-xl font-black text-xs text-orange-600 cursor-pointer shadow-2xs"
-              title="Chuỗi ngày học liên tục"
-            >
-              <Flame className="w-4 h-4 fill-orange-500 text-orange-500 animate-bounce" />
-              <span>{studentStreak} Ngày</span>
-            </div>
-
-            {/* Gems / Points */}
-            <div
-              className="flex items-center gap-1.5 bg-sky-50 border border-sky-200 px-3 py-1.5 rounded-xl font-black text-xs text-sky-600 cursor-pointer shadow-2xs"
-              title="Điểm tích lũy cá nhân"
-              onClick={() => setIsShopModalOpen(true)}
-            >
-              <Gem className="w-4 h-4 fill-sky-500 text-sky-500" />
-              <span>{studentPoints.toLocaleString()}</span>
-            </div>
-
-            {/* Hearts */}
-            <div
-              className="flex items-center gap-1.5 bg-rose-50 border border-rose-200 px-3 py-1.5 rounded-xl font-black text-xs text-rose-600 cursor-pointer shadow-2xs"
-              title="Tim / Năng lượng học tập"
-            >
-              <Heart className="w-4 h-4 fill-rose-500 text-rose-500" />
-              <span>{studentHearts}/5</span>
-            </div>
-
-            {/* Quick Action: Làm bài ngay */}
-            <MagneticButton
-              onClick={() => setIsQuizModalOpen(true)}
-              className="flex items-center gap-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold text-xs px-4 py-2 rounded-xl shadow-md shadow-emerald-500/20 active:scale-95 transition cursor-pointer"
-            >
-              <Swords className="w-4 h-4" />
-              <span>Làm bài ngay</span>
-            </MagneticButton>
+          <div className="duo-top-stats">
+            <div className="duo-top-stat" title="Chuỗi ngày học liên tục"><Flame size={23} className="text-[#ff9600] fill-[#ff9600]"/><b className="text-[#ff9600]">{studentStreak}</b></div>
+            <button type="button" onClick={() => setIsShopModalOpen(true)} className="duo-top-stat" title="Điểm XP và quà"><Gem size={23} className="text-[#1cb0f6] fill-[#8cdefd]"/><b className="text-[#1cb0f6]">{studentPoints.toLocaleString()}</b></button>
+            <div className="duo-top-stat" title="Năng lượng"><Heart size={23} className="text-[#ff4b4b] fill-[#ff4b4b]"/><b className="text-[#ff4b4b]">{studentHearts}</b></div>
+            <button type="button" onClick={() => setIsQuizModalOpen(true)} className="duo-header-cta hidden lg:flex"><Swords size={16}/> HỌC NGAY</button>
           </div>
         </header>
 
-        {/* Tab 1: BÀI HỌC 3D - ReactBits Circular Carousel + Interactive Learning Path */}
         {activeTab === 'learn' && (
-          <main className="flex-1 p-6 max-w-6xl w-full mx-auto space-y-6">
-            {/* ReactBits 3D Circular Carousel Showcase */}
-            {show3DCarousel && (
-              <CircularCarousel
-                items={DONG_A_CAROUSEL_ITEMS}
-                variant="student"
-                primaryActionLabel="Hỏi Thầy Đông A về chặng này"
-                secondaryActionLabel="Vào Thi Đấu (+180đ)"
-                onPrimaryAction={(item) => {
-                  const question =
-                    item.promptSuggestion ||
-                    `Thầy giải thích giúp em về ${item.title} (${item.period}) với ạ!`;
-                  setActiveTab('ai_chat');
-                  sendQueryToAi(question);
-                  onShowToast(`💬 Đang hỏi Trợ lý AI Đông A về: "${item.title}"`);
-                }}
-                onSecondaryAction={() => {
-                  setIsQuizModalOpen(true);
-                }}
-              />
-            )}
-
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-              {/* Left 8 cols: Interactive Stepping Path */}
-              <SpotlightCard
-                spotlightColor="rgba(16, 185, 129, 0.1)"
-                className="lg:col-span-8 bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs"
-              >
-                <div className="mb-6 pb-4 border-b border-slate-100 flex items-center justify-between">
+          <main className="duo-home flex-1 w-full max-w-[1220px] mx-auto px-5 lg:px-8 py-7 lg:py-9">
+            <div className="duo-content-grid">
+              <div className="duo-learning-column min-w-0">
+                <div className="duo-greeting">
                   <div>
-                    <span className="text-[10px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2.5 py-0.5 rounded-full inline-block mb-1">
-                      LỘ TRÌNH BÀI HỌC • CHƯƠNG 2
-                    </span>
-                    <h2 className="text-lg font-black text-slate-900">
-                      Cuộc kháng chiến lần thứ hai (Năm 1285)
-                    </h2>
+                    <span className="duo-eyebrow">HÀNH TRÌNH LỊCH SỬ 7</span>
+                    <h1>Hôm nay mình học gì nhỉ? <span aria-hidden="true">✌️</span></h1>
+                    <p>Mỗi ngày một bài học, mỗi ngày thêm yêu Sử Việt!</p>
                   </div>
-                  <div className="text-right">
-                    <span className="text-xs font-bold text-slate-500 block">Tiến độ bài học</span>
-                    <strong className="text-sm font-black text-emerald-600">2 / 4 Chặng</strong>
+                  <span className="duo-greeting-mascot" aria-hidden="true">🐉</span>
+                </div>
+
+                <div className="duo-unit-banner">
+                  <div className="duo-unit-banner-copy">
+                    <span className="duo-unit-label">PHẦN 2 · CHẶNG 3</span>
+                    <h2>Hào khí Đông A</h2>
+                    <p>Ba lần kháng chiến chống quân Mông – Nguyên</p>
+                  </div>
+                  <button type="button" className="duo-guide-btn" onClick={() => setActiveTab('bkt_path')}><BookOpen size={17}/> SỔ TAY HỌC TẬP</button>
+                  <div className="duo-banner-decoration" aria-hidden="true">✦</div>
+                </div>
+
+                <div className="duo-progress-caption">
+                  <div className="flex items-center gap-2"><span className="duo-dot"/><strong>CHINH PHỤC LỊCH SỬ</strong></div>
+                  <span>{lessonFinished ? '3' : '2'}/4 chặng hoàn thành</span>
+                </div>
+                <div className="duo-progress-track" role="progressbar" aria-valuenow={lessonFinished ? 75 : 50} aria-valuemin={0} aria-valuemax={100} aria-label="Tiến độ chương"><span style={{ width: lessonFinished ? '75%' : '50%' }} /></div>
+
+                <div className="duo-path" aria-label="Lộ trình học Bài 13">
+                  <svg className="duo-path-line" viewBox="0 0 520 620" preserveAspectRatio="none" aria-hidden="true"><path d="M260 34 C258 90 115 94 138 166 S391 248 353 322 S129 393 166 464 S308 546 260 605" fill="none" stroke="#e6e6e6" strokeWidth="15" strokeLinecap="round" strokeDasharray="1 24"/></svg>
+                  <div className="duo-path-stop duo-path-stop--one">
+                    <button type="button" onClick={() => onShowToast('✅ Hội nghị Bình Than (1282): Em đã hoàn thành chặng này!')} className="duo-lesson-node duo-node-done" aria-label="Chặng 1 Hội nghị Bình Than đã hoàn thành"><CheckCircle2 size={34} strokeWidth={3}/></button>
+                    <div className="duo-path-node-text"><strong>Hội nghị Bình Than</strong><span>Hoàn thành · 3 sao</span></div>
+                  </div>
+                  <div className="duo-path-stop duo-path-stop--two">
+                    <button type="button" onClick={() => onShowToast('✅ Phòng tuyến Vạn Kiếp (1285): Em đã hoàn thành chặng này!')} className="duo-lesson-node duo-node-done" aria-label="Chặng 2 Phòng tuyến Vạn Kiếp đã hoàn thành"><CheckCircle2 size={34} strokeWidth={3}/></button>
+                    <div className="duo-path-node-text"><strong>Phòng tuyến Vạn Kiếp</strong><span>Hoàn thành · 3 sao</span></div>
+                  </div>
+                  <div className="duo-path-stop duo-path-stop--three">
+                    <span className="duo-start-label">{lessonFinished ? 'ĐÃ HOÀN THÀNH!' : 'BẮT ĐẦU!'}</span>
+                    <button type="button" onClick={() => setIsQuizModalOpen(true)} className={`duo-lesson-node duo-node-current ${lessonFinished ? 'duo-node-done' : ''}`} aria-label="Bắt đầu bài Chương Dương Độ"><Swords size={35} strokeWidth={2.8}/></button>
+                    <div className="duo-current-lesson-info"><span className="duo-lesson-badge">BÀI HỌC HÔM NAY</span><strong>Trận Chương Dương Độ</strong><span>1285 · +180 XP đang chờ em</span><button type="button" onClick={() => setIsQuizModalOpen(true)}>HỌC NGAY <ChevronRight size={17}/></button></div>
+                  </div>
+                  <div className="duo-path-stop duo-path-stop--four">
+                    <button type="button" onClick={() => lessonFinished ? setIsQuizModalOpen(true) : onShowToast('🔒 Hoàn thành bài Chương Dương Độ để mở khóa chặng tiếp theo.')} className={`duo-lesson-node ${lessonFinished ? 'duo-node-current' : 'duo-node-locked'}`} aria-label="Chặng 4 Giải phóng Thăng Long"><Lock size={29} strokeWidth={3}/></button>
+                    <div className="duo-path-node-text"><strong>Giải phóng Thăng Long</strong><span>{lessonFinished ? 'Đã mở khóa!' : 'Hoàn thành chặng trước để mở khóa'}</span></div>
+                  </div>
+                  <div className="duo-path-stop duo-path-stop--five">
+                    <button type="button" onClick={() => onShowToast('🔒 Sắp mở: Trận Bạch Đằng năm 1288!')} className="duo-lesson-node duo-node-locked" aria-label="Trận Bạch Đằng chưa mở khóa"><Trophy size={30} strokeWidth={2.8}/></button>
+                    <div className="duo-path-node-text"><strong>Thử thách Bạch Đằng</strong><span>Chặng tiếp theo · 1288</span></div>
                   </div>
                 </div>
 
-                {/* Stepping Path Nodes */}
-                <div className="relative py-4 flex flex-col items-center gap-8">
-                  {/* Node 1: Bình Than */}
-                  <div className="flex items-center gap-4 w-full max-w-md">
-                    <div className="w-16 h-16 rounded-full bg-emerald-500 text-white border-4 border-emerald-200 flex items-center justify-center font-black text-xl shadow-md shrink-0">
-                      <CheckCircle2 className="w-8 h-8" />
-                    </div>
-                    <div className="flex-1 bg-emerald-50/70 border border-emerald-200 p-3.5 rounded-2xl">
-                      <div className="flex justify-between items-center">
-                        <h4 className="font-extrabold text-xs text-emerald-950">
-                          Chặng 1: Hội nghị Bình Than (1282)
-                        </h4>
-                        <span className="text-amber-500 text-xs">⭐⭐⭐</span>
-                      </div>
-                      <p className="text-[11px] text-emerald-800 mt-0.5">
-                        Đã hoàn thành • Đạt 10/10 điểm • Bóp nát quả cam
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Connecting Line 1 */}
-                  <div className="w-1 h-6 bg-emerald-400 rounded-full" />
-
-                  {/* Node 2: Vạn Kiếp */}
-                  <div className="flex items-center gap-4 w-full max-w-md pl-6">
-                    <div className="w-16 h-16 rounded-full bg-emerald-500 text-white border-4 border-emerald-200 flex items-center justify-center font-black text-xl shadow-md shrink-0">
-                      <CheckCircle2 className="w-8 h-8" />
-                    </div>
-                    <div className="flex-1 bg-emerald-50/70 border border-emerald-200 p-3.5 rounded-2xl">
-                      <div className="flex justify-between items-center">
-                        <h4 className="font-extrabold text-xs text-emerald-950">
-                          Chặng 2: Phòng tuyến Vạn Kiếp (1285)
-                        </h4>
-                        <span className="text-amber-500 text-xs">⭐⭐⭐</span>
-                      </div>
-                      <p className="text-[11px] text-emerald-800 mt-0.5">
-                        Đã hoàn thành • Đạt 10/10 điểm • Kế sách lui quân
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Connecting Line 2 */}
-                  <div className="w-1 h-6 bg-emerald-400 rounded-full" />
-
-                  {/* Node 3: Chương Dương Độ (ACTIVE - PULSING) */}
-                  <div className="flex items-center gap-4 w-full max-w-md relative">
-                    <div
-                      onClick={() => setIsQuizModalOpen(true)}
-                      className="w-20 h-20 rounded-full bg-gradient-to-tr from-amber-400 to-orange-500 text-slate-950 border-4 border-amber-200 flex flex-col items-center justify-center font-black shadow-xl shadow-amber-500/30 shrink-0 cursor-pointer hover:scale-105 active:scale-95 transition animate-pulse"
-                    >
-                      <Swords className="w-8 h-8" />
-                      <span className="text-[9px] uppercase tracking-wider font-black">BẮT ĐẦU</span>
-                    </div>
-                    <TiltedCard
-                      maxTilt={5}
-                      className="flex-1 bg-gradient-to-r from-amber-50 to-orange-50/70 border-2 border-amber-300 p-4 rounded-2xl shadow-sm"
-                    >
-                      <div className="flex justify-between items-center">
-                        <h4 className="font-black text-xs text-slate-900">
-                          Chặng 3: Trận Chương Dương Độ (1285)
-                        </h4>
-                        <span className="bg-amber-400 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full uppercase">
-                          BÀI HỌC HÔM NAY
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-slate-600 mt-1">
-                        Phản công cắt đứt tiếp tế của giặc Ô Mã Nhi. Bộ 3 câu hỏi trắc nghiệm SGK.
-                      </p>
-                      <button
-                        onClick={() => setIsQuizModalOpen(true)}
-                        className="mt-2.5 flex items-center gap-1.5 px-3.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs rounded-xl shadow-xs transition"
-                      >
-                        <span>Vào làm bài thi đấu (+180đ)</span>
-                        <ChevronRight className="w-3.5 h-3.5" />
-                      </button>
-                    </TiltedCard>
-                  </div>
-
-                  {/* Connecting Line 3 */}
-                  <div className="w-1 h-6 bg-slate-300 rounded-full" />
-
-                  {/* Node 4: Thăng Long (LOCKED) */}
-                  <div className="flex items-center gap-4 w-full max-w-md opacity-60">
-                    <div className="w-16 h-16 rounded-full bg-slate-200 text-slate-400 border-4 border-slate-100 flex items-center justify-center font-black text-xl shrink-0">
-                      <Lock className="w-7 h-7" />
-                    </div>
-                    <div className="flex-1 bg-slate-50 border border-slate-200 p-3.5 rounded-2xl">
-                      <h4 className="font-bold text-xs text-slate-700">
-                        Chặng 4: Giải phóng Thăng Long (1285)
-                      </h4>
-                      <p className="text-[11px] text-slate-400 mt-0.5">
-                        Khóa 🔒 • Cần hoàn thành Chặng 3 để mở khóa
-                      </p>
-                    </div>
-                  </div>
+                <button type="button" className="duo-next-unit" onClick={() => setActiveTab('quests')}><span className="text-3xl" aria-hidden="true">🗺️</span><span><strong>Khám phá bản đồ chiến dịch</strong><small>Những nhiệm vụ mới đang chờ em!</small></span><ChevronRight size={22}/></button>
+                <div className="duo-carousel-section">
+                  <div className="flex items-center justify-between gap-3"><div><h3>Sa bàn lịch sử tương tác</h3><p>Xoay và khám phá các trận đánh thời Trần</p></div><button type="button" onClick={() => setShow3DCarousel(v => !v)} className="duo-link-btn">{show3DCarousel ? 'THU GỌN' : 'KHÁM PHÁ'} <ChevronRight size={15}/></button></div>
+                  {show3DCarousel && <div className="mt-5"><CircularCarousel items={DONG_A_CAROUSEL_ITEMS} variant="student" primaryActionLabel="Hỏi trợ lý AI về trận đánh" secondaryActionLabel="Luyện tập (+180 XP)" onPrimaryAction={item => { setActiveTab('ai_chat'); sendQueryToAi(item.promptSuggestion || `Hãy kể cho em về ${item.title} (${item.period})`); }} onSecondaryAction={() => setIsQuizModalOpen(true)} /></div>}
                 </div>
-              </SpotlightCard>
-
-              {/* Right 4 cols: Side widgets for student */}
-              <div className="lg:col-span-4 space-y-4">
-                {/* Daily Quests Widget */}
-                <SpotlightCard
-                  spotlightColor="rgba(245, 158, 11, 0.1)"
-                  className="bg-white rounded-3xl border border-slate-200/90 p-4 shadow-xs"
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <QuestChestIcon className="w-5 h-5" />
-                      <h3 className="font-extrabold text-xs text-slate-900 uppercase">
-                        Nhiệm vụ hôm nay
-                      </h3>
-                    </div>
-                    <button
-                      onClick={() => setIsQuestsModalOpen(true)}
-                      className="text-[11px] font-bold text-sky-600 hover:underline"
-                    >
-                      Xem tất cả
-                    </button>
-                  </div>
-
-                  <div className="space-y-2.5">
-                    <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs">
-                      <div className="flex justify-between items-center font-bold">
-                        <span className="text-slate-800">Chuỗi 5 câu đúng liên tiếp</span>
-                        <span className="text-emerald-600">+50đ</span>
-                      </div>
-                      <div className="w-full bg-slate-200 h-1.5 rounded-full mt-2 overflow-hidden">
-                        <div className="bg-emerald-500 h-full w-full" />
-                      </div>
-                    </div>
-
-                    <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs">
-                      <div className="flex justify-between items-center font-bold">
-                        <span className="text-slate-800">Làm bài Chương Dương Độ</span>
-                        <span className="text-amber-600">+100đ</span>
-                      </div>
-                      <div className="w-full bg-slate-200 h-1.5 rounded-full mt-2 overflow-hidden">
-                        <div className="bg-amber-500 h-full w-[80%]" />
-                      </div>
-                    </div>
-                  </div>
-                </SpotlightCard>
-
-                {/* Textbook Citation helper */}
-                <SpotlightCard
-                  spotlightColor="rgba(99, 102, 241, 0.1)"
-                  className="bg-white rounded-3xl border border-slate-200/90 p-4 shadow-xs"
-                >
-                  <div className="flex items-center gap-2 mb-2">
-                    <BookOpen className="w-4 h-4 text-indigo-600" />
-                    <h3 className="font-extrabold text-xs text-slate-900 uppercase">
-                      Ghi nhớ nhanh SGK 7
-                    </h3>
-                  </div>
-                  <div className="p-3 bg-amber-50/70 border border-amber-200 rounded-xl text-xs leading-relaxed text-slate-700">
-                    <p className="font-bold text-amber-950 mb-1">• Bình Than (1282):</p>
-                    <p className="text-[11px] text-slate-600 mb-2">
-                      Hội nghị vương hầu tướng lĩnh, Trần Quốc Toản bóp nát quả cam vì chưa đủ tuổi dự bàn việc quân.
-                    </p>
-                    <p className="font-bold text-amber-950 mb-1">• Diên Hồng (1285):</p>
-                    <p className="text-[11px] text-slate-600">
-                      Hội nghị bô lão cả nước đại diện nhân dân, đồng thanh hô "ĐÁNH!".
-                    </p>
-                  </div>
-                </SpotlightCard>
-
-                {/* Shop promotion card with TiltedCard */}
-                <TiltedCard
-                  maxTilt={7}
-                  className="bg-gradient-to-r from-sky-500 to-blue-600 text-white rounded-3xl p-4 shadow-md"
-                >
-                  <div className="flex items-center gap-2 mb-1">
-                    <Sparkles className="w-4 h-4 text-amber-300" />
-                    <span className="font-extrabold text-xs uppercase">Cửa hàng đổi quà</span>
-                  </div>
-                  <p className="text-[11px] text-sky-100 mb-3">
-                    Em đang có {studentPoints.toLocaleString()} điểm, đủ để đổi Bút chì lưu niệm Đông A!
-                  </p>
-                  <button
-                    onClick={() => setIsShopModalOpen(true)}
-                    className="w-full py-2 bg-white text-sky-700 font-extrabold text-xs rounded-xl shadow-xs hover:bg-sky-50 transition"
-                  >
-                    Đến Cửa Hàng Đổi Quà
-                  </button>
-                </TiltedCard>
               </div>
+
+              <aside className="duo-right-rail" aria-label="Thành tích và nhiệm vụ học tập">
+                <div className="duo-rail-header"><span>THÀNH TÍCH CỦA EM</span><button type="button" onClick={() => setActiveTab('leaderboard')}>XEM HẠNG <ChevronRight size={14}/></button></div>
+                <div className="duo-rail-card duo-league-card">
+                  <div className="duo-league-medal" aria-hidden="true">🏆</div>
+                  <div><strong>Hạng nhất tuần này!</strong><p>Em đang dẫn đầu lớp 7A1. Tiếp tục phát huy nhé!</p></div>
+                  <button type="button" onClick={() => setActiveTab('leaderboard')} className="duo-outline-button">XEM BẢNG XẾP HẠNG</button>
+                </div>
+                <div className="duo-rail-card duo-quests-card">
+                  <div className="duo-rail-title"><span>⚡</span><h3>Nhiệm vụ mỗi ngày</h3></div>
+                  <div className="duo-quest-row"><span className="duo-quest-emoji">🎯</span><div><strong>Hoàn thành một bài học</strong><div className="duo-mini-track"><span style={{width: lessonFinished ? '100%' : '0%'}}/></div><small>{lessonFinished ? '1' : '0'}/1 bài học</small></div></div>
+                  <div className="duo-quest-row"><span className="duo-quest-emoji">⭐</span><div><strong>Kiếm 50 XP hôm nay</strong><div className="duo-mini-track"><span style={{width: lessonFinished ? '100%' : '64%'}}/></div><small>{lessonFinished ? '50' : '32'}/50 XP</small></div></div>
+                  <div className="duo-quest-row"><span className="duo-quest-emoji">🔥</span><div><strong>Duy trì chuỗi ngày học</strong><div className="duo-mini-track"><span style={{width: '83%'}}/></div><small>{studentStreak}/7 ngày</small></div></div>
+                  <button type="button" onClick={() => setIsQuestsModalOpen(true)} className="duo-rail-link">XEM TẤT CẢ NHIỆM VỤ <ChevronRight size={15}/></button>
+                </div>
+                <div className="duo-rail-card duo-ai-card"><div className="duo-ai-illustration" aria-hidden="true">💬</div><div><strong>Bí kíp học Sử cùng AI!</strong><p>Chưa hiểu bài? Trợ lý Đông A luôn sẵn sàng giải thích cho em.</p></div><button type="button" onClick={() => setActiveTab('ai_chat')} className="duo-blue-button">HỎI TRỢ LÝ AI</button></div>
+                <div className="duo-rail-card duo-goal-card"><div className="duo-rail-title"><span>💎</span><h3>Kho báu của em</h3></div><p>Em có <b>{studentPoints.toLocaleString()} XP</b> tích lũy, đổi quà siêu thú vị nhé!</p><button type="button" onClick={() => setIsShopModalOpen(true)} className="duo-rail-link">ĐẾN CỬA HÀNG <ChevronRight size={15}/></button></div>
+              </aside>
             </div>
           </main>
         )}
@@ -765,7 +497,7 @@ export const StudentView: React.FC<StudentViewProps> = ({ onShowToast }) => {
 
               <div className="space-y-2">
                 {[
-                  { rank: 1, name: 'Nguyễn Văn Long (Em)', points: 1450, streak: 6, isMe: true },
+                  { rank: 1, name: 'Nguyễn Văn Long (Em)', points: studentPoints, streak: 6, isMe: true },
                   { rank: 2, name: 'Trần Quốc Anh', points: 1320, streak: 5, isMe: false },
                   { rank: 3, name: 'Lê Minh Thư', points: 1150, streak: 4, isMe: false },
                   { rank: 4, name: 'Phạm Đức Dũng', points: 980, streak: 3, isMe: false },
@@ -823,7 +555,7 @@ export const StudentView: React.FC<StudentViewProps> = ({ onShowToast }) => {
         {activeTab === 'bkt_path' && (
           <main className="flex-1 p-6 max-w-5xl w-full mx-auto space-y-6 overflow-y-auto">
             {/* Header Card */}
-            <div className="bg-gradient-to-r from-indigo-950 via-indigo-900 to-slate-900 text-white rounded-3xl p-6 shadow-xl border border-indigo-700/50 relative overflow-hidden">
+            <div className="bg-[#1cb0f6] text-white rounded-3xl p-6 shadow-xl border border-indigo-700/50 relative overflow-hidden">
               <div className="pointer-events-none absolute -top-24 -right-24 w-72 h-72 rounded-full bg-amber-400/10 blur-3xl" />
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
                 <div>
@@ -1028,7 +760,7 @@ export const StudentView: React.FC<StudentViewProps> = ({ onShowToast }) => {
           <main className="flex-1 p-4 sm:p-6 max-w-4xl w-full mx-auto flex flex-col h-[calc(100vh-130px)]">
             <div className="bg-white/95 backdrop-blur-2xl rounded-3xl border border-slate-200/80 shadow-[0_20px_60px_-15px_rgba(15,23,42,0.08)] flex-1 flex flex-col overflow-hidden relative">
               {/* Minimalist Architectural Header (No Robot Icon) */}
-              <div className="px-6 py-4 border-b border-white/10 bg-[#0b0f19] text-white flex items-center justify-between relative overflow-hidden">
+              <div className="px-6 py-4 border-b border-white/10 bg-[#58cc02] text-white flex items-center justify-between relative overflow-hidden">
                 <div className="pointer-events-none absolute -top-20 left-1/3 w-72 h-40 bg-amber-500/10 blur-3xl rounded-full" />
 
                 <div className="relative z-10 flex flex-col gap-0.5">
@@ -1037,7 +769,7 @@ export const StudentView: React.FC<StudentViewProps> = ({ onShowToast }) => {
                     <h3 className="font-black text-sm sm:text-base tracking-tight text-white">
                       Trợ Lý Sử Học Đông A
                     </h3>
-                    <span className="text-[10px] font-bold uppercase tracking-wider bg-white/10 text-amber-300 border border-amber-400/30 px-2.5 py-0.5 rounded-full">
+                    <span className="text-[10px] font-bold uppercase tracking-wider bg-white/10 text-white border border-white/40 px-2.5 py-0.5 rounded-full">
                       SGK Lịch Sử 7 • KNTT
                     </span>
                   </div>
@@ -1078,7 +810,7 @@ export const StudentView: React.FC<StudentViewProps> = ({ onShowToast }) => {
                     )}
 
                     {msg.sender === 'user' ? (
-                      <div className="max-w-[80%] px-5 py-3.5 rounded-2xl rounded-tr-xs bg-[#0f172a] text-white text-xs sm:text-[13.5px] leading-relaxed font-medium shadow-md shadow-slate-900/10">
+                      <div className="max-w-[80%] px-5 py-3.5 rounded-2xl rounded-tr-xs bg-[#1cb0f6] text-white text-xs sm:text-[13.5px] leading-relaxed font-medium shadow-md shadow-slate-900/10">
                         {msg.text}
                       </div>
                     ) : (
@@ -1130,7 +862,7 @@ export const StudentView: React.FC<StudentViewProps> = ({ onShowToast }) => {
                   <button
                     onClick={handleSendMessage}
                     disabled={isAiLoading || !chatInput.trim()}
-                    className="px-5 py-2.5 bg-[#0b0f19] hover:bg-slate-800 disabled:opacity-35 text-white rounded-xl font-bold text-xs flex items-center gap-2 transition active:scale-95 cursor-pointer shrink-0 shadow-xs"
+                    className="px-5 py-2.5 bg-[#58cc02] hover:bg-[#58a700] disabled:opacity-35 text-white rounded-xl font-bold text-xs flex items-center gap-2 transition active:scale-95 cursor-pointer shrink-0 shadow-xs"
                   >
                     <span>Gửi</span>
                     <Send className="w-3.5 h-3.5 text-amber-300" />

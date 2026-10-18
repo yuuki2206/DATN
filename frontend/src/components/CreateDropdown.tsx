@@ -38,7 +38,7 @@ export const CreateDropdown: React.FC<CreateDropdownProps> = ({
       {/* Nút Tạo (Phong cách chuẩn Kahoot ảnh 4) */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-center gap-1.5 px-5 py-2 bg-[#1368ce] hover:bg-[#0f52a5] text-white rounded-lg text-sm font-bold shadow-md shadow-blue-500/15 active:scale-95 transition"
+        className="flex items-center justify-center gap-1.5 px-5 py-2 bg-[#b34f34] hover:bg-[#963e28] text-white rounded-lg text-sm font-bold shadow-md shadow-blue-500/15 active:scale-95 transition"
       >
         <Plus className="w-4 h-4 stroke-[2.5]" />
         <span>Tạo</span>
@@ -57,13 +57,13 @@ export const CreateDropdown: React.FC<CreateDropdownProps> = ({
           >
             {/* Biểu tượng Kahoot / Quiz */}
             <div className="w-12 h-12 rounded-xl bg-slate-50 border border-dashed border-slate-300 flex items-center justify-center shrink-0 group-hover:border-purple-300 group-hover:bg-purple-50/50 transition">
-              <div className="w-6 h-6 rounded-md bg-[#46178f] flex items-center justify-center shadow-xs">
+              <div className="w-6 h-6 rounded-md bg-[#205344] flex items-center justify-center shadow-xs">
                 <div className="w-2.5 h-2.5 bg-white transform rotate-45"></div>
               </div>
             </div>
 
             <div className="flex-1 min-w-0 pt-0.5">
-              <h4 className="font-extrabold text-sm text-slate-900 group-hover:text-[#46178f] transition">
+              <h4 className="font-extrabold text-sm text-slate-900 group-hover:text-[#205344] transition">
                 Quiz
               </h4>
               <p className="text-xs text-slate-500 leading-snug mt-0.5">
@@ -83,7 +83,7 @@ export const CreateDropdown: React.FC<CreateDropdownProps> = ({
             {/* Biểu tượng Câu chuyện */}
             <div className="w-12 h-12 rounded-xl bg-slate-50 border border-dashed border-slate-300 flex items-center justify-center shrink-0 group-hover:border-purple-300 group-hover:bg-purple-50/50 transition">
               <div className="w-6 h-7 rounded-sm bg-white border border-slate-300 shadow-2xs flex flex-col overflow-hidden">
-                <div className="h-2.5 bg-[#46178f] w-full"></div>
+                <div className="h-2.5 bg-[#205344] w-full"></div>
                 <div className="flex-1 p-1 flex flex-col justify-center gap-0.5">
                   <div className="h-0.5 bg-slate-300 rounded w-full"></div>
                   <div className="h-0.5 bg-slate-200 rounded w-3/4"></div>
@@ -92,7 +92,7 @@ export const CreateDropdown: React.FC<CreateDropdownProps> = ({
             </div>
 
             <div className="flex-1 min-w-0 pt-0.5">
-              <h4 className="font-extrabold text-sm text-slate-900 group-hover:text-[#46178f] transition">
+              <h4 className="font-extrabold text-sm text-slate-900 group-hover:text-[#205344] transition">
                 Câu chuyện
               </h4>
               <p className="text-xs text-slate-500 leading-snug mt-0.5">
@@ -112,15 +112,15 @@ export const CreateDropdown: React.FC<CreateDropdownProps> = ({
             {/* Biểu tượng Khoá học */}
             <div className="w-12 h-12 rounded-xl bg-slate-50 border border-dashed border-slate-300 flex items-center justify-center shrink-0 group-hover:border-blue-300 group-hover:bg-blue-50/50 transition">
               <div className="w-7 h-6 rounded-md bg-white border border-slate-300 shadow-2xs relative flex flex-col items-center justify-center">
-                <div className="w-4 h-1 bg-[#1368ce] rounded-full mb-1"></div>
-                <div className="w-2.5 h-2.5 rounded-full bg-blue-100 border border-[#1368ce] flex items-center justify-center">
-                  <div className="w-1 h-1 bg-[#1368ce] rounded-full"></div>
+                <div className="w-4 h-1 bg-[#b34f34] rounded-full mb-1"></div>
+                <div className="w-2.5 h-2.5 rounded-full bg-blue-100 border border-[#b34f34] flex items-center justify-center">
+                  <div className="w-1 h-1 bg-[#b34f34] rounded-full"></div>
                 </div>
               </div>
             </div>
 
             <div className="flex-1 min-w-0 pt-0.5">
-              <h4 className="font-extrabold text-sm text-slate-900 group-hover:text-[#1368ce] transition">
+              <h4 className="font-extrabold text-sm text-slate-900 group-hover:text-[#b34f34] transition">
                 Khoá học
               </h4>
               <p className="text-xs text-slate-500 leading-snug mt-0.5">

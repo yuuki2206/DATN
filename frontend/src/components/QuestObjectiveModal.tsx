@@ -131,7 +131,7 @@ export const QuestObjectiveModal: React.FC<QuestObjectiveModalProps> = ({
               <span>/</span>
               <span className="font-semibold text-slate-600 truncate">{questTitle}</span>
               <span>/</span>
-              <span className="font-black text-[#1368ce] truncate">{currentObj.title}</span>
+              <span className="font-black text-[#b34f34] truncate">{currentObj.title}</span>
             </div>
           </div>
 

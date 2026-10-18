@@ -246,7 +246,7 @@ export const StoryCreatorView: React.FC<StoryCreatorViewProps> = ({
       <header className="h-14 bg-white border-b border-slate-200 px-5 flex items-center justify-between shrink-0 z-20 text-slate-800 shadow-xs">
         {/* Left: Brand + Back button */}
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1 bg-[#46178f] text-white px-2.5 py-1 rounded-lg font-black text-xs tracking-tight shadow-2xs">
+          <div className="flex items-center gap-1 bg-[#58cc02] text-white px-2.5 py-1 rounded-lg font-black text-xs tracking-tight shadow-2xs">
             <span>Đông A</span>
             <span className="bg-[#ff3355] text-[9px] px-1 py-0.2 rounded font-bold uppercase">
               EDU
@@ -271,7 +271,7 @@ export const StoryCreatorView: React.FC<StoryCreatorViewProps> = ({
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Thêm tên câu chuyện"
               maxLength={100}
-              className="w-full px-3.5 py-1.5 bg-slate-50 hover:bg-slate-100/70 focus:bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#46178f]/20 transition"
+              className="w-full px-3.5 py-1.5 bg-slate-50 hover:bg-slate-100/70 focus:bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#205344]/20 transition"
             />
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 font-medium">
               {100 - title.length}
@@ -329,7 +329,7 @@ export const StoryCreatorView: React.FC<StoryCreatorViewProps> = ({
           {/* Save button (Xanh dương như ảnh 3, 5) */}
           <button
             onClick={handleSave}
-            className="px-4 py-1.5 bg-[#1368ce] hover:bg-[#0f52a5] text-white rounded-lg text-xs font-bold shadow-md shadow-blue-500/20 active:scale-95 transition"
+            className="px-4 py-1.5 bg-[#58cc02] hover:bg-[#58a700] text-white rounded-lg text-xs font-bold shadow-md shadow-blue-500/20 active:scale-95 transition"
           >
             Lưu
           </button>
@@ -347,7 +347,7 @@ export const StoryCreatorView: React.FC<StoryCreatorViewProps> = ({
               e.stopPropagation();
               setIsBlockMenuOpen(!isBlockMenuOpen);
             }}
-            className="w-8 h-8 rounded-lg bg-[#1368ce] hover:bg-[#0f52a5] text-white flex items-center justify-center shadow-lg active:scale-95 transition"
+            className="w-8 h-8 rounded-lg bg-[#58cc02] hover:bg-[#58a700] text-white flex items-center justify-center shadow-lg active:scale-95 transition"
             title="Thêm khối câu chuyện"
           >
             <Plus className="w-5 h-5 stroke-[2.5]" />
@@ -379,7 +379,7 @@ export const StoryCreatorView: React.FC<StoryCreatorViewProps> = ({
                 onClick={() => handleAddBlock('image')}
                 className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100 transition text-left"
               >
-                <div className="w-6 h-6 rounded-md bg-[#1368ce] text-white flex items-center justify-center">
+                <div className="w-6 h-6 rounded-md bg-[#58cc02] text-white flex items-center justify-center">
                   <ImageIcon className="w-3.5 h-3.5" />
                 </div>
                 <span>Hình ảnh</span>
@@ -450,7 +450,7 @@ export const StoryCreatorView: React.FC<StoryCreatorViewProps> = ({
                   onClick={() => handleAddBlock('image')}
                   className="p-5 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200 transition flex flex-col items-center justify-center gap-2.5 group cursor-pointer shadow-2xs hover:shadow-xs"
                 >
-                  <div className="w-12 h-10 rounded-xl bg-[#1368ce] text-white flex items-center justify-center group-hover:scale-105 transition">
+                  <div className="w-12 h-10 rounded-xl bg-[#58cc02] text-white flex items-center justify-center group-hover:scale-105 transition">
                     <ImageIcon className="w-5 h-5" />
                   </div>
                   <span className="text-xs font-extrabold text-slate-800">Hình ảnh</span>
@@ -506,7 +506,7 @@ export const StoryCreatorView: React.FC<StoryCreatorViewProps> = ({
                       setActiveBlockId(block.id);
                     }}
                     className={`relative rounded-2xl transition group flex items-start gap-3 ${
-                      isActive ? 'ring-2 ring-[#1368ce]' : ''
+                      isActive ? 'ring-2 ring-[#b34f34]' : ''
                     }`}
                   >
                     {/* Thân Khối (Block Body) */}
@@ -562,7 +562,7 @@ export const StoryCreatorView: React.FC<StoryCreatorViewProps> = ({
                                     ];
                                   updateBlock(block.id, { mediaUrl: sample.url, caption: sample.label });
                                 }}
-                                className="flex items-center gap-1.5 px-4 py-2 bg-[#1368ce] hover:bg-[#0f52a5] text-white rounded-lg text-xs font-bold transition shadow-xs"
+                                className="flex items-center gap-1.5 px-4 py-2 bg-[#58cc02] hover:bg-[#58a700] text-white rounded-lg text-xs font-bold transition shadow-xs"
                               >
                                 <Plus className="w-4 h-4 stroke-[2.5]" />
                                 <span>Thêm ảnh</span>
@@ -611,7 +611,7 @@ export const StoryCreatorView: React.FC<StoryCreatorViewProps> = ({
                                 });
                                 onShowToast('🎵 Đã thêm đoạn âm thanh sử liệu mẫu!');
                               }}
-                              className="flex items-center gap-1.5 px-4 py-2 bg-[#1368ce] hover:bg-[#0f52a5] text-white rounded-lg text-xs font-bold transition shadow-xs"
+                              className="flex items-center gap-1.5 px-4 py-2 bg-[#58cc02] hover:bg-[#58a700] text-white rounded-lg text-xs font-bold transition shadow-xs"
                             >
                               <Plus className="w-4 h-4 stroke-[2.5]" />
                               <span>Thêm</span>
@@ -634,7 +634,7 @@ export const StoryCreatorView: React.FC<StoryCreatorViewProps> = ({
                               });
                               onShowToast('🎬 Đã liên kết video tư liệu lịch sử!');
                             }}
-                            className="flex items-center gap-1.5 px-4 py-2 bg-[#1368ce] hover:bg-[#0f52a5] text-white rounded-lg text-xs font-bold transition shadow-xs"
+                            className="flex items-center gap-1.5 px-4 py-2 bg-[#58cc02] hover:bg-[#58a700] text-white rounded-lg text-xs font-bold transition shadow-xs"
                           >
                             <Plus className="w-4 h-4 stroke-[2.5]" />
                             <span>Thêm video</span>
@@ -652,7 +652,7 @@ export const StoryCreatorView: React.FC<StoryCreatorViewProps> = ({
                           </span>
 
                           {/* Logo K! / Đông A EDU (Khớp ảnh 5) */}
-                          <div className="text-2xl font-black text-[#46178f]">K!</div>
+                          <div className="text-2xl font-black text-[#58a700]">K!</div>
 
                           <div className="flex items-center gap-2 max-w-md mx-auto">
                             <input
@@ -664,7 +664,7 @@ export const StoryCreatorView: React.FC<StoryCreatorViewProps> = ({
                             />
                             <button
                               onClick={() => onShowToast('🔗 Đã xác nhận liên kết nhúng!')}
-                              className="w-8 h-8 rounded-lg bg-[#1368ce] text-white flex items-center justify-center shrink-0 hover:bg-[#0f52a5] transition"
+                              className="w-8 h-8 rounded-lg bg-[#58cc02] text-white flex items-center justify-center shrink-0 hover:bg-[#58a700] transition"
                             >
                               <Check className="w-4 h-4 stroke-[2.5]" />
                             </button>

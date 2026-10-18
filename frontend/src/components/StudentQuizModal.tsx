@@ -117,7 +117,7 @@ export const StudentQuizModal: React.FC<StudentQuizModalProps> = ({
       setBktUpdate(null);
     } else {
       setIsFinished(true);
-      onComplete(score + (selectedOption === currentQ.correctAnswer ? 1 : 0));
+      onComplete(score);
     }
   };
 
@@ -132,9 +132,9 @@ export const StudentQuizModal: React.FC<StudentQuizModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl max-w-xl w-full border border-slate-200 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="bg-white rounded-[26px] max-w-2xl w-full border-2 border-slate-200 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="bg-gradient-to-r from-emerald-600 to-teal-700 text-white p-4 flex items-center justify-between">
+        <div className="bg-[#58cc02] text-white p-5 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center font-black">
               ⚔️
@@ -159,7 +159,7 @@ export const StudentQuizModal: React.FC<StudentQuizModalProps> = ({
         {/* Progress bar */}
         <div className="w-full bg-slate-100 h-2">
           <div
-            className="bg-emerald-500 h-2 transition-all duration-300"
+            className="bg-[#58cc02] h-2 transition-all duration-300"
             style={{ width: `${((currentIdx + (isAnswerSubmitted ? 1 : 0)) / sampleQuestions.length) * 100}%` }}
           ></div>
         </div>
@@ -168,11 +168,11 @@ export const StudentQuizModal: React.FC<StudentQuizModalProps> = ({
         {!isFinished ? (
           <div className="p-5 overflow-y-auto space-y-4 flex-1">
             {/* Question Title */}
-            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4">
+            <div className="bg-white border-2 border-slate-200 rounded-2xl p-4">
               <span className="text-[10px] font-black uppercase text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full inline-block mb-2">
                 Câu hỏi trắc nghiệm
               </span>
-              <h4 className="font-bold text-slate-900 text-sm leading-relaxed">
+              <h4 className="font-black text-slate-900 text-[17px] leading-relaxed">
                 {currentQ.question}
               </h4>
             </div>
@@ -182,7 +182,7 @@ export const StudentQuizModal: React.FC<StudentQuizModalProps> = ({
               {currentQ.options.map((opt, idx) => {
                 const isSelected = selectedOption === idx;
                 const isCorrect = idx === currentQ.correctAnswer;
-                let optionStyle = 'bg-white border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/40 text-slate-800';
+                let optionStyle = 'bg-white border-slate-200 hover:border-[#1cb0f6] hover:bg-[#f5fcff] text-slate-800';
 
                 if (isAnswerSubmitted) {
                   if (isCorrect) {
@@ -193,7 +193,7 @@ export const StudentQuizModal: React.FC<StudentQuizModalProps> = ({
                     optionStyle = 'bg-slate-50 border-slate-200 text-slate-400 opacity-60';
                   }
                 } else if (isSelected) {
-                  optionStyle = 'bg-emerald-50 border-emerald-500 text-emerald-900 font-bold ring-2 ring-emerald-500/20';
+                  optionStyle = 'bg-[#ddf4ff] border-[#1cb0f6] text-[#147eac] font-bold ring-2 ring-emerald-500/20';
                 }
 
                 return (
@@ -312,7 +312,7 @@ export const StudentQuizModal: React.FC<StudentQuizModalProps> = ({
               </button>
               <button
                 onClick={onClose}
-                className="flex items-center gap-1.5 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-md shadow-emerald-500/20 active:scale-95 transition"
+                className="flex items-center gap-1.5 px-5 py-2.5 bg-[#58cc02] hover:bg-[#61d80b] text-white border-b-[4px] border-[#58a700] rounded-xl text-xs font-bold shadow-md shadow-emerald-500/20 active:scale-95 transition"
               >
                 <Award className="w-4 h-4" />
                 <span>Nhận thưởng & Về lộ trình</span>
@@ -334,7 +334,7 @@ export const StudentQuizModal: React.FC<StudentQuizModalProps> = ({
                 disabled={selectedOption === null}
                 className={`px-5 py-2 rounded-xl text-xs font-bold transition ${
                   selectedOption !== null
-                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs active:scale-95'
+                    ? 'bg-[#58cc02] hover:bg-[#61d80b] text-white border-b-[4px] border-[#58a700] shadow-xs active:scale-95'
                     : 'bg-slate-200 text-slate-400 cursor-not-allowed'
                 }`}
               >
@@ -343,7 +343,7 @@ export const StudentQuizModal: React.FC<StudentQuizModalProps> = ({
             ) : (
               <button
                 onClick={handleNext}
-                className="flex items-center gap-1.5 px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-xs active:scale-95 transition"
+                className="flex items-center gap-1.5 px-5 py-2 bg-[#58cc02] hover:bg-[#61d80b] text-white border-b-[4px] border-[#58a700] rounded-xl text-xs font-bold shadow-xs active:scale-95 transition"
               >
                 <span>
                   {currentIdx < sampleQuestions.length - 1 ? 'Câu tiếp theo' : 'Xem kết quả'}

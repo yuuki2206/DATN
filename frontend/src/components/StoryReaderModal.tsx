@@ -95,7 +95,7 @@ export const StoryReaderModal: React.FC<StoryReaderModalProps> = ({ story, onClo
           <span className="text-xs text-slate-500 font-medium">Học liệu GDPT 2018 • Đông A EDU</span>
           <button
             onClick={onClose}
-            className="px-5 py-2 bg-[#46178f] hover:bg-[#381075] text-white rounded-xl text-xs font-bold transition active:scale-95 shadow-xs"
+            className="px-5 py-2 bg-[#205344] hover:bg-[#1b4236] text-white rounded-xl text-xs font-bold transition active:scale-95 shadow-xs"
           >
             Đóng
           </button>
