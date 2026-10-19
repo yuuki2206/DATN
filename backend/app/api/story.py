@@ -1,9 +1,19 @@
+"""
+ROUTER API SINH CỐT TRUYỆN NHẬP VAI LỊCH SỬ (`/api/story/generate`)
+================================================================================
+- Code này là gì: Endpoint phục vụ tính năng Gamification (Bản đồ hành trình kháng chiến),
+  tự động sinh lời dẫn truyện hào hùng kèm câu hỏi thử thách dựa trên sự kiện lịch sử có thật.
+- Liên kết với file nào:
+  + Gọi xuống: `app/core/rag_engine.py` (trích xuất `fact_chunk`) và `app/core/gemini_client.py` (`generate_story`).
+"""
+
 from fastapi import APIRouter, HTTPException
 from app.models.schemas import StoryGenerateRequest, StoryGenerateResponse
 from app.core.rag_engine import rag_engine
 from app.core.gemini_client import gemini_client
 
 router = APIRouter(prefix="/story", tags=["Nhiệm Vụ - Sinh Cốt Truyện Nhập Vai"])
+
 
 @router.post("/generate", response_model=StoryGenerateResponse)
 async def generate_stage_story(req: StoryGenerateRequest):

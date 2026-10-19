@@ -1,8 +1,21 @@
+"""
+MODULE ĐỊNH NGHĨA HỢP ĐỒNG DỮ LIỆU API (PYDANTIC SCHEMAS)
+================================================================================
+- Code này là gì: Định nghĩa toàn bộ cấu trúc dữ liệu đầu vào (Request) và đầu ra (Response)
+  cho tất cả REST API của hệ thống (Chat AI, Sinh đề Quiz, Cốt truyện Quest, BKT).
+- Tại sao lại có nó: Đảm bảo kiểm tra kiểu dữ liệu tự động (Type Validation), chống lỗi
+  sai định dạng JSON từ Frontend gửi lên hoặc từ AI trả về, đồng thời tự động sinh tài liệu
+  OpenAPI/Swagger tại `/docs`.
+- Áp dụng kỹ thuật gì: Data Transfer Object (DTO) Pattern với Pydantic v2 (`BaseModel`, `Field`).
+- Liên kết với file nào: Được sử dụng bởi `app/api/chat.py`, `app/api/quiz.py`, `app/api/story.py`,
+  và `app/core/gemini_client.py`.
+"""
+
 from typing import List, Optional, Literal
 from pydantic import BaseModel, Field
 
 # ==============================================================================
-# SCHEMAS FOR CHAT (STUDENT AI TUTOR - "SỬ HỌC ĐÔNG A")
+# 1. SCHEMAS FOR CHAT (STUDENT AI TUTOR - "SỬ HỌC ĐÔNG A")
 # ==============================================================================
 
 class ChatMessage(BaseModel):
@@ -32,12 +45,8 @@ class ChatResponse(BaseModel):
     exp_reward: int = Field(20, description="Điểm kinh nghiệm thưởng cho câu hỏi hay")
 
 # ==============================================================================
-# SCHEMAS FOR QUIZ GENERATION (TEACHER AI STUDIO)
+# 2. SCHEMAS FOR QUIZ GENERATION (TEACHER AI STUDIO)
 # ==============================================================================
-
-class QuizOption(BaseModel):
-    text: str = Field(..., description="Nội dung đáp án")
-    is_correct: bool = Field(False, description="Đáp án đúng hay sai")
 
 class GeneratedQuestion(BaseModel):
     id: str

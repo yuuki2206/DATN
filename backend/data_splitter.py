@@ -17,14 +17,11 @@ from sklearn.model_selection import train_test_split
 
 BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data"
-ROOT_DIR = BASE_DIR.parent
 
 TRAIN_FILE = DATA_DIR / "train_data.jsonl"
 TEST_FILE = DATA_DIR / "test_data.jsonl"
-REAL_TEST_FILE = DATA_DIR / "real_student_test.jsonl"
 QMATRIX_FILE = DATA_DIR / "q_matrix.json"
 KNOWLEDGE_BASE_FILE = DATA_DIR / "knowledge_base.json"
-LEGACY_GOLD_FILE = ROOT_DIR / "Tran_Dynasty_Gold_Standard_Curriculum.jsonl"
 
 
 # ==============================================================================
@@ -1027,10 +1024,6 @@ def generate_and_split_dataset(test_size: float = 0.2, random_state: int = 42) -
     kb_dict = {u["unit_id"]: u for u in KNOWLEDGE_UNITS}
     with open(KNOWLEDGE_BASE_FILE, "w", encoding="utf-8") as f:
         json.dump(kb_dict, f, ensure_ascii=False, indent=2)
-
-    with open(LEGACY_GOLD_FILE, "w", encoding="utf-8") as f:
-        for r in train_samples:
-            f.write(json.dumps(r, ensure_ascii=False) + "\n")
 
     total = len(train_samples) + len(test_samples)
     stats = {

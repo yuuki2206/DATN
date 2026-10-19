@@ -1,3 +1,15 @@
+"""
+ROUTER API KHẢO THÍ, SINH ĐỀ TRẮC NGHIỆM & THEO DÕI TRI THỨC BKT (`/api/quiz/*`)
+================================================================================
+- Code này là gì: Cung cấp 3 endpoint cho Phân hệ Giáo viên & Đánh giá năng lực Học sinh:
+  1. `POST /api/quiz/generate`: Sinh bộ câu hỏi trắc nghiệm chuẩn GDPT 2018 từ sử liệu RAG.
+  2. `POST /api/quiz/submit-answer`: Cập nhật xác suất nắm vững kiến thức $P(L_t)$ theo định lý Bayes.
+  3. `GET /api/quiz/recommendations/{student_id}`: Gợi ý các chủ điểm yếu ($P(L) < 0.60$) cần ôn tập.
+- Liên kết với file nào:
+  + Nhận request từ: `frontend/src/components/TeacherView.tsx` & `StudentView.tsx`
+  + Gọi xuống: `app/core/rag_engine.py`, `app/core/gemini_client.py`, và `backend/bkt_engine.py`.
+"""
+
 import sys
 from pathlib import Path
 from fastapi import APIRouter, HTTPException, Query
@@ -19,6 +31,7 @@ if str(BACKEND_ROOT) not in sys.path:
 from bkt_engine import bkt_engine
 
 router = APIRouter(prefix="/quiz", tags=["Giảng Viên & Khảo Thí - Sinh Đề & BKT Cá Nhân Hóa"])
+
 
 @router.post("/generate", response_model=QuizGenerateResponse)
 async def generate_quiz(req: QuizGenerateRequest):

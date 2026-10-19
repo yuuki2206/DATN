@@ -1,3 +1,17 @@
+"""
+ROUTER API ĐÀM THOẠI GIA SƯ SỬ HỌC ĐÔNG A (`/api/chat/dong-a`)
+================================================================================
+- Code này là gì: Endpoint REST API nhận câu hỏi lịch sử của học sinh từ Frontend
+  và trả về câu trả lời sư phạm kèm trích dẫn sử liệu (`grounding_sources`), huy hiệu và điểm EXP.
+- Tại sao lại có nó: Đóng vai trò Controller điều phối luồng xử lý 2 tầng:
+  (1) Suy luận NLP cục bộ siêu tốc qua `rag_engine.ask_natural()`
+  (2) Trau chuốt diễn đạt có kiểm soát qua `hybrid_router.route_and_respond()`.
+- Liên kết với file nào:
+  + Nhận request từ: `frontend/src/components/StudentView.tsx`
+  + Gọi xuống: `app/core/rag_engine.py` -> `main_model.py` -> `create_model.py` & `context_manager.py`,
+    sau đó qua `hybrid_router.py`.
+"""
+
 import sys
 from pathlib import Path
 from fastapi import APIRouter, HTTPException
@@ -11,6 +25,7 @@ if str(BACKEND_ROOT) not in sys.path:
 from hybrid_router import hybrid_router
 
 router = APIRouter(prefix="/chat", tags=["Trợ Lý AI Sử Học Đông A"])
+
 
 @router.post("/dong-a", response_model=ChatResponse)
 async def chat_with_tutor(req: ChatRequest):

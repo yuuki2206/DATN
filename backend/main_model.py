@@ -19,7 +19,6 @@ if str(BASE_DIR) not in sys.path:
     sys.path.insert(0, str(BASE_DIR))
 
 from data_splitter import TRAIN_FILE, TEST_FILE, generate_and_split_dataset
-import create_model
 from create_model import MODEL_PATH, DongANLPModel, train_and_save_model
 
 

@@ -1,3 +1,16 @@
+"""
+MODULE KHỞI TẠO ỨNG DỤNG WEB FASTAPI (APPLICATION FACTORY & GATEWAY)
+================================================================================
+- Code này là gì: Trung tâm khởi tạo ứng dụng FastAPI, cấu hình Middleware CORS
+  và gắn kết (mount) toàn bộ các nhánh API Router (`chat`, `quiz`, `story`) dưới tiền tố `/api`.
+- Tại sao lại có nó: Tách biệt phần cấu hình HTTP/CORS/Routing khỏi phần khởi chạy Server (`run.py`)
+  và phần lõi thuật toán AI.
+- Liên kết với file nào:
+  + Được khởi chạy bởi: `backend/run.py` (Uvicorn ASGI Server).
+  + Nạp cấu hình từ: `app/config.py`.
+  + Đăng ký các Router: `app/api/chat.py`, `app/api/quiz.py`, `app/api/story.py`.
+"""
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
