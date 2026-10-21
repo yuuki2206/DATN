@@ -828,8 +828,97 @@ class RegressionTestRunner:
             f"All 3 tricky off-topic queries blocked as OOD: {m9_ok}"
         )
 
+        # 10. Tổng hợp đa chủ điểm (Multi-Intent / Multi-Chunk Synthesis)
+        qm10 = "Hội nghị Bình Than và Hội nghị Diên Hồng khác nhau thế nào?"
+        rm10 = self.model.generate_natural_response(qm10, session_id="cat_m_10")
+        m10_ok = (
+            rm10["unit_id"] == "MULTI_INTENT_SYNTHESIS"
+            and len(rm10.get("grounding_sources", [])) == 2
+            and "bình than" in rm10["answer"].lower()
+            and "diên hồng" in rm10["answer"].lower()
+        )
+        self.record_result(
+            "M.10",
+            f"Multi-Intent Synthesis: '{qm10}'",
+            m10_ok,
+            f"Unit: {rm10['unit_id']} | Synthesized units: {rm10.get('synthesized_units')} | Sources: {len(rm10.get('grounding_sources', []))}"
+        )
+
+        # 11. Nhận diện câu hỏi mô tả gián tiếp không dùng từ khóa SGK (Zero-Keyword Paraphrase)
+        indirect_cases = [
+            ("Ông vua nào nhường ngôi đi tu lập phái thiền sau khi đánh thắng giặc?", "TRAN_NHAN_TONG_PORTRAIT"),
+            ("Kế sách bỏ thành trống giấu hết lương thực không cho địch cướp gọi là gì?", "KC1_VUON_KHONG_NHA_TRONG"),
+            ("Vị tướng nào ngồi giữa đường đan sọt bị giáo đâm chảy máu đùi không biết?", "PHAM_NGU_LAO")
+        ]
+        m11_preds = [
+            (
+                self.model.generate_natural_response(iq, session_id=f"cat_m_11_{idx}")["unit_id"],
+                exp_uid
+            )
+            for idx, (iq, exp_uid) in enumerate(indirect_cases)
+        ]
+        m11_ok = all(pred == exp for pred, exp in m11_preds)
+        self.record_result(
+            "M.11",
+            "Zero-Keyword Indirect Description Paraphrase Understanding (3 cases)",
+            m11_ok,
+            f"Predictions vs Expected: {m11_preds}"
+        )
+
+        # 12. Ghi nhớ mạch câu hỏi gợi mở (Follow-up Continuation Memory)
+        sess_m12 = "cat_m_12_followup"
+        _ = self.model.generate_natural_response("Vì sao Trần Quốc Toản bóp nát quả cam?", session_id=sess_m12)
+        rm12 = self.model.generate_natural_response("Em không nhớ, là chữ gì vậy thầy? Kể tiếp đi", session_id=sess_m12)
+        m12_ok = (rm12["unit_id"] == "TQT_SIX_GOLDEN_WORDS" and "phá cường địch" in rm12["answer"].lower())
+        self.record_result(
+            "M.12",
+            "Follow-Up Continuation Memory ('Em không nhớ, là chữ gì vậy thầy? Kể tiếp đi')",
+            m12_ok,
+            f"Resolved Unit: {rm12['unit_id']} | Mentions 'Phá cường địch': {m12_ok}"
+        )
+
+        # 13. Chế độ Đố vui & Chấm tự luận trực tiếp trên khung Chat (Interactive 2-Turn Micro-Quiz)
+        import copy
+        orig_long_state = copy.deepcopy(bkt_engine.student_states.get("student_nguyen_van_long", {}))
+        sess_m13 = "cat_m_13_quiz"
+        rm13_ask = self.model.generate_natural_response("Thầy đố em một câu đi", session_id=sess_m13)
+        rm13_grade = self.model.generate_natural_response(
+            "Quân dân nhà Trần chủ động rút khỏi Thăng Long thực hiện vườn không nhà trống để bảo toàn lực lượng và làm giặc thiếu lương thực, đến tháng 1/1258 phản công ở Đông Bộ Đầu tại bến Bình Than năm 1282 Trần Quốc Toản bóp nát quả cam.",
+            session_id=sess_m13
+        )
+        m13_ok = (
+            rm13_ask["unit_id"] == "INTERACTIVE_CHAT_QUIZ"
+            and rm13_grade["unit_id"] == "INTERACTIVE_CHAT_QUIZ_GRADE"
+            and "/10" in rm13_grade["answer"]
+            and "p(l)" in rm13_grade["answer"].lower()
+        )
+        self.record_result(
+            "M.13",
+            "Interactive 2-Turn Chat Micro-Quiz & Real-Time BKT Grading",
+            m13_ok,
+            f"Turn 1: {rm13_ask['unit_id']} | Turn 2: {rm13_grade['unit_id']}"
+        )
+
+        # 14. Phân tầng Out-of-Scope 3 cấp độ: Danh tính AI & Lịch sử ngoài triều Trần
+        rm14_id = self.model.generate_natural_response("Bạn là ai và thầy làm được những gì?", session_id="cat_m_14")
+        rm14_era = self.model.generate_natural_response("Lý Công Uẩn ban Chiếu dời đô năm nào?", session_id="cat_m_14")
+        m14_ok = (
+            rm14_id["unit_id"] == "INTENT_ASSISTANT_IDENTITY"
+            and rm14_id["is_not_found"] is False
+            and rm14_era["unit_id"] == "CROSS_ERA_QUANG_TRUNG_LE_LOI_LY_THUONG_KIET"
+            and rm14_era["is_not_found"] is False
+        )
+        self.record_result(
+            "M.14",
+            "3-Tier Out-of-Scope Handling (Assistant Identity & Cross-Era Lý Công Uẩn)",
+            m14_ok,
+            f"Identity Unit: {rm14_id['unit_id']} | Cross-Era Unit: {rm14_era['unit_id']}"
+        )
+
         # Dọn dẹp dữ liệu test tạm thời sau khi kiểm thử xong
         bkt_engine.student_states.pop("test_essay_student", None)
+        if orig_long_state:
+            bkt_engine.student_states["student_nguyen_van_long"] = orig_long_state
         bkt_engine.analytics_data["unanswered_queries"] = [
             q for q in bkt_engine.analytics_data.get("unanswered_queries", [])
             if q.get("query") != "Câu hỏi lạ chưa có trong dữ liệu lịch sử"

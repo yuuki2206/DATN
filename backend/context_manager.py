@@ -530,6 +530,24 @@ SPECIAL_GROUNDED_RESPONSES: Dict[str, Dict[str, Any]] = {
             "curriculum_match": "SGK Lịch sử 7 - Bài 13: Cuộc kháng chiến lần thứ ba chống quân Nguyên (1287 - 1288)",
             "fact_chunk": "Đại thắng Bạch Đằng (tháng 4/1288) là trận quyết định kết thúc cuộc kháng chiến lần 3."
         }
+    },
+    "INTENT_ASSISTANT_IDENTITY": {
+        "unit_id": "INTENT_ASSISTANT_IDENTITY",
+        "category": "CONVERSATIONAL_INTENT",
+        "q_type": "INTENT",
+        "topic": "Giới thiệu Trợ lý AI Lịch sử Đông A & hướng dẫn sử dụng",
+        "entity": "Trợ lý AI Đông A",
+        "event": "Giao tiếp sư phạm",
+        "fact_chunk": "Trợ lý AI Lịch sử Đông A là hệ thống gia sư thông minh chuyên trách Bài 13 SGK Lịch sử 7 (Ba lần kháng chiến chống quân Mông - Nguyên 1258 - 1288), tích hợp mô hình BKT cá nhân hóa.",
+        "answer": (
+            "Xin chào em! Thầy là **Trợ Lý AI Lịch Sử Đông A** — gia sư lịch sử thông minh đồng hành cùng em trong chuyên đề **Ba lần kháng chiến chống quân Mông – Nguyên (1258 – 1288)** (Lịch sử lớp 7).\n\n"
+            "🌟 **Thầy có thể giúp em những việc sau**:\n"
+            "1. **Giải đáp & Đối chiếu lịch sử chuyên sâu**: Hỏi đáp mọi sự kiện, nhân vật, chiến thuật hoặc so sánh 2 sự kiện bất kỳ trong thời Trần.\n"
+            "2. **Hiểu cả mô tả gián tiếp**: Dù em quên tên nhân vật hay kế sách (ví dụ: *\"Ông vua nào đi tu trên núi Yên Tử?\"*), thầy vẫn nhận diện và giải thích chính xác.\n"
+            "3. **Đố vui & Chấm tự luận trực tiếp trên khung Chat**: Em chỉ cần gõ **\"Thầy đố em một câu đi\"**, thầy sẽ chọn ngay chủ đề em đang yếu trong Hồ sơ năng lực để thử thách và chấm điểm thang 10!\n"
+            "4. **Tư vấn lộ trình & Tài liệu SGK cá nhân hóa**: Gõ **\"Em không biết nên hỏi gì\"** để xem gợi ý bài học sát với mức độ nắm vững BKT của riêng em."
+        ),
+        "grounding_source": {}
     }
 }
 
@@ -777,7 +795,11 @@ class ConversationalContextManager:
         has_action_kw = any(a in unacc_q for a in [
             "xu ly", "lam gi", "phan ung", "hanh dong", "ra sao", "the nao", "la ai", "co nhung ai", "gom nhung ai"
         ])
-        is_king_action_query = has_king_kw and has_action_kw
+        has_specific_king_clue = any(k in unacc_q for k in [
+            "thai tong", "thanh tong", "nhan tong", "phat hoang", "di tu", "xuat gia",
+            "yen tu", "nhuong ngoi", "vua nao", "ong vua nao", "vi vua nao", "thach ma"
+        ])
+        is_king_action_query = has_king_kw and has_action_kw and not has_specific_king_clue
         has_active_context = bool(session.get("last_unit_id"))
 
         if is_king_action_query and not has_active_context:
@@ -790,7 +812,9 @@ class ConversationalContextManager:
         explicit_standalones = [
             "bach dang", "van don", "ham tu", "chuong duong", "tay ket", "dien hong",
             "binh than", "dong bo dau", "binh le nguyen", "thoat hoan", "toa do",
-            "o ma nhi", "tran quoc toan", "tran binh trong", "tran hung dao", "tran thu do"
+            "o ma nhi", "tran quoc toan", "tran binh trong", "tran hung dao", "tran thu do",
+            "pham ngu lao", "dan sot", "tran quang khai", "tran nhan tong", "yen tu", "di tu",
+            "vuon khong", "bo thanh trong"
         ]
         has_explicit_standalone = any(es in unacc_q for es in explicit_standalones)
 
@@ -803,6 +827,38 @@ class ConversationalContextManager:
             event = session.get("last_event") or f"kháng chiến chống quân Mông Cổ năm {time_p}"
             rewritten = f"{king} đã xử lý thế nào khi {event}?"
             return rewritten, True, None
+
+        # Mẫu 2B: Phản hồi câu hỏi gợi mở (follow_up) của AI ("Có ạ", "Kể tiếp đi", "Em không nhớ", "Là chữ gì vậy thầy?")
+        FOLLOWUP_CONTINUATION_MAP = {
+            "TQT_WHY_ORANGE": "Trần Quốc Toản đã thêu sáu chữ vàng gì lên lá cờ của mình và lập chiến công ra sao?",
+            "TQT_SIX_GOLDEN_WORDS": "Tổng quan về tấm gương yêu nước của thiếu niên anh hùng Trần Quốc Toản?",
+            "BINH_THAN_CONFERENCE": "Vì sao Trần Quốc Toản lại bóp nát quả cam tại bến Bình Than năm 1282?",
+            "DIEN_HONG_CONFERENCE": "Hoàn cảnh ra đời và ý nghĩa của Hịch tướng sĩ và tinh thần Sát Thát năm 1285?",
+            "HICH_TUONG_SI": "Các trận tổng phản công Tây Kết, Hàm Tử, Chương Dương năm 1285 diễn ra như thế nào?",
+            "KC1_WHY_INVADE": "Diễn biến trận mở màn Bình Lệ Nguyên năm 1258 diễn ra như thế nào?",
+            "KC1_BINH_LE_NGUYEN": "Sau trận Bình Lệ Nguyên nhà Trần thực hiện kế sách vườn không nhà trống như thế nào năm 1258?",
+            "KC1_VUON_KHONG_NHA_TRONG": "Sau khi rút khỏi Thăng Long thực hiện vườn không nhà trống quân Trần làm gì tiếp theo để phản công tại Đông Bộ Đầu năm 1258?",
+            "KC1_DONG_BO_DAU": "Câu nói Đầu thần chưa rơi xuống đất xin bệ hạ đừng lo của Trần Thủ Độ có ý nghĩa gì?",
+            "KC2_OVERVIEW": "Các trận phản công Tây Kết, Hàm Tử, Chương Dương năm 1285 diễn ra như thế nào?",
+            "KC2_HAM_TU_CHUONG_DUONG": "Vì sao Thoát Hoan phải chui vào ống đồng tháo chạy năm 1285?",
+            "KC3_OVERVIEW": "Chiến thắng Vân Đồn tiêu diệt đoàn thuyền lương của Trần Khánh Dư năm 1288 diễn ra thế nào?",
+            "KC3_VAN_DON": "Trận quyết chiến trên sông Bạch Đằng tháng 4 năm 1288 diễn ra như thế nào?",
+            "KC3_BACH_DANG_HOW": "Nguyên nhân thắng lợi và ý nghĩa lịch sử của ba lần kháng chiến chống quân Mông Nguyên là gì?"
+        }
+        is_followup_reply = (
+            any(k in unacc_q for k in [
+                "ke tiep", "noi tiep", "tiep tuc di", "giai thich luon", "noi ro hon",
+                "em khong nho", "khong nho a", "chua nho", "quen roi thay",
+                "la chu gi", "la cau gi", "la tran nao vay", "co a thay ke", "vang thay ke"
+            ])
+            or cleaned_no_punct in ["co", "co a", "da co", "vang", "vang a", "ke di", "ke tiep di", "tiep di thay"]
+        )
+        if is_followup_reply and has_active_context and not has_explicit_standalone:
+            last_uid = session.get("last_unit_id", "")
+            if last_uid in FOLLOWUP_CONTINUATION_MAP:
+                return FOLLOWUP_CONTINUATION_MAP[last_uid], True, None
+            time_p = session.get("last_time_period", "1285")
+            return f"Diễn biến và ý nghĩa tiếp theo của cuộc kháng chiến chống quân Mông Nguyên năm {time_p} là gì?", True, None
 
         # Mẫu 2: "Nhà vua làm gì tiếp theo?" / "Sau đó vua làm gì?" / "Vậy sau khi rút khỏi Thăng Long thì quân ta làm gì?"
         is_next_action_query = any(k in unacc_q for k in [
@@ -936,8 +992,11 @@ class ConversationalContextManager:
         event = unit_record.get("event", "")
         entity = unit_record.get("entity", "")
 
-        # Không ghi nhớ ngữ cảnh các câu OOD hay chào hỏi đơn thuần
-        if uid in ["OOD_RANDOM_AND_OFFTOPIC", "INTENT_GREETING", "INTENT_THANKS"]:
+        # Không ghi nhớ ngữ cảnh các câu OOD hay chào hỏi / hỏi thông tin trợ lý / câu đố nhanh
+        if uid in [
+            "OOD_RANDOM_AND_OFFTOPIC", "INTENT_GREETING", "INTENT_THANKS",
+            "INTENT_ASSISTANT_IDENTITY", "INTERACTIVE_CHAT_QUIZ"
+        ]:
             session["history"].append({"user": query, "assistant": answer, "unit_id": uid})
             return
 
