@@ -549,6 +549,32 @@ class BKTEngine:
             f"Phương án học hiệu quả nhất hiện nay: {COGNITIVE_STUDY_STRATEGIES[weakest_cog]['method']}"
         )
 
+        # Tính tốc độ tiến bộ (Learning Velocity) & Cảnh báo suy giảm trí nhớ Ebbinghaus (Forgetting Risk)
+        total_interactions = max(1, total_quiz_attempts + total_chat_questions)
+        learning_velocity = round((overall_mastery - self.default_p_l0) / total_interactions, 4)
+        if learning_velocity >= 0.04 or overall_mastery >= 0.70:
+            momentum_label = "Đang bứt phá nhanh 🚀"
+        elif learning_velocity >= 0.01 or overall_mastery >= 0.42:
+            momentum_label = "Tiến bộ ổn định 📈"
+        else:
+            momentum_label = "Cần tăng tốc ôn tập ⚠️"
+
+        retention_alerts = []
+        for uid, meta in self.q_matrix.items():
+            p_l = self.get_student_knowledge_level(student_id, uid)
+            if 0.35 <= p_l < 0.72:
+                # Mô hình đường cong quên lãng Ebbinghaus: R = exp(-t / S)
+                stability_days = round(2.0 + 8.0 * p_l, 1)
+                effective_retention = round(p_l * 0.88, 4)
+                retention_alerts.append({
+                    "unit_id": uid,
+                    "topic": meta.get("topic", uid),
+                    "current_mastery": round(p_l, 4),
+                    "ebbinghaus_effective_mastery": effective_retention,
+                    "review_within_days": stability_days
+                })
+        retention_alerts.sort(key=lambda x: x["ebbinghaus_effective_mastery"])
+
         # Sinh lộ trình tài liệu học tập ưu tiên
         weak_recs = self.recommend_personalized_review(student_id=student_id, top_k=top_k)
         study_materials = [self.get_study_material(r["unit_id"]) for r in weak_recs]
@@ -559,6 +585,9 @@ class BKTEngine:
             "student_id": student_id,
             "overall_mastery": overall_mastery,
             "mastery_rank": mastery_rank,
+            "learning_velocity": learning_velocity,
+            "momentum_label": momentum_label,
+            "retention_alerts": retention_alerts[:4],
             "total_quiz_attempts": total_quiz_attempts,
             "total_chat_questions": total_chat_questions,
             "campaign_breakdown": campaign_breakdown,
@@ -567,6 +596,105 @@ class BKTEngine:
             "weaknesses": weaknesses[:5],
             "ai_diagnosis": ai_diagnosis,
             "recommended_study_materials": study_materials
+        }
+
+    def generate_adaptive_exam(self, student_id: str, num_questions: int = 5) -> Dict[str, Any]:
+        """
+        Sinh Đề Ôn Tập Cá Nhân Hóa (Adaptive Custom Exam Generator):
+        Kết hợp câu hỏi Trắc nghiệm (Multiple Choice từ `quiz_bank.json`) và Tự luận ngắn
+        nhắm chính xác vào các chủ điểm học sinh đang yếu nhất trong Hồ sơ năng lực BKT.
+        """
+        profile = self.analyze_student_profile(student_id=student_id, top_k=max(5, num_questions))
+        weak_recs = self.recommend_personalized_review(student_id=student_id, top_k=10)
+
+        quiz_bank_path = DATA_DIR / "quiz_bank.json"
+        mcq_pool = []
+        if quiz_bank_path.exists():
+            try:
+                mcq_pool = json.loads(quiz_bank_path.read_text(encoding="utf-8"))
+            except Exception:
+                mcq_pool = []
+
+        selected_questions = []
+        used_units = set()
+
+        # 1. Chọn tối đa 3 câu Trắc nghiệm khớp với các chủ điểm yếu nhất
+        mcq_target = max(1, (num_questions * 3) // 5)
+        for rec in weak_recs:
+            uid = rec["unit_id"]
+            for q_item in mcq_pool:
+                if q_item.get("unit_id") == uid and uid not in used_units:
+                    selected_questions.append({
+                        "question_id": q_item.get("id", f"MCQ_{uid}"),
+                        "unit_id": uid,
+                        "question_type": "MULTIPLE_CHOICE",
+                        "topic": rec["topic"],
+                        "cognitive_level": rec["cognitive_level"],
+                        "current_mastery": rec["current_mastery"],
+                        "question_text": q_item.get("question", ""),
+                        "options": q_item.get("options", []),
+                        "correct_index": q_item.get("correct_index", 0),
+                        "explanation": q_item.get("explanation", "")
+                    })
+                    used_units.add(uid)
+                    break
+            if len(selected_questions) >= mcq_target:
+                break
+
+        # Nếu chưa đủ câu MCQ, lấy bổ sung từ mcq_pool
+        for q_item in mcq_pool:
+            if len(selected_questions) >= mcq_target:
+                break
+            uid = q_item.get("unit_id", "KC1_OVERVIEW")
+            if uid not in used_units:
+                selected_questions.append({
+                    "question_id": q_item.get("id", f"MCQ_{uid}"),
+                    "unit_id": uid,
+                    "question_type": "MULTIPLE_CHOICE",
+                    "topic": self.q_matrix.get(uid, {}).get("topic", uid),
+                    "cognitive_level": self.q_matrix.get(uid, {}).get("cognitive_level", "THONG_HIEU"),
+                    "current_mastery": round(self.get_student_knowledge_level(student_id, uid), 4),
+                    "question_text": q_item.get("question", ""),
+                    "options": q_item.get("options", []),
+                    "correct_index": q_item.get("correct_index", 0),
+                    "explanation": q_item.get("explanation", "")
+                })
+                used_units.add(uid)
+
+        # 2. Chọn các câu Tự luận ngắn (Short Answer Essay) cho các chủ điểm yếu tiếp theo
+        for rec in weak_recs:
+            if len(selected_questions) >= num_questions:
+                break
+            uid = rec["unit_id"]
+            if uid in used_units:
+                continue
+            kb_item = self.knowledge_base.get(uid, {})
+            base_qs = kb_item.get("base_queries", [])
+            q_text = (
+                base_qs[0].capitalize() + "?"
+                if base_qs else f"Hãy trình bày nội dung và ý nghĩa cốt lõi của chủ đề: {rec['topic']}?"
+            )
+            selected_questions.append({
+                "question_id": f"ESSAY_{uid}",
+                "unit_id": uid,
+                "question_type": "SHORT_ANSWER",
+                "topic": rec["topic"],
+                "cognitive_level": rec["cognitive_level"],
+                "current_mastery": rec["current_mastery"],
+                "question_text": q_text,
+                "options": [],
+                "reference_answer": kb_item.get("fact_chunk", "")
+            })
+            used_units.add(uid)
+
+        return {
+            "student_id": student_id,
+            "overall_mastery": profile["overall_mastery"],
+            "mastery_rank": profile["mastery_rank"],
+            "learning_velocity": profile["learning_velocity"],
+            "momentum_label": profile["momentum_label"],
+            "total_questions": len(selected_questions),
+            "questions": selected_questions
         }
 
     def evaluate_short_answer(

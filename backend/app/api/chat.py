@@ -16,6 +16,8 @@ ROUTER API ĐÀM THOẠI GIA SƯ SỬ HỌC ĐÔNG A & THỐNG KÊ TỰ HỌC (`
 
 import sys
 from pathlib import Path
+from typing import List
+from pydantic import BaseModel, Field
 from fastapi import APIRouter, HTTPException
 from app.models.schemas import (
     ChatRequest,
@@ -24,6 +26,16 @@ from app.models.schemas import (
     StudyMaterialCard
 )
 from app.core.rag_engine import rag_engine
+
+
+class TeachKnowledgeRequest(BaseModel):
+    unit_id: str = Field(..., description="Mã định danh chủ điểm mới (VD: CUSTOM_TRAN_KHANH_DU_THAN_OAI)")
+    topic: str = Field(..., description="Tên chủ đề kiến thức mới")
+    question_examples: List[str] = Field(..., description="Danh sách các mẫu câu hỏi tương ứng")
+    answer: str = Field(..., description="Nội dung câu trả lời chuẩn")
+    fact_chunk: str = Field("", description="Đoạn tư liệu tóm tắt cốt lõi")
+    entity: str = Field("Nhà Trần", description="Nhân vật / Thực thể lịch sử")
+    event: str = Field("Ba lần kháng chiến chống quân Mông - Nguyên (1258 - 1288)", description="Sự kiện lịch sử")
 
 BACKEND_ROOT = Path(__file__).resolve().parent.parent.parent
 if str(BACKEND_ROOT) not in sys.path:
@@ -99,3 +111,30 @@ async def get_chat_learning_analytics():
         return bkt_engine.get_learning_analytics()
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Lỗi truy vấn thống kê AI: {str(e)}")
+
+
+@router.post("/teach")
+async def teach_new_knowledge_to_ai(req: TeachKnowledgeRequest):
+    """
+    Dạy thêm tri thức mới cho AI ngay lúc chạy (Hot-Reload Dynamic Knowledge Base):
+    Không cần huấn luyện lại toàn bộ model `.joblib`, AI ghi nhớ bền vững vào `custom_knowledge.json`
+    và trả lời được ngay lập tức ở lượt hỏi kế tiếp.
+    """
+    try:
+        rag_engine._ensure_loaded()
+        record = rag_engine.nlp_model.teach_new_knowledge(
+            unit_id=req.unit_id,
+            topic=req.topic,
+            question_examples=req.question_examples,
+            answer=req.answer,
+            fact_chunk=req.fact_chunk,
+            entity=req.entity,
+            event=req.event
+        )
+        return {
+            "status": "success",
+            "message": f"Đã nạp thành công tri thức mới '{record['unit_id']}' vào bộ nhớ AI!",
+            "record": record
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Lỗi nạp tri thức động cho AI: {str(e)}")

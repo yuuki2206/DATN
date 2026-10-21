@@ -138,3 +138,15 @@ async def evaluate_student_short_answer(req: ShortAnswerEvaluationRequest):
         raise HTTPException(status_code=404, detail=str(ve))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Lỗi chấm câu trả lời tự luận AI: {str(e)}")
+
+
+@router.get("/adaptive-exam/{student_id}")
+async def get_adaptive_custom_exam(student_id: str, num_questions: int = Query(5, ge=3, le=10)):
+    """
+    Sinh Đề Ôn Tập Cá Nhân Hóa (Adaptive Custom Exam) kết hợp Trắc nghiệm & Tự luận ngắn
+    nhắm đúng vào các lỗ hổng kiến thức BKT và cảnh báo suy giảm trí nhớ Ebbinghaus của học sinh.
+    """
+    try:
+        return bkt_engine.generate_adaptive_exam(student_id=student_id, num_questions=num_questions)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Lỗi sinh đề ôn tập cá nhân hóa: {str(e)}")

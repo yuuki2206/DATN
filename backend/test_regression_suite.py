@@ -915,6 +915,98 @@ class RegressionTestRunner:
             f"Identity Unit: {rm14_id['unit_id']} | Cross-Era Unit: {rm14_era['unit_id']}"
         )
 
+        # 15. Bộ kiểm chứng Đồ thị Tri thức tự động (Knowledge Graph Fact-Checker)
+        kg_cases = [
+            "Trận Bạch Đằng năm 1285 diễn ra như thế nào?",
+            "Tại sao Trần Thủ Độ lại viết bài Hịch tướng sĩ?",
+            "Thoát Hoan chỉ huy quân Mông Cổ xâm lược Đại Việt năm 1258 đúng không?"
+        ]
+        m15_ok = all(
+            self.model.generate_natural_response(kq, session_id=f"cat_m_15_{i}")["unit_id"] == "CORRECTION_KG_CONTRADICTION"
+            for i, kq in enumerate(kg_cases)
+        )
+        self.record_result(
+            "M.15",
+            "Knowledge Graph Fact-Checker (Cross-Campaign & Author Contradictions)",
+            m15_ok,
+            f"All 3 cross-contradictions detected & corrected: {m15_ok}"
+        )
+
+        # 16. Chống chịu lỗi gõ sai chính tả tiếng Việt (Fuzzy Typo Tolerance)
+        typo_cases = [
+            ("trận bạt đằng năm 1288 diễn ra thế nào", "KC3_BACH_DANG_HOW"),
+            ("hội nghị riên hồng năm 1285 có ý nghĩa gì", "SIGNIFICANCE_DIEN_HONG"),
+            ("vì sao thoát hoang phải chui vào ống đồng", "KC2_THOAT_HOAN_COPPER_PIPE")
+        ]
+        m16_preds = [
+            (self.model.generate_natural_response(tq, session_id=f"cat_m_16_{i}")["unit_id"], exp)
+            for i, (tq, exp) in enumerate(typo_cases)
+        ]
+        m16_ok = all(p == e for p, e in m16_preds)
+        self.record_result(
+            "M.16",
+            "Fuzzy Typo Tolerance ('bạt đằng', 'riên hồng', 'thoát hoang')",
+            m16_ok,
+            f"Typo predictions: {m16_preds}"
+        )
+
+        # 17. Điều khiển Định dạng đầu ra theo yêu cầu người dùng (Format Control: Tóm tắt + Timeline + Mẹo nhớ)
+        qm17 = "Hãy tóm tắt ngắn gọn 3 ý chính, vẽ sơ đồ thời gian và chỉ mẹo ghi nhớ trận Đông Bộ Đầu năm 1258"
+        rm17 = self.model.generate_natural_response(qm17, session_id="cat_m_17")
+        m17_ok = (
+            "📌 **Tóm tắt 3 ý cốt lõi" in rm17["answer"]
+            and "⏳ **Sơ đồ Dòng thời gian" in rm17["answer"]
+            and "🔑 **Mẹo ghi nhớ nhanh" in rm17["answer"]
+        )
+        self.record_result(
+            "M.17",
+            "User Format Control (Summary Box + Timeline + Mnemonic Formula)",
+            m17_ok,
+            f"Contains Summary, Timeline & Mnemonic blocks: {m17_ok}"
+        )
+
+        # 18. Đường cong quên lãng Ebbinghaus & Sinh Đề Ôn Tập Cá Nhân Hóa (Adaptive Custom Exam)
+        rm18 = self.model.generate_natural_response("Thầy tạo đề ôn tập riêng cho em đi", session_id="cat_m_18")
+        m18_ok = (
+            rm18["unit_id"] == "ADAPTIVE_CUSTOM_EXAM"
+            and rm18.get("exam_metadata", {}).get("total_questions") == 5
+            and "ebbinghaus" in rm18["answer"].lower()
+        )
+        self.record_result(
+            "M.18",
+            "Ebbinghaus Retention & Adaptive Custom Exam Generator (MCQ + Short Answer)",
+            m18_ok,
+            f"Unit: {rm18['unit_id']} | Generated questions: {rm18.get('exam_metadata', {}).get('total_questions')}"
+        )
+
+        # 19. Dạy thêm tri thức mới cho AI ngay lúc chạy (Zero-Retrain Hot-Reload Knowledge Base)
+        from create_model import CUSTOM_KNOWLEDGE_FILE
+        self.model.teach_new_knowledge(
+            unit_id="CUSTOM_TEST_DYNAMIC_UNIT",
+            topic="Hội thề Đông Cổ và tinh thần võ sĩ đạo thời Trần",
+            question_examples=[
+                "hội thề đền đồng cổ thời trần diễn ra như thế nào",
+                "tinh thần võ sĩ đạo và hội thề đồng cổ thời nhà trần"
+            ],
+            answer="Hội thề đền Đồng Cổ là nghi lễ thiêng liêng nơi các quan lại, tướng sĩ nhà Trần uống máu ăn thề nguyện trung hiếu giữ nước.",
+            fact_chunk="Hội thề đền Đồng Cổ rèn đúc lòng trung thành tuyệt đối của tướng sĩ thời Trần."
+        )
+        rm19 = self.model.generate_natural_response(
+            "Hội thề đền Đồng Cổ thời Trần diễn ra như thế nào?",
+            session_id="cat_m_19"
+        )
+        m19_ok = (rm19["unit_id"] == "CUSTOM_TEST_DYNAMIC_UNIT" and "đồng cổ" in rm19["answer"].lower())
+        self.model.custom_units.pop("CUSTOM_TEST_DYNAMIC_UNIT", None)
+        self.model.unit_lookup.pop("CUSTOM_TEST_DYNAMIC_UNIT", None)
+        if CUSTOM_KNOWLEDGE_FILE.exists():
+            CUSTOM_KNOWLEDGE_FILE.unlink()
+        self.record_result(
+            "M.19",
+            "Zero-Retrain Hot-Reload Dynamic Knowledge Teaching (`/api/chat/teach`)",
+            m19_ok,
+            f"Matched newly taught unit immediately: {rm19['unit_id']}"
+        )
+
         # Dọn dẹp dữ liệu test tạm thời sau khi kiểm thử xong
         bkt_engine.student_states.pop("test_essay_student", None)
         if orig_long_state:
