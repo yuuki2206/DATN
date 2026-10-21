@@ -276,19 +276,34 @@ class VietnameseNLU:
         unacc = normalize_vi(remove_accents(query))
         words = set(unacc.split())
 
-        # 1. Từ khóa giao tiếp / câu hỏi tâm lý học sinh
-        conversational_words = {"xin", "chao", "hello", "hi", "cam", "on", "thanks", "alo"}
-        if conversational_words & words:
-            conv_phrases = [
-                "xin chao", "chao thay", "chao co", "chao ban", "cam on", "thank you",
-                "khong biet", "chua hieu", "kho qua", "giup em", "giup minh", "dap an", "quen mat", "chi em"
-            ]
-            if any(cp in unacc for cp in conv_phrases) or words & {"hello", "hi", "thanks"}:
-                return True
+        # 0. Chặn ngay các chủ đề đời sống / môn học khác (tránh trùng từ đồng âm như "nguyên nhân", "trần nhà", "chiến thuật game")
+        off_topic_markers = [
+            "thoi tiet", "nau an", "pho bo", "pizza", "mi tom", "lien quan", "bong da",
+            "world cup", "viet code", "python", "javascript", "dien tich", "hinh tron",
+            "phuong trinh", "hoa hoc", "nguyen tu", "vat ly", "cam cum", "dau bung",
+            "o nhiem", "moi truong", "gia vang", "chung khoan", "xo so", "tran nha", "coi tran"
+        ]
+        if any(ot in unacc for ot in off_topic_markers):
+            return False
+
+        # 1. Từ khóa giao tiếp / câu hỏi tâm lý & định hướng học tập của học sinh
+        conv_phrases = [
+            "xin chao", "chao thay", "chao co", "chao ban", "cam on", "thank you",
+            "khong biet", "chua hieu", "kho qua", "giup em", "giup minh", "dap an",
+            "quen mat", "chi em", "nen hoi gi", "hoi gi bay gio", "goi y", "bat dau tu dau",
+            "nen hoc gi", "on tap", "lo trinh", "danh gia nang luc", "ho so hoc tap"
+        ]
+        if any(cp in unacc for cp in conv_phrases) or (words & {"hello", "hi", "thanks", "alo"}):
+            return True
+
+        # Loại bỏ các cụm từ đồng âm tiếng Việt thông thường trước khi kiểm tra từ đơn "nguyen" / "tran"
+        cleaned_for_domain = unacc
+        for homonym in ["nguyen nhan", "nguyen tac", "nguyen lieu", "tai nguyen", "nguyen ven", "giu nguyen"]:
+            cleaned_for_domain = cleaned_for_domain.replace(homonym, " ")
 
         # 2. Từ vựng chuyên đề Lịch sử thời Trần (khớp từ trọn vẹn theo ranh giới từ)
         for kw in cls.DOMAIN_VOCAB:
-            if re.search(rf"\b{re.escape(kw)}\b", unacc):
+            if re.search(rf"\b{re.escape(kw)}\b", cleaned_for_domain):
                 return True
         return False
 
@@ -657,6 +672,19 @@ class DongANLPModel:
         gate_rationale = "ML Classifier + Semantic Cosine Hybrid Ranking"
         unacc_q = normalize_vi(remove_accents(normalized_query))
 
+        # Gate 0: Học sinh chưa biết hỏi gì / xin gợi ý câu hỏi / tư vấn lộ trình học tập
+        is_study_guidance = any(k in unacc_q for k in [
+            "khong biet nen hoi gi", "khong biet hoi gi", "nen hoi gi", "hoi gi bay gio",
+            "goi y cau hoi", "goi y cho em", "bat dau tu dau", "nen hoc gi",
+            "lo trinh hoc", "danh gia nang luc", "ho so hoc tap", "khong biet dap an",
+            "chua hieu bai", "kho qua em khong biet"
+        ])
+        if is_study_guidance and "INTENT_STUDENT_STRUGGLE" in self.unit_lookup:
+            best_uid = "INTENT_STUDENT_STRUGGLE"
+            best_score = max(best_score, 0.92)
+            detected_q_type = "INTENT"
+            gate_rationale = "Relevance Gate: Study guidance / student struggle intent detected"
+
         # Gate 1: Câu hỏi về nguyên nhân giặc thua dù đông và mạnh / nguyên nhân thắng lợi
         is_why_enemy_lost = any(k in unacc_q for k in [
             "dong va manh", "van thua", "vi sao thua", "tai sao thua",
@@ -782,15 +810,15 @@ class DongANLPModel:
         # 2. Nếu nằm ngoài phạm vi bài học (Out-of-Domain)
         if best_uid == "OOD_RANDOM_AND_OFFTOPIC" or best_uid not in self.unit_lookup:
             clean_q = query.strip()
-            speaker = "ta" if character_id else "thầy"
+            speaker = "ta" if (character_id and character_id in ConversationalNLG.PERSONAS) else "thầy"
             ood_ans = (
                 f"⚠️ Rất tiếc, {speaker} chưa tìm thấy thông tin lịch sử phù hợp với nội dung **\"{clean_q}\"** "
                 "trong chuyên đề **Ba lần kháng chiến chống quân Mông – Nguyên (1258 – 1288)** (Lịch sử 7).\n\n"
                 "Em có thể thử hỏi những câu tự nhiên xoay quanh bài học như:\n"
-                "• *\"Vì sao Trần Quốc Toản lại bóp nát quả cam?\"*\n"
-                "• *\"Tại sao Thoát Hoan phải chui vào ống đồng năm 1285?\"*\n"
-                "• *\"Trận Bạch Đằng năm 1288 của Trần Hưng Đạo diễn ra như thế nào?\"*\n"
-                "• *\"Kế sách Vườn không nhà trống có tác dụng gì?\"*"
+                "• **Vì sao Trần Quốc Toản lại bóp nát quả cam?**\n"
+                "• **Tại sao Thoát Hoan phải chui vào ống đồng năm 1285?**\n"
+                "• **Trận Bạch Đằng năm 1288 của Trần Hưng Đạo diễn ra như thế nào?**\n"
+                "• **Kế sách Vườn không nhà trống có tác dụng gì?**"
             )
             self.context_manager.update_session(
                 session_id, query, {"unit_id": "OOD_RANDOM_AND_OFFTOPIC"}, ood_ans, meta
@@ -821,11 +849,36 @@ class DongANLPModel:
         unit_record = self.unit_lookup[best_uid]
         sess = self.context_manager.get_or_create_session(session_id)
 
-        # Điều chỉnh câu trả lời sắc nét nếu là câu hỏi tiếp nối về xử lý của vua
+        # Điều chỉnh câu trả lời sắc nét nếu là câu hỏi tiếp nối hoặc cần định hướng học tập cá nhân hóa
         effective_unit_record = dict(unit_record)
         rewritten_q = meta.get("rewritten", query)
         unacc_q = remove_accents(query).lower()
-        if meta.get("is_coref") and best_uid == "KC1_WHY_INVADE" and any(k in unacc_q for k in ["xu ly", "lam gi", "phan ung"]):
+        if best_uid == "INTENT_STUDENT_STRUGGLE":
+            try:
+                from bkt_engine import bkt_engine
+                profile = bkt_engine.analyze_student_profile("student_nguyen_van_long", top_k=2)
+                weak_mats = profile.get("recommended_study_materials", [])
+                weak_line = ""
+                if weak_mats:
+                    top_weak = weak_mats[0]
+                    weak_line = (
+                        f"\n\n📊 **Gợi ý riêng từ Hồ sơ năng lực của em**:\n"
+                        f"• **Chủ đề cần ưu tiên củng cố**: {top_weak['topic']} (Mức nắm vững hiện tại: **{int((top_weak.get('current_mastery') or 0.35) * 100)}%**).\n"
+                        f"• **Tài liệu SGK nên đọc**: {top_weak['sgk_reference']}.\n"
+                        f"• **Phương pháp học hiệu quả**: {top_weak['study_method']}"
+                    )
+            except Exception:
+                weak_line = ""
+
+            effective_unit_record["answer"] = (
+                "Chào em! Nếu em chưa biết nên hỏi gì hoặc bắt đầu ôn tập từ đâu, thầy gợi ý **khung 3 mốc vàng** cốt lõi của chuyên đề **Ba lần kháng chiến chống quân Mông – Nguyên (1258 – 1288)**:\n\n"
+                "1. **Kháng chiến lần 1 (1258)**: Hỏi về kế sách **Vườn không nhà trống** tại Thăng Long hoặc trận phản công **Đông Bộ Đầu**.\n"
+                "2. **Kháng chiến lần 2 (1285)**: Hỏi về **Hội nghị Diên Hồng**, chuyện **Trần Quốc Toản bóp nát quả cam**, **Hịch tướng sĩ** hoặc **Thoát Hoan chui ống đồng**.\n"
+                "3. **Kháng chiến lần 3 (1287 – 1288)**: Hỏi về trận đốt thuyền lương **Vân Đồn** của Trần Khánh Dư hoặc đại thắng cọc ngầm **Bạch Đằng năm 1288**."
+                f"{weak_line}\n\n"
+                "Em thích thầy trò mình bắt đầu từ câu chuyện nào trước?"
+            )
+        elif meta.get("is_coref") and best_uid == "KC1_WHY_INVADE" and any(k in unacc_q for k in ["xu ly", "lam gi", "phan ung"]):
             effective_unit_record["answer"] = (
                 "Trước âm mưu xâm lược và thái độ nghênh ngang của ba tên sứ giả Mông Cổ đòi mượn đường, "
                 "**Vua Trần Thái Tông đã kiên quyết xử lý bằng cách cự tuyệt, hạ lệnh bắt trói giam ngay sứ giặc vào ngục** "

@@ -796,6 +796,38 @@ class RegressionTestRunner:
             f"Material returned: {bool(mat_card)} | Logged unanswered queries: {len(analytics['unanswered_queries'])}"
         )
 
+        # 8. Học sinh gõ "toi khong biet nen hoi gi" -> Trả về định hướng học tập kèm gợi ý Hồ sơ BKT (Không báo lỗi OOD)
+        qm8 = "toi khong biet nen hoi gi"
+        rm8 = self.model.generate_natural_response(qm8, character_id="student_session_long", session_id="cat_m_8")
+        m8_ok = (
+            rm8["unit_id"] == "INTENT_STUDENT_STRUGGLE"
+            and rm8["is_not_found"] is False
+            and "hồ sơ năng lực" in rm8["answer"].lower()
+        )
+        self.record_result(
+            "M.8",
+            f"Study Guidance Intent ('{qm8}') -> Personalized BKT Roadmap (Not OOD)",
+            m8_ok,
+            f"Unit: {rm8['unit_id']} | Personalized BKT guidance included: {m8_ok}"
+        )
+
+        # 9. Chặn câu hỏi ngoài lề có từ đồng âm ("nguyên nhân", "chiến thuật game", "trần nhà")
+        tricky_ood_queries = [
+            "Nguyên nhân gây ô nhiễm môi trường là gì?",
+            "Chiến thuật chơi game Liên Quân để thắng",
+            "Trần nhà bị thấm nước phải làm sao?"
+        ]
+        m9_ok = all(
+            self.model.generate_natural_response(tq, session_id="cat_m_9")["unit_id"] == "OOD_RANDOM_AND_OFFTOPIC"
+            for tq in tricky_ood_queries
+        )
+        self.record_result(
+            "M.9",
+            "Homonym Off-Topic Guard ('nguyên nhân ô nhiễm', 'chiến thuật game', 'trần nhà')",
+            m9_ok,
+            f"All 3 tricky off-topic queries blocked as OOD: {m9_ok}"
+        )
+
         # Dọn dẹp dữ liệu test tạm thời sau khi kiểm thử xong
         bkt_engine.student_states.pop("test_essay_student", None)
         bkt_engine.analytics_data["unanswered_queries"] = [
