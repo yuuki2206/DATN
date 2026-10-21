@@ -624,6 +624,105 @@
     "answer": "**Phạm Ngũ Lão** (1255 – 1320, quê làng Phù Ủng, Hưng Yên) là vị danh tướng văn võ song toàn xuất thân từ bình dân:\n\n• **Giai thoại đan sọt**: Ngồi đan sọt bên đường mải suy nghĩ việc nước đến mức lính tiên phong đâm mũi giáo vào đùi chảy máu mà chàng vẫn không hề hay biết. Nhận thấy chí lớn phi thường, Trần Hưng Đạo liền đưa về trọng dụng và gả con gái cho.\n• **Chiến công & Thơ văn**: Lập nhiều chiến công lớn ở Vạn Kiếp, Bạch Đằng và là tác giả bài thơ **'Thuật hoài' (Tỏ lòng)** khí thế nuốt trâu chọi cọp.",
     "follow_up": "Đó là minh chứng rõ nét cho việc nhà Trần trọng người hiền tài không phân biệt xuất thân sang hèn!"
   },
+  "MILITARY_ART_TRAN_DYNASTY": {
+    "unit_id": "MILITARY_ART_TRAN_DYNASTY",
+    "category": "NGUYEN_NHAN_Y_NGHIA",
+    "topic": "Nghệ thuật quân sự độc đáo thời Trần (Lấy yếu thắng mạnh, lấy đoản binh thắng trường trận)",
+    "q_matrix": {
+      "cognitive_level": "VAN_DUNG",
+      "difficulty": 0.75,
+      "skills": [
+        "SKILL_MILITARY_ART"
+      ]
+    },
+    "entity": "Trần Hưng Đạo & Quân dân nhà Trần",
+    "event": "Nghệ thuật quân sự ba lần kháng chiến (1258 - 1288)",
+    "fact_chunk": "Nghệ thuật quân sự thời Trần kết tinh ở tư tưởng 'lấy đoản binh thắng trường trận' (lấy yếu thắng mạnh, lấy ít địch nhiều), kết hợp rút lui chiến lược, kế sách 'Vườn không nhà trống', đánh cắt hậu cần (Vân Đồn) và quyết chiến chiến lược đúng thời cơ (Đông Bộ Đầu, Chương Dương, Bạch Đằng).",
+    "badge": "Tinh hoa Đông A",
+    "base_queries": [
+      "nét độc đáo về nghệ thuật quân sự của nhà trần trong ba lần kháng chiến là gì",
+      "nghệ thuật đánh giặc lấy đoản binh thắng trường trận của trần hưng đạo là gì",
+      "chiến thuật lấy yếu thắng mạnh của nhà trần được thể hiện như thế nào",
+      "phân tích nghệ thuật quân sự trong ba lần kháng chiến chống mông nguyên"
+    ],
+    "answer": "Nghệ thuật quân sự thời Trần trong ba lần kháng chiến chống Mông – Nguyên (1258 – 1288) là đỉnh cao của đường lối **chiến tranh nhân dân**, kết tinh qua **4 nét độc đáo**:\n\n1. **Lấy đoản binh thắng trường trận (Lấy ít địch nhiều, lấy yếu chống mạnh)**: Tránh giao chiến trực diện khi kỵ binh giặc đang sung sức, chủ động rút lui chiến lược (Bình Lệ Nguyên, Vạn Kiếp) để bảo toàn quân chủ lực.\n2. **Kế sách 'Vườn không nhà trống' kết hợp chiến tranh du kích**: Triệt tiêu nguồn lương thảo tại chỗ tại Thăng Long, kết hợp dân binh địa phương ngày đêm tập kích làm giặc mỏi mệt, hoang mang.\n3. **Đánh vào chỗ hiểm yếu – Cắt đứt mạch máu hậu cần**: Tiêu biểu là trận phục kích đoàn thuyền lương Trương Văn Hổ tại **Vân Đồn (1288)** khiến 30 vạn quân Thoát Hoan lâm vào cảnh tuyệt lương.\n4. **Chớp thời cơ mở trận quyết chiến chiến lược**: Lợi dụng địa hình sông nước, thủy triều và sĩ khí giặc suy sụp để giáng đòn sấm sét tại **Đông Bộ Đầu (1258)**, **Hàm Tử – Chương Dương (1285)** và **Bạch Đằng (1288)**.",
+    "follow_up": "Em ấn tượng nhất với kế sách nào trong 4 nghệ thuật quân sự trên của cha ông ta?"
+  },
+  "ROLE_OF_ETHNIC_MINORITIES": {
+    "unit_id": "ROLE_OF_ETHNIC_MINORITIES",
+    "category": "DANH_TUONG_GIA_THAN",
+    "topic": "Vai trò của đồng bào dân tộc thiểu số và các tù trưởng miền núi (Hà Đặc, Hà Chương, Hà Khuất, Nguyễn Thế Lộc)",
+    "q_matrix": {
+      "cognitive_level": "THONG_HIEU",
+      "difficulty": 0.45,
+      "skills": [
+        "SKILL_ETHNIC_MINORITIES",
+        "SKILL_HA_KHUAT"
+      ]
+    },
+    "entity": "Hà Khuất, Hà Đặc, Hà Chương, Nguyễn Thế Lộc",
+    "event": "Chiến đấu bảo vệ biên cương phía Bắc (1258 - 1288)",
+    "fact_chunk": "Trong ba lần kháng chiến, đồng bào các dân tộc thiểu số miền núi phía Bắc dưới sự chỉ huy của các tù trưởng yêu nước như Hà Khuất (Quy Hóa - 1258), anh em Hà Đặc - Hà Chương (Đà Giang - 1285), Nguyễn Thế Lộc (Lạng Sơn - 1285, 1288) đã lập nhiều chiến công lớn, chặn đánh và tiêu hao sinh lực địch.",
+    "badge": "Trung nghĩa Đông A",
+    "base_queries": [
+      "vai trò của đồng bào các dân tộc thiểu số miền núi trong kháng chiến chống mông nguyên",
+      "hà đặc hà chương và nguyễn thế lộc có công lao gì trong kháng chiến thời trần",
+      "đồng bào miền núi đã đóng góp gì trong ba lần kháng chiến chống quân mông nguyên",
+      "kể tên các tù trưởng dân tộc thiểu số tiêu biểu đánh giặc mông nguyên"
+    ],
+    "answer": "Đồng bào các dân tộc thiểu số vùng biên giới phía Bắc đã sát cánh cùng triều đình lập nên những chiến công vang dội, khẳng định sức mạnh **đoàn kết miền xuôi – miền ngược**:\n\n• **Chủ trại Hà Khuất (Kháng chiến lần 1 - 1258)**: Chỉ huy dân binh trại Quy Hóa (Yên Bái – Lào Cai) chặn đánh tàn quân Mông Cổ tháo chạy từ Đông Bộ Đầu, khiến giặc đại bại.\n• **Hai anh em tù trưởng Hà Đặc và Hà Chương (Kháng chiến lần 2 - 1285)**: Dẫn dắt đồng bào vùng núi Đà Giang (Phú Thọ – Hòa Bình) làm hình người cỏ mặc áo giáp nhử giặc bắn hết tên rồi tập kích đánh bại quân Nguyên; Hà Đặc anh dũng hy sinh.\n• **Tù trưởng Nguyễn Thế Lộc và Nguyễn Lĩnh (1285 & 1288)**: Chỉ huy dân binh dân tộc Tày vùng Lạng Sơn phục kích tại đồn Ma Lục, dùng tên độc tiêu diệt hàng vạn quân giặc trên đường tháo chạy.",
+    "follow_up": "Sự góp sức của đồng bào miền núi là minh chứng sống động cho câu 'Cả nước góp sức' đấy em!"
+  },
+  "TRAN_NHAN_TONG_PORTRAIT": {
+    "unit_id": "TRAN_NHAN_TONG_PORTRAIT",
+    "category": "DANH_TUONG_GIA_THAN",
+    "topic": "Vua Trần Nhân Tông - Hoàng đế anh hùng và Phật hoàng Trúc Lâm Yên Tử",
+    "q_matrix": {
+      "cognitive_level": "THONG_HIEU",
+      "difficulty": 0.45,
+      "skills": [
+        "SKILL_TRAN_NHAN_TONG"
+      ]
+    },
+    "entity": "Vua Trần Nhân Tông (Phật hoàng)",
+    "event": "Lãnh đạo kháng chiến lần 2 (1285), lần 3 (1288) và sáng lập Thiền phái Trúc Lâm",
+    "fact_chunk": "Vua Trần Nhân Tông (Trần Khâm, 1258 - 1308) trực tiếp lãnh đạo thắng lợi hai cuộc kháng chiến năm 1285 và 1288. Ông nổi tiếng với hai câu thơ 'Xã tắc lưỡng hồi lao thạch mã / Sơn hà thiên cổ điện kim âu'. Sau chiến thắng, ông nhường ngôi, lên núi Yên Tử tu hành và sáng lập Thiền phái Trúc Lâm Yên Tử.",
+    "badge": "Tinh hoa Đông A",
+    "base_queries": [
+      "vua trần nhân tông là ai và có công lao gì trong kháng chiến chống nguyên",
+      "hai câu thơ xã tắc lưỡng hồi lao thạch mã sơn hà thiên cổ điện kim âu của ai",
+      "ai là tác giả câu thơ xã tắc hai phen chồn ngựa đá non sông nghìn thuở vững âu vàng",
+      "câu thơ xã tắc lưỡng hồi lao thạch mã sơn hà thiên cổ điện kim âu nói về chiến thắng nào của vua trần nhân tông",
+      "vị vua nào trực tiếp lãnh đạo cả hai cuộc kháng chiến năm 1285 và 1288 rồi đi tu ở yên tử",
+      "kể về phật hoàng trần nhân tông và thiền phái trúc lâm yên tử trong lịch sử nhà trần"
+    ],
+    "answer": "**Vua Trần Nhân Tông** (tên thật là **Trần Khâm**, 1258 – 1308) là một trong những vị hoàng đế anh minh và nhân từ bậc nhất lịch sử dân tộc:\n\n• **Vị vua hai lần bình Nguyên**: Cùng Thượng hoàng Trần Thánh Tông và Trần Hưng Đạo trực tiếp cầm quân đánh thắng hai cuộc xâm lược khốc liệt nhất của đế chế Nguyên (năm 1285 và 1288).\n• **Thơ văn hào sảng**: Sau đại thắng Bạch Đằng năm 1288, khi làm lễ dâng tù binh ở lăng Chiêu Lăng, thấy chân ngựa đá dính bùn, nhà vua cảm xúc đề hai câu thơ bất hủ:\n  *'Xã tắc lưỡng hồi lao thạch mã / Sơn hà thiên cổ điện kim âu'* (Xã tắc hai phen chồn ngựa đá / Non sông nghìn thuở vững âu vàng).\n• **Phật hoàng Trúc Lâm**: Khi đất nước thái bình, ông nhường ngôi rồi lên núi **Yên Tử (Quảng Ninh)** xuất gia, sáng lập **Thiền phái Trúc Lâm Yên Tử** mang đậm bản sắc nhập thế, yêu nước của dân tộc Việt.",
+    "follow_up": "Em có biết hai câu thơ của vua Trần Nhân Tông thể hiện niềm tự hào gì về tương lai đất nước không?"
+  },
+  "HISTORICAL_LESSONS_TODAY": {
+    "unit_id": "HISTORICAL_LESSONS_TODAY",
+    "category": "NGUYEN_NHAN_Y_NGHIA",
+    "topic": "Bài học kinh nghiệm lịch sử từ ba lần kháng chiến thời Trần đối với sự nghiệp bảo vệ Tổ quốc hiện nay",
+    "q_matrix": {
+      "cognitive_level": "VAN_DUNG",
+      "difficulty": 0.85,
+      "skills": [
+        "SKILL_HISTORICAL_LESSONS"
+      ]
+    },
+    "entity": "Dân tộc Việt Nam",
+    "event": "Bài học giữ nước từ Hào khí Đông A",
+    "fact_chunk": "Ba lần kháng chiến chống Mông - Nguyên để lại bài học cốt lõi: 1. Khoan thư sức dân để làm kế sâu rễ bền gốc (lấy dân làm gốc). 2. Phát huy khối đại đoàn kết toàn dân tộc ('Vua tôi đồng lòng, anh em hòa mục, cả nước góp sức'). 3. Đề cao cảnh giác và nghệ thuật quân sự chiến tranh nhân dân.",
+    "badge": "Tinh hoa Đông A",
+    "base_queries": [
+      "bài học kinh nghiệm rút ra từ ba lần kháng chiến chống quân mông nguyên đối với ngày nay",
+      "tư tưởng khoan thư sức dân để làm kế sâu rễ bền gốc có ý nghĩa gì hiện nay",
+      "liên hệ trách nhiệm của học sinh hôm nay từ hào khí đông a thời trần",
+      "vận dụng bài học đại đoàn kết thời trần vào công cuộc xây dựng và bảo vệ tổ quốc hiện nay"
+    ],
+    "answer": "Thắng lợi vĩ đại của ba lần kháng chiến chống Mông – Nguyên (1258 – 1288) để lại **4 bài học lịch sử vô giá** cho công cuộc xây dựng và bảo vệ Tổ quốc ngày nay:\n\n1. **Bài học 'Lấy dân làm gốc'**: Thực hiện lời dặn của Trần Hưng Đạo: *'Khoan thư sức dân để làm kế sâu rễ bền gốc, đó là thượng sách giữ nước'* — chăm lo đời sống nhân dân chính là nền tảng sức mạnh quốc gia vững chắc nhất.\n2. **Phát huy khối đại đoàn kết toàn dân tộc**: Tinh thần Diên Hồng *'Vua tôi đồng lòng, anh em hòa mục, cả nước góp sức'* nhắc nhở chúng ta luôn đoàn kết muôn người như một trước mọi thử thách.\n3. **Trọng dụng hiền tài & Phát huy trí tuệ Việt**: Không phân biệt xuất thân (như trọng dụng Phạm Ngũ Lão, Yết Kiêu, Dã Tượng) và vận dụng linh hoạt thế trận toàn dân.\n4. **Trách nhiệm của thế hệ trẻ (học sinh lớp 7)**: Tiếp nối gương sáng tuổi trẻ Hoài Văn hầu Trần Quốc Toản — chăm chỉ rèn luyện đạo đức, học tập tốt, tự hào và giữ gìn chủ quyền thiêng liêng của Tổ quốc.",
+    "follow_up": "Theo em, trong các bài học trên, bài học nào gần gũi nhất với học sinh chúng mình?"
+  },
   "INTENT_GREETING": {
     "unit_id": "INTENT_GREETING",
     "category": "CONVERSATIONAL_INTENT",

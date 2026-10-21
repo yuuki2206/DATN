@@ -284,6 +284,51 @@
       "SKILL_PHAM_NGU_LAO"
     ]
   },
+  "MILITARY_ART_TRAN_DYNASTY": {
+    "topic": "Nghệ thuật quân sự độc đáo thời Trần (Lấy yếu thắng mạnh, lấy đoản binh thắng trường trận)",
+    "category": "NGUYEN_NHAN_Y_NGHIA",
+    "entity": "Trần Hưng Đạo & Quân dân nhà Trần",
+    "event": "Nghệ thuật quân sự ba lần kháng chiến (1258 - 1288)",
+    "cognitive_level": "VAN_DUNG",
+    "difficulty": 0.75,
+    "skills": [
+      "SKILL_MILITARY_ART"
+    ]
+  },
+  "ROLE_OF_ETHNIC_MINORITIES": {
+    "topic": "Vai trò của đồng bào dân tộc thiểu số và các tù trưởng miền núi (Hà Đặc, Hà Chương, Hà Khuất, Nguyễn Thế Lộc)",
+    "category": "DANH_TUONG_GIA_THAN",
+    "entity": "Hà Khuất, Hà Đặc, Hà Chương, Nguyễn Thế Lộc",
+    "event": "Chiến đấu bảo vệ biên cương phía Bắc (1258 - 1288)",
+    "cognitive_level": "THONG_HIEU",
+    "difficulty": 0.45,
+    "skills": [
+      "SKILL_ETHNIC_MINORITIES",
+      "SKILL_HA_KHUAT"
+    ]
+  },
+  "TRAN_NHAN_TONG_PORTRAIT": {
+    "topic": "Vua Trần Nhân Tông - Hoàng đế anh hùng và Phật hoàng Trúc Lâm Yên Tử",
+    "category": "DANH_TUONG_GIA_THAN",
+    "entity": "Vua Trần Nhân Tông (Phật hoàng)",
+    "event": "Lãnh đạo kháng chiến lần 2 (1285), lần 3 (1288) và sáng lập Thiền phái Trúc Lâm",
+    "cognitive_level": "THONG_HIEU",
+    "difficulty": 0.45,
+    "skills": [
+      "SKILL_TRAN_NHAN_TONG"
+    ]
+  },
+  "HISTORICAL_LESSONS_TODAY": {
+    "topic": "Bài học kinh nghiệm lịch sử từ ba lần kháng chiến thời Trần đối với sự nghiệp bảo vệ Tổ quốc hiện nay",
+    "category": "NGUYEN_NHAN_Y_NGHIA",
+    "entity": "Dân tộc Việt Nam",
+    "event": "Bài học giữ nước từ Hào khí Đông A",
+    "cognitive_level": "VAN_DUNG",
+    "difficulty": 0.85,
+    "skills": [
+      "SKILL_HISTORICAL_LESSONS"
+    ]
+  },
   "INTENT_GREETING": {
     "topic": "Chào hỏi làm quen tự nhiên",
     "category": "CONVERSATIONAL_INTENT",

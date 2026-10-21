@@ -710,6 +710,101 @@ class RegressionTestRunner:
         )
 
     # ==========================================================================
+    # CATEGORY M: NEW CURRICULUM UNITS, PROFILE DIAGNOSTICS & AI ESSAY GRADER
+    # ==========================================================================
+    def test_category_m_adaptive_ai_and_new_units(self):
+        print("\n" + "=" * 70)
+        print("▶ CATEGORY M: EXPANDED CURRICULUM, ACCOUNT ANALYTICS & AI ESSAY GRADER")
+        print("=" * 70)
+
+        from bkt_engine import bkt_engine
+
+        # 1. Nghệ thuật quân sự thời Trần
+        qm1 = "Nét độc đáo về nghệ thuật quân sự lấy đoản binh thắng trường trận của nhà Trần là gì?"
+        rm1 = self.model.generate_natural_response(qm1, session_id="cat_m_1")
+        m1_ok = (rm1["unit_id"] == "MILITARY_ART_TRAN_DYNASTY" and "đoản binh" in rm1["answer"].lower())
+        self.record_result("M.1", f"New Unit Military Art: '{qm1}'", m1_ok, f"Unit: {rm1['unit_id']}")
+
+        # 2. Vai trò đồng bào dân tộc thiểu số miền núi
+        qm2 = "Vai trò của đồng bào các dân tộc thiểu số miền núi trong kháng chiến chống Mông Nguyên?"
+        rm2 = self.model.generate_natural_response(qm2, session_id="cat_m_2")
+        m2_ok = (rm2["unit_id"] == "ROLE_OF_ETHNIC_MINORITIES" and "hà đặc" in rm2["answer"].lower())
+        self.record_result("M.2", f"New Unit Ethnic Minorities: '{qm2}'", m2_ok, f"Unit: {rm2['unit_id']}")
+
+        # 3. Vua Trần Nhân Tông & Trúc Lâm Yên Tử
+        qm3 = "Hai câu thơ Xã tắc lưỡng hồi lao thạch mã Sơn hà thiên cổ điện kim âu là của ai?"
+        rm3 = self.model.generate_natural_response(qm3, session_id="cat_m_3")
+        m3_ok = (rm3["unit_id"] == "TRAN_NHAN_TONG_PORTRAIT" and "trần nhân tông" in rm3["answer"].lower())
+        self.record_result("M.3", f"New Unit King Trần Nhân Tông: '{qm3}'", m3_ok, f"Unit: {rm3['unit_id']}")
+
+        # 4. Bài học kinh nghiệm lịch sử đối với ngày nay
+        qm4 = "Bài học kinh nghiệm rút ra từ ba lần kháng chiến chống quân Mông Nguyên đối với ngày nay?"
+        rm4 = self.model.generate_natural_response(qm4, session_id="cat_m_4")
+        m4_ok = (rm4["unit_id"] == "HISTORICAL_LESSONS_TODAY" and "khoan thư sức dân" in rm4["answer"].lower())
+        self.record_result("M.4", f"New Unit Historical Lessons Today: '{qm4}'", m4_ok, f"Unit: {rm4['unit_id']}")
+
+        # 5. Phân tích toàn diện hồ sơ tài khoản học sinh & gợi ý tài liệu SGK
+        profile = bkt_engine.analyze_student_profile("student_nguyen_van_long", top_k=3)
+        m5_ok = (
+            len(profile["campaign_breakdown"]) == 4
+            and len(profile["cognitive_breakdown"]) == 3
+            and len(profile["recommended_study_materials"]) > 0
+            and bool(profile["ai_diagnosis"])
+        )
+        self.record_result(
+            "M.5",
+            "Student Account Diagnostic & Adaptive Study Plan (BKT + Bloom + SGK Materials)",
+            m5_ok,
+            f"Overall: {profile['overall_mastery']} | Materials count: {len(profile['recommended_study_materials'])}"
+        )
+
+        # 6. AI Chấm câu trả lời tự luận ngắn & tự động cập nhật BKT
+        eval_res = bkt_engine.evaluate_short_answer(
+            student_id="test_essay_student",
+            unit_id="TQT_WHY_ORANGE",
+            student_answer="Tháng 10/1282 tại Hội nghị Bình Than, Trần Quốc Toản vì tuổi nhỏ 15-16 tuổi không được vào bàn việc nước nên vừa căm thù giặc vừa hổ thẹn đã bóp nát quả cam vua ban."
+        )
+        m6_ok = (eval_res["score_10"] >= 7.0 and eval_res["is_passed"] is True and eval_res["bkt_update"]["new_p_l"] > 0.30)
+        self.record_result(
+            "M.6",
+            "AI Short-Answer Essay Grader & Automatic BKT Update",
+            m6_ok,
+            f"Score: {eval_res['score_10']}/10 | New P(L): {eval_res['bkt_update']['new_p_l']}"
+        )
+
+        # 7. Đồng bộ 2 chiều Chat AI -> Hồ sơ học sinh & Active Learning Log
+        mat_card = bkt_engine.record_chat_interaction(
+            student_id="test_essay_student",
+            unit_id="KC1_VUON_KHONG_NHA_TRONG",
+            query="Kế sách vườn không nhà trống có tác dụng gì?",
+            confidence=0.82,
+            is_not_found=False
+        )
+        _ = bkt_engine.record_chat_interaction(
+            student_id="test_essay_student",
+            unit_id="OOD_RANDOM_AND_OFFTOPIC",
+            query="Câu hỏi lạ chưa có trong dữ liệu lịch sử",
+            confidence=0.12,
+            is_not_found=True
+        )
+        analytics = bkt_engine.get_learning_analytics()
+        m7_ok = (mat_card is not None and "sgk_reference" in mat_card and len(analytics["unanswered_queries"]) > 0)
+        self.record_result(
+            "M.7",
+            "Two-Way Chat-to-Profile Sync & Unanswered Query Active Learning Logger",
+            m7_ok,
+            f"Material returned: {bool(mat_card)} | Logged unanswered queries: {len(analytics['unanswered_queries'])}"
+        )
+
+        # Dọn dẹp dữ liệu test tạm thời sau khi kiểm thử xong
+        bkt_engine.student_states.pop("test_essay_student", None)
+        bkt_engine.analytics_data["unanswered_queries"] = [
+            q for q in bkt_engine.analytics_data.get("unanswered_queries", [])
+            if q.get("query") != "Câu hỏi lạ chưa có trong dữ liệu lịch sử"
+        ]
+        bkt_engine._save_persistent_data()
+
+    # ==========================================================================
     # RUN ALL SUITES & REPORT SUMMARY
     # ==========================================================================
     def run_all(self):
@@ -726,6 +821,7 @@ class RegressionTestRunner:
         self.test_category_j_critical_failures()
         self.test_category_k_mandatory_benchmarks()
         self.test_category_l_test3_audit_10_tests()
+        self.test_category_m_adaptive_ai_and_new_units()
 
         total = self.passed_tests + self.failed_tests
         pass_rate = (self.passed_tests / total * 100) if total > 0 else 0.0

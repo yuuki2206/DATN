@@ -247,7 +247,10 @@ class VietnameseNLU:
         # Từ vựng quân sự, chiến thuật & tư duy lịch sử (Chống OOD giả đối với câu hỏi suy luận)
         "chien thuat", "rut lui", "chien luoc", "ke sach", "dau hang", "phan cong",
         "thao chay", "that bai", "dong va manh", "van thua", "thua", "danh thang",
-        "thang loi", "boi vi sao", "bao toan luc luong", "nghe thuat quan su", "the giac", "doan ket"
+        "thang loi", "boi vi sao", "bao toan luc luong", "nghe thuat quan su", "the giac", "doan ket",
+        "doan binh", "truong tran", "ha dac", "ha chuong", "nguyen the loc", "nhan tong",
+        "phat hoang", "truc lam", "yen tu", "thach ma", "kim au", "khoan thu suc dan",
+        "sau re ben goc", "dan toc thieu so", "mien nui", "bai hoc kinh nghiem"
     ]
 
     @classmethod

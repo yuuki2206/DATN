@@ -1,12 +1,16 @@
 """
-ROUTER API KHẢO THÍ, SINH ĐỀ TRẮC NGHIỆM & THEO DÕI TRI THỨC BKT (`/api/quiz/*`)
+ROUTER API KHẢO THÍ, SINH ĐỀ, PHÂN TÍCH HỒ SƠ BKT & CHẤM TỰ LUẬN (`/api/quiz/*`)
 ================================================================================
-- Code này là gì: Cung cấp 3 endpoint cho Phân hệ Giáo viên & Đánh giá năng lực Học sinh:
+- Code này là gì: Cung cấp 5 endpoint cho Phân hệ Giáo viên & Đánh giá năng lực Học sinh:
   1. `POST /api/quiz/generate`: Sinh bộ câu hỏi trắc nghiệm chuẩn GDPT 2018 từ sử liệu RAG.
   2. `POST /api/quiz/submit-answer`: Cập nhật xác suất nắm vững kiến thức $P(L_t)$ theo định lý Bayes.
-  3. `GET /api/quiz/recommendations/{student_id}`: Gợi ý các chủ điểm yếu ($P(L) < 0.60$) cần ôn tập.
+  3. `GET /api/quiz/recommendations/{student_id}`: Gợi ý các chủ điểm yếu ($P(L) < 0.60$) kèm tài liệu SGK.
+  4. `GET /api/quiz/study-plan/{student_id}`: Phân tích toàn diện hồ sơ tài khoản học sinh
+     (theo 3 cuộc kháng chiến & 3 mức độ nhận thức Bloom) và xuất Phương án + Tài liệu học tập.
+  5. `POST /api/quiz/evaluate-answer`: AI chấm câu trả lời tự luận ngắn của học sinh theo thang 10,
+     chỉ ra ý đúng / ý thiếu và tự động cập nhật điểm năng lực BKT.
 - Liên kết với file nào:
-  + Nhận request từ: `frontend/src/components/TeacherView.tsx` & `StudentView.tsx`
+  + Nhận request từ: `frontend/src/views/TeacherView.tsx` & `StudentView.tsx`
   + Gọi xuống: `app/core/rag_engine.py`, `app/core/gemini_client.py`, và `backend/bkt_engine.py`.
 """
 
@@ -14,12 +18,15 @@ import sys
 from pathlib import Path
 from fastapi import APIRouter, HTTPException, Query
 from app.models.schemas import (
-    QuizGenerateRequest, 
+    QuizGenerateRequest,
     QuizGenerateResponse,
     StudentAnswerSubmission,
     BKTUpdateResponse,
     PersonalizedRecommendationResponse,
-    PersonalizedRecommendationItem
+    PersonalizedRecommendationItem,
+    StudentProfileAnalysisResponse,
+    ShortAnswerEvaluationRequest,
+    ShortAnswerEvaluationResponse
 )
 from app.core.rag_engine import rag_engine
 from app.core.gemini_client import gemini_client
@@ -30,22 +37,20 @@ if str(BACKEND_ROOT) not in sys.path:
 
 from bkt_engine import bkt_engine
 
-router = APIRouter(prefix="/quiz", tags=["Giảng Viên & Khảo Thí - Sinh Đề & BKT Cá Nhân Hóa"])
+router = APIRouter(prefix="/quiz", tags=["Giảng Viên & Khảo Thí - Sinh Đề, Hồ Sơ BKT & Chấm Tự Luận AI"])
 
 
 @router.post("/generate", response_model=QuizGenerateResponse)
 async def generate_quiz(req: QuizGenerateRequest):
     """
-    Giáo viên yêu cầu sinh bộ câu hỏi trắc nghiệm tự động chuẩn kiến thức SGK 7
+    Giáo viên yêu cầu sinh bộ câu hỏi trắc nghiệm tự động chuẩn kiến thức SGK 7.
     """
     try:
-        # 1. RAG Retrieval: Trích xuất các sự kiện & tư liệu liên quan đến chủ đề
         relevant_records = rag_engine.search_relevant_chunks(
             query=req.topic,
             top_k=5
         )
 
-        # 2. Sinh câu hỏi trắc nghiệm
         questions = await gemini_client.generate_quiz(
             topic=req.topic,
             num_questions=req.num_questions,
@@ -86,8 +91,8 @@ async def submit_student_answer(sub: StudentAnswerSubmission):
 @router.get("/recommendations/{student_id}", response_model=PersonalizedRecommendationResponse)
 async def get_personalized_recommendations(student_id: str, top_k: int = Query(3, ge=1, le=10)):
     """
-    Gợi ý cá nhân hóa các cụm tri thức yếu (P(L) < 0.60) cần ôn tập trọng tâm.
-    Dựa trên Q-matrix (32 kỹ năng, độ khó, mức độ nhận thức).
+    Gợi ý cá nhân hóa các cụm tri thức yếu (P(L) < 0.60) cần ôn tập trọng tâm,
+    đính kèm trích dẫn mục SGK và phương pháp học tương ứng.
     """
     try:
         recs = bkt_engine.recommend_personalized_review(student_id=student_id, top_k=top_k)
@@ -100,3 +105,36 @@ async def get_personalized_recommendations(student_id: str, top_k: int = Query(3
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Lỗi truy vấn gợi ý cá nhân hóa: {str(e)}")
 
+
+@router.get("/study-plan/{student_id}", response_model=StudentProfileAnalysisResponse)
+async def get_student_study_plan(student_id: str, top_k: int = Query(5, ge=1, le=10)):
+    """
+    Đánh giá toàn diện dữ liệu tài khoản học sinh (theo 3 cuộc kháng chiến & 3 mức độ nhận thức Bloom),
+    đưa ra nhận xét chẩn đoán AI và đề xuất Phương án + Tài liệu học tập SGK hiệu quả.
+    """
+    try:
+        report = bkt_engine.analyze_student_profile(student_id=student_id, top_k=top_k)
+        return StudentProfileAnalysisResponse(**report)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Lỗi phân tích hồ sơ học tập học sinh: {str(e)}")
+
+
+@router.post("/evaluate-answer", response_model=ShortAnswerEvaluationResponse)
+async def evaluate_student_short_answer(req: ShortAnswerEvaluationRequest):
+    """
+    AI chấm điểm câu trả lời tự luận ngắn của học sinh theo thang 10:
+    - Đối sánh khái niệm lịch sử cốt lõi với tư liệu chuẩn SGK.
+    - Chỉ rõ ý học sinh đã nhớ đúng và ý còn thiếu.
+    - Tự động cập nhật xác suất nắm vững kiến thức P(L) vào hồ sơ BKT.
+    """
+    try:
+        evaluation = bkt_engine.evaluate_short_answer(
+            student_id=req.student_id,
+            unit_id=req.unit_id,
+            student_answer=req.student_answer
+        )
+        return ShortAnswerEvaluationResponse(**evaluation)
+    except ValueError as ve:
+        raise HTTPException(status_code=404, detail=str(ve))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Lỗi chấm câu trả lời tự luận AI: {str(e)}")
