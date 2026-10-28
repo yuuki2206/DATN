@@ -93,6 +93,12 @@ CATEGORY_STUDY_GUIDE: Dict[str, Dict[str, str]] = {
         "pillar_label": "Nhân vật Lịch sử, Hội nghị & Nghệ thuật Quân sự",
         "sgk_reference": "SGK Lịch sử & Địa lí 7 (Kết nối tri thức) - Bài 15, Tư liệu mở rộng, Trang 68–74",
         "core_summary": "Ghi nhớ công lao của vua Trần Nhân Tông, các gia tướng xuất thân bình dân (Phạm Ngũ Lão, Yết Kiêu, Dã Tượng) và các tù trưởng dân tộc thiểu số (Hà Khuất, Hà Đặc, Hà Chương, Nguyễn Thế Lộc)."
+    },
+    "NEN_TANG_QUAN_SU": {
+        "pillar": "NHAN_VAT_HOI_NGHI",
+        "pillar_label": "Nhân vật Lịch sử, Hội nghị & Nghệ thuật Quân sự",
+        "sgk_reference": "SGK Lịch sử & Địa lí 7 (Kết nối tri thức) - Bài 14 & Bài 15, Trang 62–73",
+        "core_summary": "Nắm vững chính sách 'Ngụ binh ư nông', tổ chức Cấm quân Thánh Dực – Tinh binh Sát Thát và hệ thống căn cứ địa chiến lược Vạn Kiếp – Thiên Trường – Trường Yên."
     }
 }
 
@@ -179,11 +185,12 @@ class BKTEngine:
 
     def _save_persistent_data(self):
         try:
-            DATA_DIR.mkdir(parents=True, exist_ok=True)
-            with open(STUDENT_PROFILES_FILE, "w", encoding="utf-8") as f:
-                json.dump(self.student_states, f, ensure_ascii=False, indent=2)
-            with open(ANALYTICS_FILE, "w", encoding="utf-8") as f:
-                json.dump(self.analytics_data, f, ensure_ascii=False, indent=2)
+            if STUDENT_PROFILES_FILE.exists():
+                with open(STUDENT_PROFILES_FILE, "w", encoding="utf-8", newline="\n") as f:
+                    json.dump(self.student_states, f, ensure_ascii=False, indent=2)
+            if ANALYTICS_FILE.exists():
+                with open(ANALYTICS_FILE, "w", encoding="utf-8", newline="\n") as f:
+                    json.dump(self.analytics_data, f, ensure_ascii=False, indent=2)
         except Exception:
             pass
 
@@ -281,17 +288,73 @@ class BKTEngine:
             else f"Hãy trình bày nội dung cốt lõi về: {q_meta.get('topic', unit_id)}?"
         )
 
+        topic_title = q_meta.get("topic", unit_id)
         return {
             "unit_id": unit_id,
-            "topic": q_meta.get("topic", unit_id),
+            "topic": topic_title,
+            "title": topic_title,
             "category": category,
             "cognitive_level": cog_level,
+            "bloom_target": cog_level,
             "sgk_reference": cat_guide["sgk_reference"],
+            "reading_section": cat_guide["sgk_reference"],
+            "doc_source": "SGK Lịch sử và Địa lí 7 (Kết nối tri thức) & Đại Việt Sử Ký Toàn Thư",
             "core_fact_summary": fact_chunk,
             "key_takeaways": key_takeaways[:4],
+            "summary_points": key_takeaways[:4],
             "study_method": cog_guide["method"],
-            "practice_question": practice_question
+            "practice_question": practice_question,
+            "practice_prompt": practice_question,
         }
+
+    def get_study_materials_for_units(
+        self,
+        unit_ids: List[str],
+        max_items: int = 2,
+        student_id: Optional[str] = None
+    ) -> List[Dict[str, Any]]:
+        """Trả về danh sách tài liệu học tập tương thích `StudyMaterialItem` cho các cụm tri thức."""
+        self._load_curriculum_metadata()
+        materials = []
+        for uid in unit_ids[:max_items]:
+            mat = self.get_study_material(uid)
+            if student_id:
+                p_l = self.get_student_knowledge_level(student_id, uid)
+                mat["current_mastery"] = round(p_l, 4)
+                mat["mastery_status"] = (
+                    "Đã vững vàng" if p_l >= 0.80 else ("Đang tiếp thu" if p_l >= 0.60 else "Cần củng cố")
+                )
+            materials.append(mat)
+        return materials
+
+    def log_unanswered_query(
+        self,
+        query: str,
+        student_id: str = "student_demo_01",
+        session_id: str = "default",
+        predicted_unit: str = "OOD_RANDOM_AND_OFFTOPIC",
+        confidence: float = 0.0
+    ) -> None:
+        """Ghi nhận câu hỏi ngoài miền hoặc chưa trả lời được vào nhật ký Active Learning."""
+        clean_q = (query or "").strip()
+        if not clean_q:
+            return
+        unanswered = self.analytics_data.setdefault("unanswered_queries", [])
+        existing = next((item for item in unanswered if item.get("query", "").lower() == clean_q.lower()), None)
+        if existing:
+            existing["count"] = existing.get("count", 1) + 1
+            existing["last_asked"] = time.time()
+        else:
+            unanswered.append({
+                "query": clean_q,
+                "student_id": student_id,
+                "session_id": session_id,
+                "predicted_unit": predicted_unit,
+                "confidence": round(float(confidence), 4),
+                "count": 1,
+                "last_asked": time.time()
+            })
+        self._save_persistent_data()
 
     def update_student_response(
         self,
@@ -354,9 +417,10 @@ class BKTEngine:
         self,
         student_id: str,
         unit_id: str,
-        query: str,
-        confidence: float,
-        is_not_found: bool = False
+        query: str = "",
+        confidence: float = 0.9,
+        is_not_found: bool = False,
+        topic: Optional[str] = None
     ) -> Optional[Dict[str, Any]]:
         """
         Đồng bộ 2 chiều giữa Chat AI và Hồ sơ học sinh:
@@ -366,23 +430,24 @@ class BKTEngine:
           để giáo viên/nhà phát triển biết câu hỏi nào cần bổ sung thêm dữ liệu.
         """
         self._load_curriculum_metadata()
-        clean_q = query.strip()
+        clean_q = (query or "").strip()
 
         if is_not_found or unit_id in ("OOD_RANDOM_AND_OFFTOPIC", "ABSENT_HISTORICAL_FACT") or confidence < 0.35:
-            unanswered = self.analytics_data.setdefault("unanswered_queries", [])
-            existing = next((item for item in unanswered if item["query"].lower() == clean_q.lower()), None)
-            if existing:
-                existing["count"] += 1
-                existing["last_asked"] = time.time()
-            else:
-                unanswered.append({
-                    "query": clean_q,
-                    "predicted_unit": unit_id,
-                    "confidence": round(confidence, 4),
-                    "count": 1,
-                    "last_asked": time.time()
-                })
-            self._save_persistent_data()
+            if clean_q:
+                unanswered = self.analytics_data.setdefault("unanswered_queries", [])
+                existing = next((item for item in unanswered if item["query"].lower() == clean_q.lower()), None)
+                if existing:
+                    existing["count"] += 1
+                    existing["last_asked"] = time.time()
+                else:
+                    unanswered.append({
+                        "query": clean_q,
+                        "predicted_unit": unit_id,
+                        "confidence": round(confidence, 4),
+                        "count": 1,
+                        "last_asked": time.time()
+                    })
+                self._save_persistent_data()
             return None
 
         # Thống kê mức độ quan tâm theo chủ đề
@@ -403,8 +468,15 @@ class BKTEngine:
         record["last_updated_time"] = time.time()
         self._save_persistent_data()
 
+        mastery_status = "Đã vững vàng" if new_p_l >= 0.80 else ("Đang tiếp thu" if new_p_l >= 0.60 else "Cần củng cố")
         material = self.get_study_material(unit_id)
+        if topic:
+            material["topic"] = topic
         material["current_mastery"] = new_p_l
+        material["old_p_l"] = round(old_p_l, 4)
+        material["new_p_l"] = round(new_p_l, 4)
+        material["p_l_delta"] = round(new_p_l - old_p_l, 4)
+        material["mastery_status"] = mastery_status
         return material
 
     def recommend_personalized_review(self, student_id: str, top_k: int = 3) -> List[Dict[str, Any]]:
@@ -421,6 +493,8 @@ class BKTEngine:
             p_l = self.get_student_knowledge_level(student_id, uid)
             if p_l < 0.60:
                 material = self.get_study_material(uid)
+                material["current_mastery"] = round(p_l, 4)
+                material["mastery_status"] = "Cần củng cố"
                 recommendations.append({
                     "unit_id": uid,
                     "topic": meta.get("topic"),
@@ -433,7 +507,8 @@ class BKTEngine:
                     ),
                     "sgk_reference": material["sgk_reference"],
                     "study_method": material["study_method"],
-                    "key_takeaways": material["key_takeaways"]
+                    "key_takeaways": material["key_takeaways"],
+                    "study_material": material,
                 })
 
         recommendations.sort(key=lambda x: x["current_mastery"])
@@ -598,20 +673,144 @@ class BKTEngine:
             "recommended_study_materials": study_materials
         }
 
+    def analyze_student_account_profile(self, student_id: str, top_k: int = 5) -> Dict[str, Any]:
+        """
+        Phân tích toàn diện hồ sơ tài khoản học sinh tương thích 100% với schema
+        `StudentAccountAnalysisResponse` của endpoint `GET /api/quiz/student-profile/{student_id}`.
+        """
+        base = self.analyze_student_profile(student_id=student_id, top_k=top_k)
+        student_data = self.student_states.get(student_id, {})
+
+        total_attempts = 0
+        total_correct = 0
+        for uid, meta in self.q_matrix.items():
+            if meta.get("category") in ("OUT_OF_DOMAIN", "CONVERSATIONAL_INTENT", "CROSS_ERA_SAFEGUARD"):
+                continue
+            rec = student_data.get(uid, {})
+            total_attempts += int(rec.get("attempts", 0))
+            total_correct += int(rec.get("correct_count", 0))
+
+        accuracy_rate = round(total_correct / total_attempts, 4) if total_attempts > 0 else 0.0
+
+        # Map campaign_breakdown -> CampaignMasteryItem
+        campaign_items = []
+        for c in base["campaign_breakdown"]:
+            p_id = c["pillar_id"]
+            mastered_cnt = 0
+            for uid, meta in self.q_matrix.items():
+                cat = meta.get("category", "")
+                if cat in ("OUT_OF_DOMAIN", "CONVERSATIONAL_INTENT", "CROSS_ERA_SAFEGUARD"):
+                    continue
+                cat_guide = CATEGORY_STUDY_GUIDE.get(cat, CATEGORY_STUDY_GUIDE["NGUYEN_NHAN_Y_NGHIA"])
+                if cat_guide["pillar"] == p_id and self.get_student_knowledge_level(student_id, uid) >= 0.70:
+                    mastered_cnt += 1
+            campaign_items.append({
+                "campaign_id": p_id,
+                "campaign_name": c["label"],
+                "average_mastery": c["avg_mastery"],
+                "mastered_units": mastered_cnt,
+                "total_units": c["unit_count"],
+                "status": c["status"],
+            })
+
+        # Map cognitive_breakdown -> CognitiveMasteryItem
+        cognitive_items = []
+        for cb in base["cognitive_breakdown"]:
+            lvl = cb["cognitive_level"]
+            practiced_cnt = 0
+            total_cnt = 0
+            for uid, meta in self.q_matrix.items():
+                if meta.get("category") in ("OUT_OF_DOMAIN", "CONVERSATIONAL_INTENT", "CROSS_ERA_SAFEGUARD"):
+                    continue
+                if meta.get("cognitive_level", "THONG_HIEU") == lvl:
+                    total_cnt += 1
+                    rec = student_data.get(uid, {})
+                    if rec.get("attempts", 0) > 0 or rec.get("chat_count", 0) > 0:
+                        practiced_cnt += 1
+            cognitive_items.append({
+                "level_code": lvl,
+                "level_name": cb["label"],
+                "average_mastery": cb["avg_mastery"],
+                "practiced_units": practiced_cnt,
+                "total_units": total_cnt,
+            })
+
+        weak_mats = base["recommended_study_materials"]
+        weak_uids = [m["unit_id"] for m in weak_mats]
+        study_plan = [
+            {
+                "step": 1,
+                "phase_name": "Củng cố nền tảng SGK Lịch sử 7",
+                "action_title": "Đọc lại các mục trọng tâm đang hổng kiến thức",
+                "description": "Đọc kỹ căn cứ sử liệu và ghi nhớ các mốc thời gian, nhân vật cốt lõi của giai đoạn yếu nhất.",
+                "target_units": weak_uids[:2] or ["KC1_VUON_KHONG_NHA_TRONG"],
+                "estimated_minutes": 15,
+            },
+            {
+                "step": 2,
+                "phase_name": "Rèn luyện tư duy Thông hiểu & Vận dụng",
+                "action_title": "Thực hành trả lời câu hỏi Vì sao & So sánh chiến thuật",
+                "description": "Tập giải thích nguyên nhân thắng lợi và nghệ thuật quân sự của nhà Trần qua Hỏi - Đáp cùng Quân Sư AI.",
+                "target_units": weak_uids[2:4] or ["KC3_BACH_DANG_HOW"],
+                "estimated_minutes": 20,
+            },
+            {
+                "step": 3,
+                "phase_name": "Khảo thí thích ứng BKT",
+                "action_title": "Làm đề ôn tập cá nhân hóa để nâng chuẩn P(L) >= 80%",
+                "description": "Hoàn thành bài kiểm tra 5 câu kết hợp Trắc nghiệm và Tự luận ngắn để khóa chặt trí nhớ dài hạn.",
+                "target_units": weak_uids[:3] or ["CAUSES_OF_VICTORY"],
+                "estimated_minutes": 15,
+            },
+        ]
+
+        return {
+            "student_id": student_id,
+            "overall_mastery": base["overall_mastery"],
+            "student_rank_title": base["mastery_rank"],
+            "total_attempts": total_attempts,
+            "total_correct": total_correct,
+            "accuracy_rate": accuracy_rate,
+            "chat_questions_asked": base["total_chat_questions"],
+            "ai_evaluator_comment": base["ai_diagnosis"],
+            "strengths": base["strengths"],
+            "weaknesses": base["weaknesses"],
+            "campaign_breakdown": campaign_items,
+            "cognitive_breakdown": cognitive_items,
+            "study_plan": study_plan,
+            "recommended_materials": weak_mats,
+        }
+
     def generate_adaptive_exam(self, student_id: str, num_questions: int = 5) -> Dict[str, Any]:
         """
         Sinh Đề Ôn Tập Cá Nhân Hóa (Adaptive Custom Exam Generator):
-        Kết hợp câu hỏi Trắc nghiệm (Multiple Choice từ `quiz_bank.json`) và Tự luận ngắn
+        Kết hợp câu hỏi Trắc nghiệm (Multiple Choice từ `quiz_bank.json` hoặc `game_content.json`) và Tự luận ngắn
         nhắm chính xác vào các chủ điểm học sinh đang yếu nhất trong Hồ sơ năng lực BKT.
         """
         profile = self.analyze_student_profile(student_id=student_id, top_k=max(5, num_questions))
         weak_recs = self.recommend_personalized_review(student_id=student_id, top_k=10)
 
         quiz_bank_path = DATA_DIR / "quiz_bank.json"
+        game_content_path = DATA_DIR / "game_content.json"
         mcq_pool = []
         if quiz_bank_path.exists():
             try:
                 mcq_pool = json.loads(quiz_bank_path.read_text(encoding="utf-8"))
+            except Exception:
+                mcq_pool = []
+        elif game_content_path.exists():
+            try:
+                gc_data = json.loads(game_content_path.read_text(encoding="utf-8"))
+                for q in gc_data.get("questions", []):
+                    if q.get("type") == "mcq":
+                        mcq_pool.append({
+                            "id": q.get("id"),
+                            "unit_id": q.get("unit_id"),
+                            "question": q.get("prompt", ""),
+                            "options": q.get("options", []),
+                            "correct_index": q.get("answer", 0),
+                            "explanation": q.get("explanation", ""),
+                        })
             except Exception:
                 mcq_pool = []
 
@@ -795,6 +994,7 @@ class BKTEngine:
             "unit_id": unit_id,
             "topic": topic,
             "score_10": score_10,
+            "coverage_ratio": round(concept_ratio, 4),
             "is_passed": is_passed,
             "matched_concepts": matched_concepts[:4],
             "missing_concepts": missing_concepts[:4],

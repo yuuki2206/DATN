@@ -284,7 +284,7 @@ SPECIAL_GROUNDED_RESPONSES: Dict[str, Dict[str, Any]] = {
         }
     },
     "SIGNIFICANCE_DONG_BO_DAU": {
-        "unit_id": "SIGNIFICANCE_DONG_BO_DAU",
+        "unit_id": "KC1_DONG_BO_DAU",
         "category": "SIGNIFICANCE",
         "topic": "Ý nghĩa lịch sử của trận phản công Đông Bộ Đầu (1258)",
         "entity": "Trần Thái Tông & Quân dân nhà Trần",
@@ -866,7 +866,7 @@ class ConversationalContextManager:
             return query, False, SPECIAL_GROUNDED_RESPONSES["SIGNIFICANCE_DIEN_HONG"]
 
         # 11. Điểm chung qua ba lần kháng chiến
-        is_common_3_wars = (any(k in unacc_q for k in ["diem chung", "giong nhau", "tuong dong", "diem giong", "tong ket"]) and any(k in unacc_q for k in ["ba lan", "3 lan", "ca ba lan"]))
+        is_common_3_wars = (any(k in unacc_q for k in ["diem chung", "giong nhau", "tuong dong", "diem giong"]) and any(k in unacc_q for k in ["ba lan", "3 lan", "ca ba lan"]))
         if is_common_3_wars:
             return query, False, SPECIAL_GROUNDED_RESPONSES["COMPARISON_ALL_3_WARS_COMMON"]
 
@@ -933,8 +933,9 @@ class ConversationalContextManager:
             "xu ly", "lam gi", "phan ung", "hanh dong", "ra sao", "the nao", "la ai", "co nhung ai", "gom nhung ai"
         ])
         has_specific_king_clue = any(k in unacc_q for k in [
-            "thai tong", "thanh tong", "nhan tong", "phat hoang", "di tu", "xuat gia",
-            "yen tu", "nhuong ngoi", "vua nao", "ong vua nao", "vi vua nao", "thach ma"
+            "thai tong", "thanh tong", "nhan tong", "tran kham", "tran canh", "phat hoang",
+            "truc lam", "di tu", "xuat gia", "yen tu", "nhuong ngoi", "vua nao",
+            "ong vua nao", "vi vua nao", "thach ma", "ham nghi", "quang trung", "le loi", "ngo quyen"
         ])
         is_king_action_query = has_king_kw and has_action_kw and not has_specific_king_clue
         has_active_context = bool(session.get("last_unit_id"))
@@ -951,7 +952,7 @@ class ConversationalContextManager:
             "binh than", "dong bo dau", "binh le nguyen", "thoat hoan", "toa do",
             "o ma nhi", "tran quoc toan", "tran binh trong", "tran hung dao", "tran thu do",
             "pham ngu lao", "dan sot", "tran quang khai", "tran nhan tong", "yen tu", "di tu",
-            "vuon khong", "bo thanh trong"
+            "vuon khong", "bo thanh trong", "tran khanh du", "binh thu yeu luoc", "ngu binh"
         ]
         has_explicit_standalone = any(es in unacc_q for es in explicit_standalones)
 
@@ -980,7 +981,11 @@ class ConversationalContextManager:
             "KC2_HAM_TU_CHUONG_DUONG": "Vì sao Thoát Hoan phải chui vào ống đồng tháo chạy năm 1285?",
             "KC3_OVERVIEW": "Chiến thắng Vân Đồn tiêu diệt đoàn thuyền lương của Trần Khánh Dư năm 1288 diễn ra thế nào?",
             "KC3_VAN_DON": "Trận quyết chiến trên sông Bạch Đằng tháng 4 năm 1288 diễn ra như thế nào?",
-            "KC3_BACH_DANG_HOW": "Nguyên nhân thắng lợi và ý nghĩa lịch sử của ba lần kháng chiến chống quân Mông Nguyên là gì?"
+            "KC3_BACH_DANG_HOW": "Nguyên nhân thắng lợi và ý nghĩa lịch sử của ba lần kháng chiến chống quân Mông Nguyên là gì?",
+            "GAME_NGU_BINH_U_NONG": "Tại sao nhà Trần dùng kế sách vườn không nhà trống khiến quân giặc đói lương?",
+            "GAME_TRAN_KHANH_DU": "Chiến thắng Vân Đồn tiêu diệt đoàn thuyền lương Trương Văn Hổ năm 1288 diễn ra như thế nào?",
+            "GAME_BINH_THU_YEU_LUOC": "Hoàn cảnh ra đời và ý nghĩa của bài Hịch tướng sĩ của Trần Quốc Tuấn?",
+            "GAME_TRAN_NHAN_TONG": "Hội nghị Bình Than năm 1282 do vua Trần Nhân Tông triệu tập đã quyết định những gì?"
         }
         is_followup_reply = (
             any(k in unacc_q for k in [

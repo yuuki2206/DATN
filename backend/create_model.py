@@ -95,7 +95,7 @@ INDIRECT_CONCEPT_MAPPINGS: List[Tuple[List[str], str, str]] = [
     (
         ["di tu", "xuat gia", "cao dau", "nhuong ngoi di tu", "len nui tu", "lap phai thien", "ong vua di tu"],
         "trần nhân tông phật hoàng trúc lâm yên tử",
-        "TRAN_NHAN_TONG_PORTRAIT"
+        "GAME_TRAN_NHAN_TONG"
     ),
     (
         ["bo thanh trong", "thanh rong", "giau het luong thuc", "khong cho dich cuop", "khong con gi de cuop", "so tan dan khoi kinh thanh"],
@@ -163,8 +163,9 @@ PHONETIC_TYPO_MAP: List[Tuple[List[str], str]] = [
 CANONICAL_ENTITY_PHRASES: List[str] = [
     "bach dang", "dien hong", "binh than", "van don", "dong bo dau",
     "binh le nguyen", "thoat hoan", "vuon khong nha trong", "hich tuong si",
-    "tran quoc toan", "tran hung dao", "tran binh trong", "tran thu do",
-    "tran khanh du", "pham ngu lao", "tran quang khai", "tran nhan tong"
+    "tran quoc toan", "tran hung dao", "tran quoc tuan", "tran binh trong",
+    "tran thu do", "tran khanh du", "pham ngu lao", "tran quang khai",
+    "tran nhan tong", "tran thai tong", "tran thanh tong"
 ]
 
 
@@ -189,17 +190,25 @@ def expand_abbreviations(text: str) -> str:
         if any(tp in unacc for tp in typo_list):
             extra_concepts.append(canonical_fix)
 
-    # 2. So khớp xấp xỉ khoảng cách ký tự (Fuzzy Sliding N-gram Matching >= 0.85)
+    # 2. So khớp xấp xỉ khoảng cách ký tự (Fuzzy Sliding N-gram Matching >= 0.85 & từng từ >= 0.75)
     if not re.search(r"\btran nha\b", unacc):
         tokens = unacc.split()
         for canonical in CANONICAL_ENTITY_PHRASES:
             if canonical in unacc:
                 continue
-            c_len = len(canonical.split())
+            c_tokens = canonical.split()
+            c_len = len(c_tokens)
             if len(tokens) >= c_len:
                 for i in range(len(tokens) - c_len + 1):
-                    win = " ".join(tokens[i:i + c_len])
-                    if win[0] == canonical[0] and difflib.SequenceMatcher(None, win, canonical).ratio() >= 0.85:
+                    win_tokens = tokens[i:i + c_len]
+                    win = " ".join(win_tokens)
+                    if win in CANONICAL_ENTITY_PHRASES or win == "tran phan cong":
+                        continue
+                    if (
+                        win[0] == canonical[0]
+                        and difflib.SequenceMatcher(None, win, canonical).ratio() >= 0.85
+                        and all(difflib.SequenceMatcher(None, wt, ct).ratio() >= 0.75 for wt, ct in zip(win_tokens, c_tokens))
+                    ):
                         extra_concepts.append(canonical)
                         break
 
@@ -232,21 +241,60 @@ def build_bilingual_features(text: str) -> str:
     if "binh than" in unacc:
         tags.append("__binh_than__ __binh_than__ __binh_than__")
     if "dong bo dau" in unacc:
-        tags.append("__dong_bo_dau__ __dong_bo_dau__ __dong_bo_dau__")
-    if any(k in unacc for k in ["binh le nguyen", "le phu tran", "le tan", "van thuyen"]):
+        tags.append("__dong_bo_dau__ __dong_bo_dau__ __dong_bo_dau__ __dong_bo_dau__")
+    if any(k in unacc for k in ["binh le nguyen", "le phu tran", "le tan", "van thuyen", "che ten"]):
         tags.append("__binh_le_nguyen__ __binh_le_nguyen__ __binh_le_nguyen__")
-    if "bach dang" in unacc:
+    if any(k in unacc for k in ["bach dang", "coc ngam", "coc go", "trieu rut"]):
         tags.append("__bach_dang__ __bach_dang__ __bach_dang__")
-    if any(k in unacc for k in ["van don", "thuyen luong", "truong van ho"]):
+    if any(k in unacc for k in ["van don", "thuyen luong", "thach luong", "17 van", "truong van ho"]):
         tags.append("__van_don__ __van_don__ __van_don__")
-    if any(k in unacc for k in ["thoat hoan", "chui ong", "ong dong"]):
+    if any(k in unacc for k in ["thoat hoan", "chui ong", "chui vao ong dong", "tron trong ong dong"]) or ("ong dong" in unacc and "phan cong dong" not in unacc):
         tags.append("__thoat_hoan_ong_dong__ __thoat_hoan_ong_dong__")
-    if any(k in unacc for k in ["qua cam", "bop nat", "sau chu vang", "6 chu vang", "pha cuong dich"]):
-        tags.append("__tran_quoc_toan__ __tran_quoc_toan__")
+    if any(k in unacc for k in ["qua cam", "bop nat", "bop cam"]):
+        tags.append("__tqt_why_orange__ __tqt_why_orange__ __tqt_why_orange__")
+    if any(k in unacc for k in ["sau chu vang", "6 chu vang", "pha cuong dich", "bao hoang an", "chieu mo bao nhieu gia no", "1000 gia no", "hon 1000 gia no"]):
+        tags.append("__tqt_six_golden_words__ __tqt_six_golden_words__ __tqt_six_golden_words__")
     if any(k in unacc for k in ["tran binh trong", "quy nuoc nam"]):
         tags.append("__tran_binh_trong__ __tran_binh_trong__")
-    if any(k in unacc for k in ["hich tuong si", "sat that"]):
-        tags.append("__hich_tuong_si__ __hich_tuong_si__")
+    if any(k in unacc for k in ["hich tuong si", "sat that", "nua dem vo goi", "ruot dau nhu cat"]) and not any(d in unacc for d in ["di su", "trai giac", "do khac chung", "khac chung"]):
+        tags.append("__hich_tuong_si__ __hich_tuong_si__ __hich_tuong_si__")
+    if any(k in unacc for k in ["dau than chua roi", "dau toi chua roi", "xin be ha dung lo"]) or ("tran thu do" in unacc and not any(d in unacc for d in ["1225", "1226", "thanh lap", "chieu hoang", "tran canh"])):
+        tags.append("__tran_thu_do__ __tran_thu_do__ __tran_thu_do__ __tran_thu_do__")
+    if any(k in unacc for k in ["chem dau than", "chem dau toi", "muon hang", "tran hung dao la ai", "tran quoc tuan la ai", "cong lao cua hung dao"]):
+        tags.append("__tran_hung_dao_portrait__ __tran_hung_dao_portrait__ __tran_hung_dao_portrait__")
+    if any(k in unacc for k in ["muc dich cua mong co", "am muu mong co", "muon duong", "nam tong", "su gia mong co", "ngot luong hop thai"]):
+        tags.append("__kc1_why_invade__ __kc1_why_invade__ __kc1_why_invade__")
+    if any(k in unacc for k in ["tung gia hoan kinh", "chuong duong do", "ham tu quan"]):
+        tags.append("__ham_tu_chuong_duong__ __ham_tu_chuong_duong__ __ham_tu_chuong_duong__")
+    if any(k in unacc for k in ["boi lan", "duc thung thuyen", "yet kieu", "da tuong", "voi chien"]):
+        tags.append("__yet_kieu_da_tuong__ __yet_kieu_da_tuong__ __yet_kieu_da_tuong__")
+    if any(k in unacc for k in ["to long", "thuat hoai", "dan sot", "pham ngu lao"]):
+        tags.append("__pham_ngu_lao__ __pham_ngu_lao__ __pham_ngu_lao__")
+    if any(k in unacc for k in ["doan binh", "truong tran", "lay yeu thang manh", "nghe thuat quan su"]):
+        tags.append("__military_art__ __military_art__ __military_art__")
+    if any(k in unacc for k in ["ha dac", "ha chuong", "nguyen the loc", "dan toc thieu so", "dong bao mien nui", "tu truong"]):
+        tags.append("__ethnic_minorities__ __ethnic_minorities__ __ethnic_minorities__")
+    if any(k in unacc for k in ["bai hoc kinh nghiem", "khoan thu suc dan", "sau re ben goc", "bao ve to quoc hien nay", "hien nay", "ngay nay"]):
+        tags.append("__historical_lessons__ __historical_lessons__ __historical_lessons__")
+    if any(k in unacc for k in ["thanh duc", "cam quan", "non ma loi", "lo quan", "huong binh"]):
+        tags.append("__quan_thanh_duc_sat_that__ __quan_thanh_duc_sat_that__ __quan_thanh_duc_sat_that__")
+    if any(k in unacc for k in ["can cu van kiep", "noi bang", "thien truong", "truong yen", "hau phuong", "20 van quan"]):
+        tags.append("__van_kiep_thien_truong__ __van_kiep_thien_truong__ __van_kiep_thien_truong__")
+    if any(k in unacc for k in ["tran ich tac", "tran kien", "nguyen dia lo", "phan boi", "dau hang giac", "ma luc"]):
+        tags.append("__trung_than_vs_phan_boi__ __trung_than_vs_phan_boi__ __trung_than_vs_phan_boi__")
+    if any(k in unacc for k in ["nhung nam nao", "may lan", "bao nhieu lan", "tong ket ca 3", "tong ket ba lan", "tom tat ba lan", "tom tat 3 lan", "cac tran danh tieu bieu trong 3 lan"]):
+        tags.append("__all_3_wars_summary__ __all_3_wars_summary__ __all_3_wars_summary__")
+    if any(k in unacc for k in ["tam voc the gioi", "tam voc quoc te", "y nghia doi voi the gioi", "y nghia gi doi voi the gioi", "y nghia lich su cua ba lan", "y nghia 3 lan", "de lai bai hoc gi"]) and not any(d in unacc for d in ["hien nay", "ngay nay", "hom nay"]):
+        tags.append("__historical_significance__ __historical_significance__ __historical_significance__")
+    # Chủ đề bổ sung cùng game Hào Khí Đông A
+    if any(k in unacc for k in ["ngu binh", "gui binh", "ve que lam ruong", "luan phien ve que", "lam ruong", "quan dong vua du luong", "to chuc quan doi"]):
+        tags.append("__ngu_binh_u_nong__ __ngu_binh_u_nong__ __ngu_binh_u_nong__")
+    if any(k in unacc for k in ["binh thu", "sach binh phap", "cuon binh phap"]):
+        tags.append("__binh_thu_yeu_luoc__ __binh_thu_yeu_luoc__ __binh_thu_yeu_luoc__")
+    if any(k in unacc for k in ["nhan tong", "tran kham", "truc lam", "yen tu", "phat hoang", "lao thach ma", "dien kim au", "chon ngua da", "vung au vang"]) and not any(d in unacc for d in ["tran thai tong", "phu van", "trang 492", "1237"]):
+        tags.append("__tran_nhan_tong__ __tran_nhan_tong__")
+    if any(k in unacc for k in ["buon than", "ban than", "chi linh", "tuoc quan", "tha toi"]):
+        tags.append("__khanh_du_cuoc_doi__ __khanh_du_cuoc_doi__")
     if any(k in unacc for k in [
         "rut khoi thang long", "rut lui khoi thang long", "roi thang long", "chu dong rut",
         "vuon khong nha trong", "vknt", "thanh trong rong", "so tan khoi thang long",
@@ -256,16 +304,48 @@ def build_bilingual_features(text: str) -> str:
     if any(k in unacc for k in [
         "dong va manh", "van thua", "that bai truoc", "nguyen nhan thang loi",
         "vi sao thang", "tai sao thang", "vi sao thua", "tai sao thua",
-        "nuoc nho thang", "danh thang quan mong", "danh thang de che"
+        "nuoc nho thang", "danh thang quan mong", "danh thang de che",
+        "danh thang duoc de che", "nguyen nhan nha tran thang", "yeu to quan trong nhat giup",
+        "vua toi dong long anh em hoa muc"
     ]):
         tags.append("__causes_of_victory__ __causes_of_victory__ __causes_of_victory__")
 
-    if any(w in words for w in ["hello", "hi"]) or any(k in unacc for k in ["xin chao", "chao thay", "chao ban", "chao tro ly"]):
-        tags.append("__intent_greeting__ __intent_greeting__")
-    if any(w in words for w in ["thanks"]) or any(k in unacc for k in ["cam on", "thank you", "tuyet voi de hieu"]):
-        tags.append("__intent_thanks__ __intent_thanks__")
-    if any(k in unacc for k in ["khong biet dap an", "chua hieu bai", "kho qua", "khong biet lam", "giup minh voi", "khong biet cau tra loi", "quen mat roi", "chi em cach", "kho nho qua"]):
-        tags.append("__intent_struggle__ __intent_struggle__")
+    # Điểm neo ngữ nghĩa cho 14 cụm tri thức chính sử Đại Việt Sử Ký Toàn Thư
+    if any(k in unacc for k in ["nhat hieu", "nhap tong", "cu da", "hoang cu da", "an xoai"]):
+        tags.append("__dvsktt_nhat_hieu_cu_da__ __dvsktt_nhat_hieu_cu_da__ __dvsktt_nhat_hieu_cu_da__")
+    if any(k in unacc for k in ["do khac chung", "khac chung", "ngua keo xe muoi", "ngua ky", "cho nha can nguoi", "di su sang trai giac", "giai thich hai chu sat that"]):
+        tags.append("__dvsktt_do_khac_chung__ __dvsktt_do_khac_chung__ __dvsktt_do_khac_chung__")
+    if any(k in unacc for k in ["gay bit sat", "dau sat nhon", "rut dau sat", "yen sinh vuong", "tran lieu", "quach tu nghi", "quoc tang", "danh tuong nao cua nha duong", "so sanh tran quoc tuan voi"]):
+        tags.append("__dvsktt_gay_bit_sat__ __dvsktt_gay_bit_sat__ __dvsktt_gay_bit_sat__")
+    if any(k in unacc for k in ["do hanh", "nguyen khoai", "tich le co ngoc", "ao lo xich", "400 chiec thuyen", "400 chien thuyen", "chieu lang", "thu duoc bao nhieu chien thuyen", "bat nhung tuong giac nao"]):
+        tags.append("__dvsktt_do_hanh_nguyen_khoai__ __dvsktt_do_hanh_nguyen_khoai__ __dvsktt_do_hanh_nguyen_khoai__")
+    if any(k in unacc for k in ["hoang ta thon", "dui thuyen", "dui dam thuyen", "o ma nhi chet", "so phan cua tuong giac o ma nhi"]):
+        tags.append("__dvsktt_hoang_ta_thon__ __dvsktt_hoang_ta_thon__ __dvsktt_hoang_ta_thon__")
+    if any(k in unacc for k in ["tran thi kien", "thi kien", "kiem phap quan", "moc hong", "mua ra", "cam danh bac", "phan phu tien", "chim ung"]):
+        tags.append("__dvsktt_tran_thi_kien__ __dvsktt_tran_thi_kien__ __dvsktt_tran_thi_kien__")
+    if any(k in unacc for k in ["thanh lap nha tran", "ly chieu hoang", "chieu hoang", "tran canh", "1225", "1226", "quoc thuong phu", "dien thien an", "kien trung"]):
+        tags.append("__dvsktt_thanh_lap_nha_tran__ __dvsktt_thanh_lap_nha_tran__ __dvsktt_thanh_lap_nha_tran__")
+    if any(k in unacc for k in ["thai thuong hoang", "quoc trieu hinh thu", "quoc trieu thong che", "tham hinh vien", "12 lo", "so ho tich", "vac dau", "chuong ho", "bo may nha nuoc", "bo luat thanh van"]):
+        tags.append("__dvsktt_bo_may_phap_luat__ __dvsktt_bo_may_phap_luat__ __dvsktt_bo_may_phap_luat__")
+    if any(k in unacc for k in ["dinh nhi", "quai vac", "ha de su", "khuyen nong su", "dien trang", "thai ap", "1248", "1266", "kinh te nong nghiep"]):
+        tags.append("__dvsktt_kinh_te_nha_tran__ __dvsktt_kinh_te_nha_tran__ __dvsktt_kinh_te_nha_tran__")
+    if any(k in unacc for k in ["tam khoi", "nguyen hien", "le van huu", "mac dinh chi", "luong quoc trang nguyen", "thai hoc sinh", "1247", "1304", "khoa cu"]):
+        tags.append("__dvsktt_khoa_cu_nha_tran__ __dvsktt_khoa_cu_nha_tran__ __dvsktt_khoa_cu_nha_tran__")
+    if any(k in unacc for k in ["chu van an", "that tram so", "7 ninh than", "7 ten ninh than", "phuong hoang", "tu nghiep", "van mieu"]):
+        tags.append("__dvsktt_chu_van_an__ __dvsktt_chu_van_an__ __dvsktt_chu_van_an__")
+    if any(k in unacc for k in ["truong han sieu", "bach dang giang phu", "phu song bach dang", "han thuyen", "nguyen thuyen", "chu nom", "van te ca sau", "cot minh duc cao"]):
+        tags.append("__dvsktt_truong_han_sieu__ __dvsktt_truong_han_sieu__ __dvsktt_truong_han_sieu__")
+    if any(k in unacc for k in ["doan nhu hai", "nhu hai", "thao bieu ta toi", "ngu su trung tan", "di su chiem thanh", "1299", "1303"]):
+        tags.append("__dvsktt_doan_nhu_hai__ __dvsktt_doan_nhu_hai__ __dvsktt_doan_nhu_hai__")
+    if any(k in unacc for k in ["phu van", "quoc su phu van", "khong co phat", "phat o ngay trong long", "phat o trong long", "thap pho minh", "thap binh son", "vac pho minh", "tran thai tong len nui yen tu", "trang 492"]):
+        tags.append("__dvsktt_van_hoa_phu_van__ __dvsktt_van_hoa_phu_van__ __dvsktt_van_hoa_phu_van__")
+
+    if any(w in words for w in ["hello", "hi", "alo"]) or any(k in unacc for k in ["xin chao", "chao thay", "chao ban", "chao tro ly"]):
+        tags.append("__intent_greeting__ __intent_greeting__ __intent_greeting__")
+    if any(w in words for w in ["thanks"]) or any(k in unacc for k in ["cam on", "thank you", "thank u", "tuyet voi de hieu"]):
+        tags.append("__intent_thanks__ __intent_thanks__ __intent_thanks__")
+    if any(k in unacc for k in ["khong biet dap an", "chua hieu bai", "kho qua", "khong biet lam", "giup minh voi", "khong biet cau tra loi", "quen mat roi", "chi em cach", "kho nho qua", "bi cau hoi", "trac nghiem nay roi"]):
+        tags.append("__intent_struggle__ __intent_struggle__ __intent_struggle__")
     tag_str = " ".join(tags)
     return f"{norm} {unacc} {tag_str}".strip()
 
@@ -361,7 +441,28 @@ class VietnameseNLU:
         "thang loi", "boi vi sao", "bao toan luc luong", "nghe thuat quan su", "the giac", "doan ket",
         "doan binh", "truong tran", "ha dac", "ha chuong", "nguyen the loc", "nhan tong",
         "phat hoang", "truc lam", "yen tu", "thach ma", "kim au", "khoan thu suc dan",
-        "sau re ben goc", "dan toc thieu so", "mien nui", "bai hoc kinh nghiem"
+        "sau re ben goc", "dan toc thieu so", "mien nui", "bai hoc kinh nghiem",
+        "ngu binh", "ngu binh u nong", "gui binh", "binh thu", "binh thu yeu luoc",
+        "tran kham", "chi linh", "nhan hue vuong", "van thuyen", "che ten",
+        "dau than", "chem dau", "pha cuong dich", "bao hoang an", "vo goi",
+        "ruot dau", "tung gia", "hoan kinh", "thach luong", "trieu rut",
+        "duc thung", "boi lan", "to long", "thuat hoai", "dan sot",
+        "thanh duc", "cam quan", "ma loi", "noi bang", "thien truong",
+        "truong yen", "ich tac", "tran kien", "dia lo", "ma luc",
+        "phu ninh", "da giang", "thien mac", "quy hoa", "huong binh",
+        "nhat hieu", "nhap tong", "cu da", "an xoai", "khac chung",
+        "do hanh", "nguyen khoai", "tich le co ngoc", "ao lo xich",
+        "hoang ta thon", "dui thuyen", "thi kien", "kiem phap quan",
+        "ngo si lien", "phan phu tien", "yen sinh vuong", "tran lieu",
+        "chieu lang", "dai viet su ky", "quach tu nghi", "quoc tang",
+        "chieu hoang", "tran canh", "kien trung", "thai thuong hoang",
+        "quoc trieu hinh thu", "quoc trieu thong che", "tham hinh vien",
+        "dinh nhi", "quai vac", "ha de su", "dien trang", "thai ap",
+        "tam khoi", "nguyen hien", "le van huu", "mac dinh chi",
+        "thai hoc sinh", "chu van an", "that tram so", "phuong hoang",
+        "truong han sieu", "bach dang giang phu", "han thuyen", "chu nom",
+        "doan nhu hai", "phu van", "pho minh", "binh son",
+        "cot minh duc cao", "dat hiem", "thang binh", "muon thuo"
     ]
 
     @classmethod
@@ -399,13 +500,14 @@ class VietnameseNLU:
 
         # 1. Từ khóa giao tiếp / câu hỏi tâm lý, danh tính trợ lý, đố vui & định hướng học tập của học sinh
         conv_phrases = [
-            "xin chao", "chao thay", "chao co", "chao ban", "cam on", "thank you",
+            "xin chao", "chao thay", "chao co", "chao ban", "cam on", "thank you", "thank u",
             "khong biet", "chua hieu", "kho qua", "giup em", "giup minh", "dap an",
             "quen mat", "chi em", "nen hoi gi", "hoi gi bay gio", "goi y", "bat dau tu dau",
             "nen hoc gi", "on tap", "lo trinh", "danh gia nang luc", "ho so hoc tap",
             "ban la ai", "thay la ai", "thay ten gi", "ban ten gi", "ai tao ra",
             "thay lam duoc gi", "tro ly dong a", "cach dung", "do em", "kiem tra bai",
-            "cho em 1 cau hoi", "cho em mot cau hoi", "thu thach em", "hoi em mot cau"
+            "cho em 1 cau hoi", "cho em mot cau hoi", "thu thach em", "hoi em mot cau",
+            "bi cau hoi", "trac nghiem nay"
         ]
         if any(cp in unacc for cp in conv_phrases) or (words & {"hello", "hi", "thanks", "alo"}):
             return True
@@ -571,8 +673,83 @@ class ConversationalNLG:
                 "Trẫm cùng muôn dân trăm họ đồng lòng mới làm nên cơ nghiệp ấy. Tiểu hữu hãy nghe: ",
                 "Lấy dân làm gốc là đạo trị quốc của nhà Trần. Trẫm giải thích cho tiểu hữu nhé: "
             ]
+        },
+        "TRAN_THAI_TONG": {
+            "name": "Vua Trần Thái Tông",
+            "openers": [
+                "Nhớ lại buổi đầu chống kỵ binh Mông Cổ năm 1258, trẫm kể cho tiểu hữu tường tận: ",
+                "Giữ vững giang sơn trước mũi nhọn quân thù đòi hỏi sự tỉnh táo. Hãy nghe trẫm nói: "
+            ]
+        },
+        "TRAN_NHAN_TONG": {
+            "name": "Phật Hoàng Trần Nhân Tông",
+            "openers": [
+                "Trẫm cùng muôn dân đã đi qua hai cuộc binh đao khói lửa để giữ vững âu vàng. Tiểu hữu hãy nghe: ",
+                "Từ bến Bình Than đến đỉnh Yên Tử, trẫm đúc kết điều này cho hậu thế: "
+            ]
+        },
+        "TRAN_QUANG_KHAI": {
+            "name": "Thượng Tướng Thái Sư Trần Quang Khải",
+            "openers": [
+                "Nhớ ngày đoạt giáo ở bến Chương Dương, ta kể cho tiểu hữu nghe: ",
+                "Thái bình rồi vẫn phải dốc sức giữ non sông! Tiểu hữu hãy nghe lời ta: "
+            ]
+        },
+        "TRAN_NHAT_DUAT": {
+            "name": "Chiêu Văn Vương Trần Nhật Duật",
+            "openers": [
+                "Am hiểu phong tục muôn phương giúp ta nhìn thấu thế trận. Tiểu hữu hãy nghe: ",
+                "Từ trận Hàm Tử Quan vang dội, ta chia sẻ cùng tiểu hữu điều này: "
+            ]
+        },
+        "TRAN_KHANH_DU": {
+            "name": "Nhân Huệ Vương Trần Khánh Dư",
+            "openers": [
+                "Từ người bán than nơi Chí Linh đến ngày phục kích thuyền lương Vân Đồn, ta kể tiểu hữu nghe: ",
+                "Đánh giặc phải biết chặt đứt dạ dày của chúng! Tiểu hữu hãy nghe đây: "
+            ]
+        },
+        "LE_PHU_TRAN": {
+            "name": "Chiêu Minh Vương Lê Phụ Trần",
+            "openers": [
+                "Giữa mưa tên ở Bình Lệ Nguyên, bình tĩnh bảo toàn lực lượng mới là thượng sách! Hãy nghe ta kể: ",
+                "Ta từng cầm ván thuyền che tên cho vua và rút ra bài học lớn này cho hậu thế: "
+            ]
+        },
+        "PHAM_NGU_LAO": {
+            "name": "Điện Súy Phạm Ngũ Lão",
+            "openers": [
+                "Múa giáo non sông trải mấy thu, ta kể cho tiểu hữu rõ việc quân thời Trần: ",
+                "Mang chí lớn trả nợ công danh cho đất nước, tiểu hữu hãy nghe lời ta: "
+            ]
+        },
+        "YET_KIEU": {
+            "name": "Danh Tướng Thủy Chiến Yết Kiêu",
+            "openers": [
+                "Dưới làn nước sâu sông Bạch Đằng, ta khắc ghi từng trận đánh! Tiểu hữu hãy nghe: ",
+                "Một lòng trung thành với Hưng Đạo Vương và non sông, ta kể tiểu hữu nghe nhé: "
+            ]
+        },
+        "THANH_DUC": {
+            "name": "Cấm Quân Thánh Dực",
+            "openers": [
+                "Trên tay khắc chữ Sát Thát, cấm quân chúng ta xin kể lại cho hậu thế: "
+            ]
+        },
+        "QUAN_SAT_THAT": {
+            "name": "Dũng Sĩ Sát Thát",
+            "openers": [
+                "Hai chữ Sát Thát khắc sâu trên cánh tay, ta kể cho tiểu hữu nghe: "
+            ]
         }
     }
+
+    @classmethod
+    def get_persona(cls, character_id: Optional[str]) -> Optional[Dict[str, Any]]:
+        if not character_id:
+            return None
+        norm_id = character_id.strip().upper()
+        return cls.PERSONAS.get(norm_id)
 
     @classmethod
     def compose(
@@ -584,7 +761,7 @@ class ConversationalNLG:
         character_id: Optional[str] = None,
         turn_seed: int = 0
     ) -> Dict[str, Any]:
-        persona = cls.PERSONAS.get(character_id) if character_id else None
+        persona = cls.get_persona(character_id)
         char_name = persona["name"] if persona else "Trợ Lý AI Lịch Sử Đông A"
 
         unit_q_type = unit_record.get("q_type", "EVENT")
@@ -650,11 +827,16 @@ class DongANLPModel:
         ("KC2_TRAN_BINH_TRONG", ["tran binh trong", "bao nghia vuong"]),
         ("TRAN_QUANG_KHAI_POETRY", ["tran quang khai", "tung gia hoan kinh su"]),
         ("PHAM_NGU_LAO", ["pham ngu lao", "thuat hoai"]),
-        ("TRAN_NHAN_TONG_PORTRAIT", ["tran nhan tong", "phat hoang", "truc lam yen tu"]),
-        ("KC1_TRAN_THU_DO", ["tran thu do"]),
+        ("GAME_TRAN_NHAN_TONG", ["tran nhan tong", "phat hoang", "truc lam yen tu", "truc lam"]),
+        ("GAME_NGU_BINH_U_NONG", ["ngu binh u nong", "ngu binh"]),
+        ("GAME_BINH_THU_YEU_LUOC", ["binh thu yeu luoc"]),
+        ("KC1_TRAN_THU_DO_QUOTE", ["tran thu do"]),
         ("HICH_TUONG_SI", ["hich tuong si"]),
         ("KC2_HAM_TU_CHUONG_DUONG", ["ham tu", "chuong duong", "tay ket"]),
-        ("KC2_THOAT_HOAN_COPPER_PIPE", ["thoat hoan", "chui ong dong"])
+        ("KC2_THOAT_HOAN_COPPER_PIPE", ["thoat hoan", "chui ong dong"]),
+        ("GAME_QUAN_THANH_DUC_SAT_THAT", ["quan thanh duc", "non ma loi"]),
+        ("GAME_VAN_KIEP_THIEN_TRUONG_BASES", ["can cu van kiep", "thien truong", "truong yen"]),
+        ("GAME_TRUNG_THAN_VS_PHAN_BOI", ["tran ich tac", "tran kien"])
     ]
 
     MICRO_QUIZ_BANK: Dict[str, str] = {
@@ -697,31 +879,43 @@ class DongANLPModel:
 
     def teach_new_knowledge(
         self,
-        unit_id: str,
-        topic: str,
-        question_examples: List[str],
-        answer: str,
+        unit_id: str = "",
+        topic: str = "",
+        question_examples: Optional[List[str]] = None,
+        answer: str = "",
         fact_chunk: str = "",
         entity: str = "Nhà Trần",
-        event: str = "Ba lần kháng chiến chống quân Mông - Nguyên (1258 - 1288)"
+        event: str = "Ba lần kháng chiến chống quân Mông - Nguyên (1258 - 1288)",
+        base_queries: Optional[List[str]] = None,
+        cognitive_level: str = "THONG_HIEU",
+        difficulty: float = 0.5,
     ) -> Dict[str, Any]:
         """
         Dạy thêm tri thức mới cho AI ngay lúc chạy (Zero-Retrain Hot-Reload Learning):
         Lưu bền vững vào `custom_knowledge.json` và nạp thẳng vào bộ nhớ `unit_lookup` + `custom_units`.
+        Hỗ trợ đồng thời cả lời gọi nội bộ (`question_examples`) lẫn API `/api/chat/teach` (`base_queries`).
         """
         self._load_custom_knowledge()
-        clean_uid = unit_id.strip().upper()
-        if not clean_uid.startswith("CUSTOM_"):
-            clean_uid = f"CUSTOM_{clean_uid}"
+        raw_uid = (unit_id or "").strip().upper()
+        if not raw_uid:
+            slug = re.sub(r"[^A-Z0-9]+", "_", remove_accents(topic).upper()).strip("_")[:32]
+            raw_uid = slug or f"UNIT_{len(self.custom_units) + 1}"
+        clean_uid = raw_uid if raw_uid.startswith("CUSTOM_") else f"CUSTOM_{raw_uid}"
+
+        raw_examples = question_examples if question_examples is not None else (base_queries or [])
+        clean_examples = [q.strip() for q in raw_examples if q and q.strip()]
 
         record = {
+            "status": "success",
             "unit_id": clean_uid,
             "category": "CUSTOM_KNOWLEDGE",
             "q_type": "EVENT",
             "topic": topic.strip(),
-            "entity": entity.strip(),
-            "event": event.strip(),
-            "question_examples": [q.strip() for q in question_examples if q.strip()],
+            "entity": (entity or "Nhà Trần").strip(),
+            "event": (event or "Ba lần kháng chiến chống quân Mông - Nguyên (1258 - 1288)").strip(),
+            "cognitive_level": cognitive_level or "THONG_HIEU",
+            "difficulty": float(difficulty if difficulty is not None else 0.5),
+            "question_examples": clean_examples,
             "answer": answer.strip(),
             "grounding_source": {
                 "doc_name": "Tư liệu Bổ sung Chuyên đề Lịch sử 7 (Giáo viên / Hệ thống)",
@@ -731,10 +925,13 @@ class DongANLPModel:
             "game_metadata": {
                 "unlocked_badge": "Sử gia thông thái",
                 "exp_reward": 35
-            }
+            },
+            "added_training_samples": len(clean_examples),
+            "total_units": len(self.unit_lookup) + (0 if clean_uid in self.unit_lookup else 1),
         }
         self.custom_units[clean_uid] = record
         self.unit_lookup[clean_uid] = record
+        record["total_units"] = len(self.unit_lookup)
 
         try:
             CUSTOM_KNOWLEDGE_FILE.parent.mkdir(parents=True, exist_ok=True)
@@ -931,11 +1128,16 @@ class DongANLPModel:
                 unit_sem_scores[uid] = score
 
         # 5. Hợp nhất điểm Hybrid (60% ML Classifier + 40% Semantic Cosine)
+        unacc_q = normalize_vi(remove_accents(normalized_query))
         combined_scores: Dict[str, float] = {}
         for uid in classes:
             c_score = clf_scores.get(uid, 0.0)
             s_score = unit_sem_scores.get(uid, 0.0)
-            combined_scores[uid] = 0.60 * c_score + 0.40 * s_score
+            score_val = 0.60 * c_score + 0.40 * s_score
+            # Nếu câu hỏi không chứa tín hiệu ngoại triều (cross_era_uid is None) và không hỏi "ai đầu tiên cắm cọc" -> chặn CROSS_ERA_* tranh chấp với Bạch Đằng 1288
+            if uid.startswith("CROSS_ERA_") and not cross_era_uid and not ("dau tien" in unacc_q and "coc" in unacc_q):
+                score_val *= 0.05
+            combined_scores[uid] = score_val
 
         # Sắp xếp top 3 cụm tri thức có điểm kết hợp cao nhất
         sorted_candidates = sorted(combined_scores.items(), key=lambda x: x[1], reverse=True)
@@ -956,7 +1158,6 @@ class DongANLPModel:
         # CỔNG PHÙ HỢP Ý ĐỊNH & KIỂM SOÁT CHẤT LƯỢNG (RELEVANCE GATE)
         # ======================================================================
         gate_rationale = "ML Classifier + Semantic Cosine Hybrid Ranking"
-        unacc_q = normalize_vi(remove_accents(normalized_query))
 
         # Gate 0A: Hỏi thông tin danh tính trợ lý / khả năng của AI
         is_identity_query = any(k in unacc_q for k in [
@@ -996,14 +1197,81 @@ class DongANLPModel:
         is_why_enemy_lost = any(k in unacc_q for k in [
             "dong va manh", "van thua", "vi sao thua", "tai sao thua",
             "nguyen nhan thang loi", "vi sao thang", "tai sao thang", "nuoc nho thang",
-            "danh thang quan mong", "danh thang de che"
+            "danh thang quan mong", "danh thang de che", "danh thang duoc de che",
+            "nguyen nhan nha tran thang", "yeu to quan trong nhat giup", "vua toi dong long"
         ])
         if is_why_enemy_lost and best_uid != "CAUSES_OF_VICTORY":
             causes_score = combined_scores.get("CAUSES_OF_VICTORY", 0.0)
-            if causes_score > 0.03 or "CAUSES_OF_VICTORY" in [c["unit_id"] for c in top_3]:
-                best_uid = "CAUSES_OF_VICTORY"
-                best_score = max(best_score, causes_score)
-                gate_rationale = "Relevance Gate: Re-routed query asking why enemy lost / causes of victory to CAUSES_OF_VICTORY"
+            best_uid = "CAUSES_OF_VICTORY"
+            best_score = max(best_score, causes_score, 0.85)
+            gate_rationale = "Relevance Gate: Re-routed query asking why enemy lost / causes of victory to CAUSES_OF_VICTORY"
+
+        # Gate 1B: Câu hỏi về âm mưu / mục đích Mông Cổ xâm lược lần 1 năm 1258
+        is_kc1_motive = (
+            any(k in unacc_q for k in ["muc dich cua mong co", "am muu mong co", "muon duong", "nam tong", "su gia mong co", "ngot luong hop thai"])
+            or (
+                any(w in unacc_q for w in ["muc dich", "am muu", "vi sao", "tai sao", "nguyen nhan"])
+                and any(w in unacc_q for w in ["mong co", "1258", "lan 1", "lan thu nhat"])
+                and any(w in unacc_q for w in ["xam luoc", "danh dai viet", "tan cong"])
+            )
+        )
+        if is_kc1_motive and "KC1_WHY_INVADE" in self.unit_lookup:
+            best_uid = "KC1_WHY_INVADE"
+            best_score = max(best_score, 0.88)
+            gate_rationale = "Relevance Gate: Mongol invasion motive / 1258 purpose routed to KC1_WHY_INVADE"
+
+        # Gate 1C: Phân biệt câu nói Trần Hưng Đạo ("Nếu bệ hạ muốn hàng xin hãy chém đầu thần trước đã") với Trần Thủ Độ
+        if any(k in unacc_q for k in ["muon hang", "chem dau than", "chem dau toi"]) and "TRAN_HUNG_DAO_PORTRAIT" in self.unit_lookup:
+            best_uid = "TRAN_HUNG_DAO_PORTRAIT"
+            best_score = max(best_score, 0.92)
+            gate_rationale = "Relevance Gate: Trần Hưng Đạo quote ('chém đầu thần trước đã') routed to TRAN_HUNG_DAO_PORTRAIT"
+
+        # Gate 1D: Câu hỏi toàn cảnh kháng chiến lần 3 (1287 - 1288)
+        is_kc3_overview = (
+            any(k in unacc_q for k in ["lan thu ba", "lan 3", "lan thu 3", "1287"])
+            and any(k in unacc_q for k in ["khang chien", "dien bien", "tom tat", "ke ve", "tran danh lon nao", "nam 1288"])
+            and not any(b in unacc_q for b in ["bach dang", "van don", "thuyen luong", "coc", "truong van ho", "o ma nhi", "quyet dinh"])
+        )
+        if is_kc3_overview and "KC3_OVERVIEW" in self.unit_lookup:
+            best_uid = "KC3_OVERVIEW"
+            best_score = max(best_score, 0.88)
+            gate_rationale = "Relevance Gate: 3rd campaign overview routed to KC3_OVERVIEW"
+
+        # Gate 1E: Tổng quan 3 lần kháng chiến (diễn ra những năm nào, thắng mấy lần, tổng kết 3 lần)
+        is_all_3_summary = any(k in unacc_q for k in [
+            "dien ra vao nhung nam nao", "thang mong nguyen may lan", "danh thang quan mong nguyen may lan",
+            "tong ket ca 3 lan", "tong ket ba lan", "tom tat ba lan", "tom tat 3 lan",
+            "cac tran danh tieu bieu trong 3 lan", "cac tran danh tieu bieu trong ba lan"
+        ])
+        if is_all_3_summary and "ALL_3_WARS_SUMMARY" in self.unit_lookup:
+            best_uid = "ALL_3_WARS_SUMMARY"
+            best_score = max(best_score, 0.90)
+            gate_rationale = "Relevance Gate: 3 wars summary / count / years routed to ALL_3_WARS_SUMMARY"
+
+        # Gate 1F: Ý nghĩa lịch sử / tầm vóc quốc tế / thế giới của 3 lần kháng chiến và Bạch Đằng
+        is_hist_sig = (
+            any(k in unacc_q for k in [
+                "tam voc the gioi", "tam voc quoc te", "y nghia gi doi voi the gioi",
+                "y nghia doi voi the gioi", "y nghia lich su cua ba lan", "y nghia 3 lan",
+                "y nghia ba lan", "thang loi chong mong nguyen de lai bai hoc gi"
+            ])
+            and not any(d in unacc_q for d in ["hien nay", "ngay nay", "hom nay"])
+        )
+        if is_hist_sig and "HISTORICAL_SIGNIFICANCE" in self.unit_lookup:
+            best_uid = "HISTORICAL_SIGNIFICANCE"
+            best_score = max(best_score, 0.90)
+            gate_rationale = "Relevance Gate: Historical / international significance routed to HISTORICAL_SIGNIFICANCE"
+
+        # Gate 1G: Trận địa cọc gỗ / cọc ngầm khi triều rút trên sông Bạch Đằng (1288)
+        if (
+            any(k in unacc_q for k in ["trieu rut", "vuong coc", "coc ngam", "bai coc"])
+            and not cross_era_uid
+            and not ("dau tien" in unacc_q and "coc" in unacc_q)
+            and "KC3_BACH_DANG_HOW" in self.unit_lookup
+        ):
+            best_uid = "KC3_BACH_DANG_HOW"
+            best_score = max(best_score, 0.88)
+            gate_rationale = "Relevance Gate: Tidal stakes battle tactic routed to KC3_BACH_DANG_HOW"
 
         # Gate 2: Câu hỏi về rút khỏi Thăng Long / kế sách rút lui / chiến thuật rút lui
         is_withdraw_thang_long = any(k in unacc_q for k in [
@@ -1062,7 +1330,8 @@ class DongANLPModel:
         self,
         query: str,
         character_id: Optional[str] = None,
-        session_id: str = "default"
+        session_id: str = "default",
+        student_id: Optional[str] = None,
     ) -> Dict[str, Any]:
         """
         Hàm suy luận chính trả về câu trả lời tự nhiên, nguồn trích dẫn và phần thưởng game.
@@ -1074,9 +1343,11 @@ class DongANLPModel:
             else:
                 self.session_memory = self.context_manager.sessions
 
+        effective_student_id = student_id or "student_nguyen_van_long"
         sess = self.context_manager.get_or_create_session(session_id)
         unacc_raw = normalize_vi(remove_accents(query))
-        speaker_name = ConversationalNLG.PERSONAS.get(character_id, {}).get("name", "Trợ Lý AI Lịch Sử Đông A")
+        persona_obj = ConversationalNLG.get_persona(character_id)
+        speaker_name = persona_obj["name"] if persona_obj else "Trợ Lý AI Lịch Sử Đông A"
 
         quiz_request_phrases = [
             "do em mot cau", "do em 1 cau", "do em cau", "kiem tra bai cu",
@@ -1099,6 +1370,7 @@ class DongANLPModel:
                 )
                 return {
                     "unit_id": quiz_uid,
+                    "topic": ref_rec.get("topic", quiz_uid),
                     "confidence": 0.99,
                     "answer": skip_ans,
                     "character_name": speaker_name,
@@ -1113,7 +1385,7 @@ class DongANLPModel:
                 sess["pending_quiz_unit"] = None
                 from bkt_engine import bkt_engine
                 eval_res = bkt_engine.evaluate_short_answer(
-                    student_id="student_nguyen_van_long",
+                    student_id=effective_student_id,
                     unit_id=quiz_uid,
                     student_answer=query
                 )
@@ -1136,6 +1408,7 @@ class DongANLPModel:
                 return {
                     "unit_id": "INTERACTIVE_CHAT_QUIZ_GRADE",
                     "graded_unit_id": quiz_uid,
+                    "topic": eval_res["topic"],
                     "confidence": 0.99,
                     "answer": grade_ans,
                     "character_name": speaker_name,
@@ -1148,7 +1421,7 @@ class DongANLPModel:
         # 0B. Nếu học sinh yêu cầu AI đố 1 câu / kiểm tra bài cũ ngay trên khung Chat
         if is_quiz_request:
             from bkt_engine import bkt_engine
-            profile = bkt_engine.analyze_student_profile("student_nguyen_van_long", top_k=5)
+            profile = bkt_engine.analyze_student_profile(effective_student_id, top_k=5)
             asked_units = sess.setdefault("asked_quiz_units", [])
             target_uid = "TQT_WHY_ORANGE"
             mastery_pct = 35
@@ -1179,6 +1452,7 @@ class DongANLPModel:
             return {
                 "unit_id": "INTERACTIVE_CHAT_QUIZ",
                 "quiz_target_unit": target_uid,
+                "topic": topic_name,
                 "confidence": 0.99,
                 "answer": quiz_prompt_ans,
                 "character_name": speaker_name,
@@ -1195,7 +1469,7 @@ class DongANLPModel:
         ])
         if is_exam_request:
             from bkt_engine import bkt_engine
-            exam_data = bkt_engine.generate_adaptive_exam("student_nguyen_van_long", num_questions=5)
+            exam_data = bkt_engine.generate_adaptive_exam(effective_student_id, num_questions=5)
             lines = [
                 f"📋 **ĐỀ ÔN TẬP CÁ NHÂN HÓA (THIẾT KẾ RIÊNG THEO HỒ SƠ BKT CỦA EM)**",
                 f"• **Mức độ nắm vững tổng thể**: `{int(exam_data['overall_mastery'] * 100)}%` (*{exam_data['momentum_label']}*)",
@@ -1229,7 +1503,7 @@ class DongANLPModel:
         # 1. Trường hợp có override_result (Làm rõ đại từ vua, Đính chính tiền đề sai, Thông tin ngoài phạm vi)
         if "override_result" in meta:
             override = meta["override_result"]
-            speaker = ConversationalNLG.PERSONAS.get(character_id, {}).get("name", "Trợ Lý AI Lịch Sử Đông A")
+            speaker = speaker_name
             src = override.get("grounding_source")
             sources = []
             if src and override.get("category") not in ["COUNTERFACTUAL", "ABSENT", "FALSE_PREMISE", "COMPARISON"] and src.get("fact_chunk"):
@@ -1293,8 +1567,8 @@ class DongANLPModel:
                 s_data = r_item.get("grounding_source", {})
                 if s_data and s_data.get("fact_chunk"):
                     synth_sources.append({
-                        "doc_name": s_data.get("doc_name", "SGK Lịch sử 7 (KNTT) - Bài 13"),
-                        "page_number": None,
+                        "doc_name": s_data.get("doc_name", "SGK Lịch sử 7 (KNTT) & Đại Việt Sử Ký Toàn Thư"),
+                        "page_number": s_data.get("page_number"),
                         "curriculum_match": s_data.get("curriculum_match", "SGK Lịch sử 7 - Bài 13"),
                         "fact_chunk": s_data.get("fact_chunk", "")
                     })
@@ -1315,7 +1589,7 @@ class DongANLPModel:
         # 2. Nếu nằm ngoài phạm vi bài học (Out-of-Domain)
         if best_uid == "OOD_RANDOM_AND_OFFTOPIC" or best_uid not in self.unit_lookup:
             clean_q = query.strip()
-            speaker = "ta" if (character_id and character_id in ConversationalNLG.PERSONAS) else "thầy"
+            speaker = "ta" if persona_obj else "thầy"
             ood_ans = (
                 f"⚠️ Rất tiếc, {speaker} chưa tìm thấy thông tin lịch sử phù hợp với nội dung **\"{clean_q}\"** "
                 "trong chuyên đề **Ba lần kháng chiến chống quân Mông – Nguyên (1258 – 1288)** (Lịch sử 7).\n\n"
@@ -1344,7 +1618,7 @@ class DongANLPModel:
                 "unit_id": "OOD_RANDOM_AND_OFFTOPIC",
                 "confidence": round(confidence, 4),
                 "answer": ood_ans,
-                "character_name": ConversationalNLG.PERSONAS.get(character_id, {}).get("name", "Trợ Lý AI Lịch Sử Đông A"),
+                "character_name": speaker_name,
                 "grounding_sources": [],
                 "badge_unlocked": None,
                 "exp_reward": 0,
@@ -1361,7 +1635,7 @@ class DongANLPModel:
         if best_uid == "INTENT_STUDENT_STRUGGLE":
             try:
                 from bkt_engine import bkt_engine
-                profile = bkt_engine.analyze_student_profile("student_nguyen_van_long", top_k=2)
+                profile = bkt_engine.analyze_student_profile(effective_student_id, top_k=2)
                 weak_mats = profile.get("recommended_study_materials", [])
                 weak_line = ""
                 if weak_mats:
@@ -1455,7 +1729,7 @@ class DongANLPModel:
         if src_data and src_data.get("fact_chunk"):
             sources.append({
                 "doc_name": src_data.get("doc_name", "SGK Lịch sử 7 (KNTT) & Đại Việt Sử Ký Toàn Thư"),
-                "page_number": None,
+                "page_number": src_data.get("page_number"),
                 "curriculum_match": src_data.get("curriculum_match", "SGK Lịch sử 7 - Bài 13"),
                 "fact_chunk": src_data.get("fact_chunk", "")
             })
@@ -1479,6 +1753,7 @@ class DongANLPModel:
 
         return {
             "unit_id": best_uid,
+            "topic": unit_record.get("topic", best_uid),
             "confidence": round(confidence, 4),
             "answer": composed["answer"],
             "character_name": composed["character_name"],
@@ -1487,6 +1762,60 @@ class DongANLPModel:
             "exp_reward": game_meta.get("exp_reward", 25 if sources else 0),
             "is_not_found": False
         }
+
+    def search_dvsktt_passages(self, query: str, top_k: int = 3) -> List[Dict[str, Any]]:
+        """
+        Tìm kiếm toàn văn (Full-Text Passage Retrieval) trực tiếp trên 1.083 đoạn biên niên sử
+        của toàn bộ 419 trang Kỷ Nhà Trần (trang 478 - 896) trong `dvsktt_tran_dynasty_corpus.json`.
+        """
+        corpus_file = DATA_DIR / "dvsktt_tran_dynasty_corpus.json"
+        if not corpus_file.exists():
+            return []
+        try:
+            if not hasattr(self, "_dvsktt_passages_cache") or not self._dvsktt_passages_cache:
+                corpus_data = json.loads(corpus_file.read_text(encoding="utf-8"))
+                self._dvsktt_passages_cache = corpus_data.get("tran_dynasty_passages", [])
+
+            q_norm = normalize_vi(query)
+            q_unacc = normalize_vi(remove_accents(query))
+            q_tokens = [t for t in q_unacc.split() if len(t) >= 2]
+            if not q_tokens:
+                return []
+
+            scored: List[Tuple[float, Dict[str, Any]]] = []
+            for p in self._dvsktt_passages_cache:
+                txt = p.get("text", "")
+                txt_norm = normalize_vi(txt)
+                txt_unacc = normalize_vi(remove_accents(txt))
+                score = 0.0
+                for tok in q_tokens:
+                    if tok in txt_unacc:
+                        score += 1.0
+                # Thưởng điểm cụm 2-gram và khớp có dấu
+                for i in range(len(q_tokens) - 1):
+                    bg = f"{q_tokens[i]} {q_tokens[i + 1]}"
+                    if bg in txt_unacc:
+                        score += 2.5
+                for w in q_norm.split():
+                    if len(w) >= 3 and w in txt_norm:
+                        score += 0.8
+                if score > 0:
+                    scored.append((score, p))
+
+            scored.sort(key=lambda x: x[0], reverse=True)
+            return [
+                {
+                    "passage_id": item["passage_id"],
+                    "pdf_page": item["pdf_page"],
+                    "quyen": item["quyen"],
+                    "folios": item["folios"],
+                    "score": round(sc, 2),
+                    "text": item["text"]
+                }
+                for sc, item in scored[:top_k]
+            ]
+        except Exception:
+            return []
 
 
 def train_and_save_model() -> DongANLPModel:

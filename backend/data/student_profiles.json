@@ -1,197 +1,197 @@
 {
   "student_nguyen_van_long": {
     "KC1_OVERVIEW": {
-      "p_l": 0.84,
-      "last_updated_time": 1792561984.346501,
+      "p_l": 0.5880423197363659,
+      "last_updated_time": 1793178194.2858977,
       "attempts": 4,
       "correct_count": 4,
       "chat_count": 2
     },
     "KC1_TRAN_THU_DO_QUOTE": {
-      "p_l": 0.88,
-      "last_updated_time": 1792561984.346501,
+      "p_l": 0.6160443349619071,
+      "last_updated_time": 1793178194.2858977,
       "attempts": 3,
       "correct_count": 3,
       "chat_count": 1
     },
     "TQT_WHY_ORANGE": {
-      "p_l": 0.82,
-      "last_updated_time": 1792561984.346501,
+      "p_l": 0.5740413121235952,
+      "last_updated_time": 1793178194.2858977,
       "attempts": 3,
       "correct_count": 3,
       "chat_count": 2
     },
     "TQT_SIX_GOLDEN_WORDS": {
-      "p_l": 0.85,
-      "last_updated_time": 1792561984.346501,
+      "p_l": 0.5950428235427512,
+      "last_updated_time": 1793178194.2858977,
       "attempts": 3,
       "correct_count": 3,
       "chat_count": 1
     },
     "DIEN_HONG_CONFERENCE": {
-      "p_l": 0.76,
-      "last_updated_time": 1792561984.346501,
+      "p_l": 0.5320382892852834,
+      "last_updated_time": 1793178194.2858977,
       "attempts": 3,
       "correct_count": 2,
       "chat_count": 2
     },
     "KC2_THOAT_HOAN_COPPER_PIPE": {
-      "p_l": 0.79,
-      "last_updated_time": 1792561984.346501,
+      "p_l": 0.5530398007044394,
+      "last_updated_time": 1793178194.2858977,
       "attempts": 2,
       "correct_count": 2,
       "chat_count": 1
     },
     "KC1_VUON_KHONG_NHA_TRONG": {
-      "p_l": 0.52,
-      "last_updated_time": 1792561984.346501,
+      "p_l": 0.364026197932036,
+      "last_updated_time": 1793178194.2858977,
       "attempts": 2,
       "correct_count": 1,
       "chat_count": 1
     },
     "KC2_HAM_TU_CHUONG_DUONG": {
-      "p_l": 0.44,
-      "last_updated_time": 1792561984.346501,
+      "p_l": 0.30802216748095357,
+      "last_updated_time": 1793178194.2858977,
       "attempts": 2,
       "correct_count": 1,
       "chat_count": 0
     },
     "KC3_VAN_DON": {
-      "p_l": 0.36,
-      "last_updated_time": 1792561984.346501,
+      "p_l": 0.252018137029871,
+      "last_updated_time": 1793178194.2858977,
       "attempts": 2,
       "correct_count": 0,
       "chat_count": 1
     },
     "KC3_BACH_DANG_HOW": {
-      "p_l": 0.8191,
-      "last_updated_time": 1792561984.4074903,
+      "p_l": 0.5734112870193663,
+      "last_updated_time": 1793178194.2858977,
       "attempts": 4,
       "correct_count": 2,
       "chat_count": 1
     },
     "CAUSES_OF_VICTORY": {
-      "p_l": 0.34,
-      "last_updated_time": 1792561984.346501,
+      "p_l": 0.2380171294171005,
+      "last_updated_time": 1793178194.2858977,
       "attempts": 2,
       "correct_count": 0,
       "chat_count": 0
     },
     "MILITARY_ART_TRAN_DYNASTY": {
-      "p_l": 0.32,
-      "last_updated_time": 1792561984.346501,
+      "p_l": 0.22401612180432987,
+      "last_updated_time": 1793178194.2858977,
       "attempts": 1,
       "correct_count": 0,
       "chat_count": 0
     },
     "HISTORICAL_LESSONS_TODAY": {
-      "p_l": 0.35,
-      "last_updated_time": 1792561984.346501,
+      "p_l": 0.24501763322348577,
+      "last_updated_time": 1793178194.2858977,
       "attempts": 1,
       "correct_count": 0,
       "chat_count": 0
     },
     "KC1_WHY_INVADE": {
-      "p_l": 0.3,
-      "last_updated_time": 1792561984.3508923,
+      "p_l": 0.21001511472524959,
+      "last_updated_time": 1793178194.2858977,
       "attempts": 0,
       "correct_count": 0,
       "chat_count": 0
     },
     "KC1_BINH_LE_NGUYEN": {
-      "p_l": 0.3,
-      "last_updated_time": 1792561984.3508923,
+      "p_l": 0.21001511472524959,
+      "last_updated_time": 1793178194.2858977,
       "attempts": 0,
       "correct_count": 0,
       "chat_count": 0
     },
     "KC1_DONG_BO_DAU": {
-      "p_l": 0.3,
-      "last_updated_time": 1792561984.3508923,
+      "p_l": 0.21001511472524959,
+      "last_updated_time": 1793178194.2858977,
       "attempts": 0,
       "correct_count": 0,
       "chat_count": 0
     },
     "TQT_OVERVIEW": {
-      "p_l": 0.3,
-      "last_updated_time": 1792561984.3508923,
+      "p_l": 0.21001511472524959,
+      "last_updated_time": 1793178194.2858977,
       "attempts": 0,
       "correct_count": 0,
       "chat_count": 0
     },
     "BINH_THAN_CONFERENCE": {
-      "p_l": 0.3,
-      "last_updated_time": 1792561984.3508923,
+      "p_l": 0.21001511472524959,
+      "last_updated_time": 1793178194.2858977,
       "attempts": 0,
       "correct_count": 0,
       "chat_count": 0
     },
     "HICH_TUONG_SI": {
-      "p_l": 0.3,
-      "last_updated_time": 1792561984.3508923,
+      "p_l": 0.21001511472524959,
+      "last_updated_time": 1793178194.2858977,
       "attempts": 0,
       "correct_count": 0,
       "chat_count": 0
     },
     "TRAN_HUNG_DAO_PORTRAIT": {
-      "p_l": 0.3,
-      "last_updated_time": 1792561984.3508923,
+      "p_l": 0.21001511472524959,
+      "last_updated_time": 1793178194.2858977,
       "attempts": 0,
       "correct_count": 0,
       "chat_count": 0
     },
     "KC2_OVERVIEW": {
-      "p_l": 0.3,
-      "last_updated_time": 1792561984.3508923,
+      "p_l": 0.21001511472524959,
+      "last_updated_time": 1793178194.2858977,
       "attempts": 0,
       "correct_count": 0,
       "chat_count": 0
     },
     "KC2_TRAN_BINH_TRONG": {
-      "p_l": 0.3,
-      "last_updated_time": 1792561984.3508923,
+      "p_l": 0.21001511472524959,
+      "last_updated_time": 1793178194.2858977,
       "attempts": 0,
       "correct_count": 0,
       "chat_count": 0
     },
     "KC3_OVERVIEW": {
-      "p_l": 0.3,
-      "last_updated_time": 1792561984.3508923,
+      "p_l": 0.21001511472524959,
+      "last_updated_time": 1793178194.2858977,
       "attempts": 0,
       "correct_count": 0,
       "chat_count": 0
     },
     "ALL_3_WARS_SUMMARY": {
-      "p_l": 0.3,
-      "last_updated_time": 1792561984.3508923,
+      "p_l": 0.21001511472524959,
+      "last_updated_time": 1793178194.2858977,
       "attempts": 0,
       "correct_count": 0,
       "chat_count": 0
     },
     "HISTORICAL_SIGNIFICANCE": {
-      "p_l": 0.3,
-      "last_updated_time": 1792561984.3508923,
+      "p_l": 0.21001511472524959,
+      "last_updated_time": 1793178194.2858977,
       "attempts": 0,
       "correct_count": 0,
       "chat_count": 0
     },
     "YET_KIEU_DA_TUONG": {
-      "p_l": 0.3,
-      "last_updated_time": 1792561984.3508923,
+      "p_l": 0.21001511472524959,
+      "last_updated_time": 1793178194.2858977,
       "attempts": 0,
       "correct_count": 0,
       "chat_count": 0
     },
     "PHAM_NGU_LAO": {
-      "p_l": 0.3,
-      "last_updated_time": 1792561984.3508923,
+      "p_l": 0.21001511472524959,
+      "last_updated_time": 1793178194.2858977,
       "attempts": 0,
       "correct_count": 0,
       "chat_count": 0
     },
     "ROLE_OF_ETHNIC_MINORITIES": {
-      "p_l": 0.3,
-      "last_updated_time": 1792561984.3508923,
+      "p_l": 0.21001511472524964,
+      "last_updated_time": 1793178194.2858977,
       "attempts": 0,
       "correct_count": 0,
       "chat_count": 0
@@ -199,6 +199,146 @@
     "TRAN_NHAN_TONG_PORTRAIT": {
       "p_l": 0.3,
       "last_updated_time": 1792561984.3508923,
+      "attempts": 0,
+      "correct_count": 0,
+      "chat_count": 0
+    },
+    "GAME_TRAN_NHAN_TONG": {
+      "p_l": 0.24312453939333856,
+      "last_updated_time": 1793178194.2858977,
+      "attempts": 0,
+      "correct_count": 0,
+      "chat_count": 0
+    },
+    "GAME_NGU_BINH_U_NONG": {
+      "p_l": 0.24312453939333856,
+      "last_updated_time": 1793178194.2858977,
+      "attempts": 0,
+      "correct_count": 0,
+      "chat_count": 0
+    },
+    "GAME_TRAN_KHANH_DU": {
+      "p_l": 0.24312453939333856,
+      "last_updated_time": 1793178194.2858977,
+      "attempts": 0,
+      "correct_count": 0,
+      "chat_count": 0
+    },
+    "GAME_BINH_THU_YEU_LUOC": {
+      "p_l": 0.24312453939333856,
+      "last_updated_time": 1793178194.2858977,
+      "attempts": 0,
+      "correct_count": 0,
+      "chat_count": 0
+    },
+    "INTENT_GREETING": {
+      "p_l": 0.24312453939333856,
+      "last_updated_time": 1793178194.2858977,
+      "attempts": 0,
+      "correct_count": 0,
+      "chat_count": 0
+    },
+    "INTENT_STUDENT_STRUGGLE": {
+      "p_l": 0.24312453939333856,
+      "last_updated_time": 1793178194.2858977,
+      "attempts": 0,
+      "correct_count": 0,
+      "chat_count": 0
+    },
+    "INTENT_THANKS": {
+      "p_l": 0.24312453939333856,
+      "last_updated_time": 1793178194.2858977,
+      "attempts": 0,
+      "correct_count": 0,
+      "chat_count": 0
+    },
+    "CROSS_ERA_HAM_NGHI": {
+      "p_l": 0.24312453939333856,
+      "last_updated_time": 1793178194.2858977,
+      "attempts": 0,
+      "correct_count": 0,
+      "chat_count": 0
+    },
+    "CROSS_ERA_NGO_QUYEN": {
+      "p_l": 0.24312453939333856,
+      "last_updated_time": 1793178194.2858977,
+      "attempts": 0,
+      "correct_count": 0,
+      "chat_count": 0
+    },
+    "CROSS_ERA_QUANG_TRUNG_LE_LOI_LY_THUONG_KIET": {
+      "p_l": 0.24312453939333856,
+      "last_updated_time": 1793178194.2858977,
+      "attempts": 0,
+      "correct_count": 0,
+      "chat_count": 0
+    },
+    "OOD_RANDOM_AND_OFFTOPIC": {
+      "p_l": 0.24312453939333856,
+      "last_updated_time": 1793178194.2858977,
+      "attempts": 0,
+      "correct_count": 0,
+      "chat_count": 0
+    },
+    "GAME_QUAN_THANH_DUC_SAT_THAT": {
+      "p_l": 0.3,
+      "last_updated_time": 1793178194.2858977,
+      "attempts": 0,
+      "correct_count": 0,
+      "chat_count": 0
+    },
+    "GAME_VAN_KIEP_THIEN_TRUONG_BASES": {
+      "p_l": 0.3,
+      "last_updated_time": 1793178194.2858977,
+      "attempts": 0,
+      "correct_count": 0,
+      "chat_count": 0
+    },
+    "GAME_TRUNG_THAN_VS_PHAN_BOI": {
+      "p_l": 0.3,
+      "last_updated_time": 1793178194.2858977,
+      "attempts": 0,
+      "correct_count": 0,
+      "chat_count": 0
+    },
+    "DVSKTT_TRAN_NHAT_HIEU_HOANG_CU_DA": {
+      "p_l": 0.3,
+      "last_updated_time": 1793178194.2858977,
+      "attempts": 0,
+      "correct_count": 0,
+      "chat_count": 0
+    },
+    "DVSKTT_DO_KHAC_CHUNG_SU_GIA": {
+      "p_l": 0.3,
+      "last_updated_time": 1793178194.2858977,
+      "attempts": 0,
+      "correct_count": 0,
+      "chat_count": 0
+    },
+    "DVSKTT_TRAN_QUOC_TUAN_GAY_BIT_SAT": {
+      "p_l": 0.3,
+      "last_updated_time": 1793178194.2858977,
+      "attempts": 0,
+      "correct_count": 0,
+      "chat_count": 0
+    },
+    "DVSKTT_BACH_DANG_DO_HANH_NGUYEN_KHOAI": {
+      "p_l": 0.3,
+      "last_updated_time": 1793178194.2858977,
+      "attempts": 0,
+      "correct_count": 0,
+      "chat_count": 0
+    },
+    "DVSKTT_HOANG_TA_THON_NGO_SI_LIEN_BAN": {
+      "p_l": 0.3,
+      "last_updated_time": 1793178194.2858977,
+      "attempts": 0,
+      "correct_count": 0,
+      "chat_count": 0
+    },
+    "DVSKTT_TRAN_THI_KIEN_PHAP_LUAT": {
+      "p_l": 0.3,
+      "last_updated_time": 1793178194.2858977,
       "attempts": 0,
       "correct_count": 0,
       "chat_count": 0

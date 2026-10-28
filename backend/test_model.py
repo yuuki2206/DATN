@@ -2,8 +2,8 @@
 FILE 3: KIỂM THỬ & ĐÁNH GIÁ MODEL TRÊN TẬP TEST 20% (EVALUATE & TEST NLP MODEL)
 ================================================================================
 Chức năng độc lập (1 File riêng biệt theo đúng kiến trúc chuẩn):
-1. Nạp model đã huấn luyện từ `backend/models/dong_a_nlp_model.joblib`.
-2. Đọc dữ liệu kiểm thử độc lập từ tập Test 20% (`backend/data/test_data.jsonl`).
+1. Nạp model đã huấn luyện từ `ai/models/dong_a_nlp_model.joblib`.
+2. Đọc dữ liệu kiểm thử độc lập từ tập Test 20% (`ai/data/test_data.jsonl`).
 3. Tính toán các chỉ số đánh giá chuẩn Machine Learning:
    - Accuracy (Độ chính xác trên tập Test 20%)
    - Macro & Weighted Precision, Recall, F1-Score

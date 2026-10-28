@@ -19,10 +19,15 @@ import asyncio
 from pathlib import Path
 from typing import List, Dict, Any, Tuple
 
-# Cấu hình môi trường và đường dẫn
-BACKEND_DIR = Path(__file__).resolve().parent
-if str(BACKEND_DIR) not in sys.path:
-    sys.path.insert(0, str(BACKEND_DIR))
+# Cấu hình môi trường và đường dẫn: thư mục ai/ luôn đứng đầu sys.path, sau đó đến backend/
+AI_DIR = Path(__file__).resolve().parent
+BACKEND_DIR = AI_DIR.parent / "backend"
+for _path in (BACKEND_DIR, AI_DIR):
+    if _path.exists():
+        _p_str = str(_path)
+        if _p_str in sys.path:
+            sys.path.remove(_p_str)
+        sys.path.insert(0, _p_str)
 
 import joblib
 from create_model import MODEL_PATH, DongANLPModel
@@ -734,7 +739,7 @@ class RegressionTestRunner:
         # 3. Vua Trần Nhân Tông & Trúc Lâm Yên Tử
         qm3 = "Hai câu thơ Xã tắc lưỡng hồi lao thạch mã Sơn hà thiên cổ điện kim âu là của ai?"
         rm3 = self.model.generate_natural_response(qm3, session_id="cat_m_3")
-        m3_ok = (rm3["unit_id"] == "TRAN_NHAN_TONG_PORTRAIT" and "trần nhân tông" in rm3["answer"].lower())
+        m3_ok = (rm3["unit_id"] == "GAME_TRAN_NHAN_TONG" and "trần nhân tông" in rm3["answer"].lower())
         self.record_result("M.3", f"New Unit King Trần Nhân Tông: '{qm3}'", m3_ok, f"Unit: {rm3['unit_id']}")
 
         # 4. Bài học kinh nghiệm lịch sử đối với ngày nay
@@ -846,7 +851,7 @@ class RegressionTestRunner:
 
         # 11. Nhận diện câu hỏi mô tả gián tiếp không dùng từ khóa SGK (Zero-Keyword Paraphrase)
         indirect_cases = [
-            ("Ông vua nào nhường ngôi đi tu lập phái thiền sau khi đánh thắng giặc?", "TRAN_NHAN_TONG_PORTRAIT"),
+            ("Ông vua nào nhường ngôi đi tu lập phái thiền sau khi đánh thắng giặc?", "GAME_TRAN_NHAN_TONG"),
             ("Kế sách bỏ thành trống giấu hết lương thực không cho địch cướp gọi là gì?", "KC1_VUON_KHONG_NHA_TRONG"),
             ("Vị tướng nào ngồi giữa đường đan sọt bị giáo đâm chảy máu đùi không biết?", "PHAM_NGU_LAO")
         ]
@@ -1018,6 +1023,399 @@ class RegressionTestRunner:
         bkt_engine._save_persistent_data()
 
     # ==========================================================================
+    # CATEGORY N: CHỦ ĐỀ BỔ SUNG CÙNG GAME HÀO KHÍ ĐÔNG A (DATN-2026)
+    # ==========================================================================
+    def test_category_m_game_topics(self):
+        print("\n" + "=" * 70)
+        print("▶ CATEGORY N: CHỦ ĐỀ BỔ SUNG CÙNG GAME (NGỤ BINH Ư NÔNG, TRẦN KHÁNH DƯ, BINH THƯ YẾU LƯỢC, TRẦN NHÂN TÔNG)")
+        print("=" * 70)
+
+        test_cases = [
+            ("Ngụ binh ư nông là gì?", "GAME_NGU_BINH_U_NONG", "làm ruộng"),
+            ("Trần Khánh Dư là ai?", "GAME_TRAN_KHANH_DU", "buôn than"),
+            ("Ai là tác giả Binh thư yếu lược?", "GAME_BINH_THU_YEU_LUOC", "Trần Quốc Tuấn"),
+            ("Vua Trần Nhân Tông là ai?", "GAME_TRAN_NHAN_TONG", "Trúc Lâm"),
+            ("Quân Thánh Dực và nón Ma Lôi thời Trần là gì?", "GAME_QUAN_THANH_DUC_SAT_THAT", "Thánh Dực"),
+            ("Căn cứ Vạn Kiếp và hậu phương Thiên Trường có vị trí chiến lược như thế nào?", "GAME_VAN_KIEP_THIEN_TRUONG_BASES", "Vạn Kiếp"),
+            ("Trần Ích Tắc và Trần Kiện là ai trong cuộc kháng chiến chống Nguyên năm 1285?", "GAME_TRUNG_THAN_VS_PHAN_BOI", "Trần Ích Tắc"),
+        ]
+        for i, (query, expected_uid, keyword) in enumerate(test_cases, 1):
+            res = self.model.generate_natural_response(query, session_id=f"cat_game_{i}")
+            passed = res["unit_id"] == expected_uid and keyword.lower() in res["answer"].lower()
+            self.record_result("N", f"Game topic: '{query}'", passed, f"Unit: {res['unit_id']} | Keyword '{keyword}': {keyword.lower() in res['answer'].lower()}")
+
+        # Kiểm thử nhập vai 14 Tướng & Quân chủng trong Game (Case-insensitive Persona Roleplay)
+        p_res1 = self.model.generate_natural_response("Trận Vân Đồn năm 1288 diễn ra thế nào?", character_id="tran_khanh_du", session_id="cat_game_persona_1")
+        p_res2 = self.model.generate_natural_response("Hội nghị Bình Than năm 1282 có mục đích gì?", character_id="tran_nhan_tong", session_id="cat_game_persona_2")
+        persona_ok = ("Trần Khánh Dư" in p_res1["character_name"] and "Trần Nhân Tông" in p_res2["character_name"])
+        self.record_result("N", "14-Hero Game Persona Roleplay Support (lowercase hero IDs)", persona_ok, f"Hero 1: {p_res1['character_name']} | Hero 2: {p_res2['character_name']}")
+
+        # Hỏi nối tiếp bằng đại từ sau khi đã nói về Trần Nhân Tông
+        sess = "cat_game_followup"
+        r1 = self.model.generate_natural_response("Trần Nhân Tông là ai?", session_id=sess)
+        r2 = self.model.generate_natural_response("Ông ấy xuất gia ở đâu?", session_id=sess)
+        passed = r1["unit_id"] == "GAME_TRAN_NHAN_TONG" and r2["unit_id"] == "GAME_TRAN_NHAN_TONG" and "Yên Tử" in r2["answer"]
+        self.record_result("N", "Follow-up: 'Trần Nhân Tông là ai?' -> 'Ông ấy xuất gia ở đâu?'", passed, f"T1: {r1['unit_id']} | T2: {r2['unit_id']}")
+
+        # Chủ đề cũ gần nghĩa vẫn giữ đúng cụm tri thức
+        boundary = [
+            ("Ai là người đánh đắm đoàn thuyền lương của Trương Văn Hổ?", "KC3_VAN_DON"),
+            ("Ai là tác giả của Hịch tướng sĩ?", "HICH_TUONG_SI"),
+            ("Hội nghị Bình Than diễn ra vào năm nào?", "BINH_THAN_CONFERENCE"),
+        ]
+        for query, expected_uid in boundary:
+            res = self.model.generate_natural_response(query, session_id=f"cat_game_boundary_{expected_uid}")
+            self.record_result("N", f"Boundary: '{query}'", res["unit_id"] == expected_uid, f"Unit: {res['unit_id']}")
+
+    # ==========================================================================
+    # CATEGORY O: KIỂM THỬ HỢP ĐỒNG TÍCH HỢP FULL-STACK API (CHAT, QUIZ, BKT, TEACH)
+    # ==========================================================================
+    def test_category_o_fullstack_api_contracts(self):
+        print("\n" + "=" * 70)
+        print("▶ CATEGORY O: FULL-STACK API CONTRACT TESTS (/api/chat/*, /api/quiz/*, AdvisorChat)")
+        print("=" * 70)
+
+        from bkt_engine import bkt_engine
+        from create_model import CUSTOM_KNOWLEDGE_FILE
+
+        # O.1: Mô phỏng đúng luồng gọi của Frontend AdvisorChat (`rag_engine.ask_natural` với `student_1`)
+        try:
+            from rag_engine import rag_engine
+            chat_res = rag_engine.ask_natural(
+                query="Vì sao gọi là vườn không nhà trống?",
+                character_id="student_1",
+                session_id="student_1",
+                student_id="student_demo_01"
+            )
+            o1_ok = (
+                chat_res.get("unit_id") == "KC1_VUON_KHONG_NHA_TRONG"
+                and isinstance(chat_res.get("bkt_chat_update"), dict)
+                and "new_p_l" in chat_res["bkt_chat_update"]
+                and isinstance(chat_res.get("recommended_materials"), list)
+                and len(chat_res["recommended_materials"]) > 0
+                and "title" in chat_res["recommended_materials"][0]
+            )
+        except Exception as exc:
+            o1_ok = False
+            chat_res = {"error": str(exc)}
+        bkt_engine.student_states.pop("user_1", None)
+        bkt_engine.student_states.pop("student_demo_01", None)
+        bkt_engine._save_persistent_data()
+        self.record_result(
+            "O.1",
+            "Frontend AdvisorChat -> RAGEngine.ask_natural & BKT Chat Sync Contract",
+            o1_ok,
+            f"Unit: {chat_res.get('unit_id')} | BKT update & StudyMaterialItem fields present: {o1_ok}"
+        )
+
+        # O.2: Kiểm thử hợp đồng `/api/chat/teach` (`base_queries`, `cognitive_level`, `difficulty` -> `TeachKnowledgeResponse`)
+        teach_res = self.model.teach_new_knowledge(
+            unit_id="",
+            topic="Chiến thuyền Mông Đồng và thủy quân Đông A",
+            entity="Thủy quân nhà Trần",
+            event="Kháng chiến chống Mông - Nguyên",
+            fact_chunk="Thủy quân nhà Trần sử dụng chiến thuyền cơ động đánh thắng thủy quân Nguyên trên sông Bạch Đằng.",
+            answer="Chiến thuyền nhà Trần nhỏ gọn, thông thuộc luồng lạch và thủy triều.",
+            base_queries=["chiến thuyền mông đồng thủy quân nhà trần có đặc điểm gì"],
+            cognitive_level="THONG_HIEU",
+            difficulty=0.5,
+        )
+        o2_ok = all(k in teach_res for k in ("status", "unit_id", "topic", "added_training_samples", "total_units"))
+        self.model.custom_units.pop(teach_res.get("unit_id", ""), None)
+        self.model.unit_lookup.pop(teach_res.get("unit_id", ""), None)
+        if CUSTOM_KNOWLEDGE_FILE.exists():
+            CUSTOM_KNOWLEDGE_FILE.unlink()
+        self.record_result(
+            "O.2",
+            "Endpoint `/api/chat/teach` Schema Contract (`base_queries` & `TeachKnowledgeResponse`)",
+            o2_ok,
+            f"Returned keys valid: {o2_ok} (unit_id={teach_res.get('unit_id')})"
+        )
+
+        # O.3: Kiểm thử hợp đồng `/api/quiz/student-profile/{student_id}` (`analyze_student_account_profile`)
+        acc_profile = bkt_engine.analyze_student_account_profile("student_nguyen_van_long")
+        o3_ok = all(
+            k in acc_profile
+            for k in (
+                "student_id", "overall_mastery", "student_rank_title", "total_attempts",
+                "total_correct", "accuracy_rate", "chat_questions_asked", "ai_evaluator_comment",
+                "campaign_breakdown", "cognitive_breakdown", "study_plan", "recommended_materials"
+            )
+        )
+        self.record_result(
+            "O.3",
+            "Endpoint `/api/quiz/student-profile/{id}` Schema Contract (`StudentAccountAnalysisResponse`)",
+            o3_ok,
+            f"All 12 required schema fields present: {o3_ok} | Rank: {acc_profile.get('student_rank_title')}"
+        )
+
+        # O.4: Kiểm thử hợp đồng `/api/quiz/evaluate-essay` (`coverage_ratio` + `BKTUpdateResponse`)
+        essay_eval = bkt_engine.evaluate_short_answer(
+            student_id="test_api_contract_student",
+            unit_id="KC3_BACH_DANG_HOW",
+            student_answer="Tháng 4/1288 Trần Hưng Đạo đóng cọc gỗ ngầm trên sông Bạch Đằng lợi dụng thủy triều rút tiêu diệt đoàn thuyền Ô Mã Nhi."
+        )
+        o4_ok = ("coverage_ratio" in essay_eval and "bkt_update" in essay_eval and essay_eval["score_10"] >= 6.0)
+        bkt_engine.student_states.pop("test_api_contract_student", None)
+        bkt_engine._save_persistent_data()
+        self.record_result(
+            "O.4",
+            "Endpoint `/api/quiz/evaluate-essay` Schema Contract (`coverage_ratio` included)",
+            o4_ok,
+            f"Score: {essay_eval.get('score_10')} | Coverage ratio: {essay_eval.get('coverage_ratio')}"
+        )
+
+        # O.5: Kiểm thử `/api/quiz/adaptive-exam/{student_id}` tích hợp ngân hàng MCQ `game_content.json`
+        exam_res = bkt_engine.generate_adaptive_exam("student_nguyen_van_long", num_questions=5)
+        has_mcq = any(q["question_type"] == "MULTIPLE_CHOICE" and len(q.get("options", [])) >= 2 for q in exam_res["questions"])
+        has_essay = any(q["question_type"] == "SHORT_ANSWER" for q in exam_res["questions"])
+        o5_ok = (exam_res["total_questions"] == 5 and has_mcq and has_essay)
+        self.record_result(
+            "O.5",
+            "Endpoint `/api/quiz/adaptive-exam/{id}` Hybrid MCQ (`game_content.json`) + Short Answer",
+            o5_ok,
+            f"Total: {exam_res['total_questions']} | Has MCQ: {has_mcq} | Has Essay: {has_essay}"
+        )
+
+    # ==========================================================================
+    # CATEGORY P: TOPIC GROUPS AI QUIZ GENERATION & BLOOM MATRIX (5 TESTS)
+    # ==========================================================================
+    def test_category_p_topic_groups_quiz(self):
+        print("\n" + "=" * 70)
+        print("▶ CATEGORY P: TOPIC GROUPS AI QUIZ GENERATION & BLOOM MATRIX")
+        print("=" * 70)
+        import asyncio
+        from rag_engine import rag_engine, CURRICULUM_TOPIC_GROUPS
+        from gemini_client import gemini_client
+
+        # P.1: rag_engine.get_topic_groups() contract
+        groups = rag_engine.get_topic_groups()
+        p1_has_5 = len(groups) == 5
+        group_ids = [g["id"] for g in groups]
+        p1_expected_ids = {"KHANG_CHIEN_1", "KHANG_CHIEN_2", "KHANG_CHIEN_3", "NHAN_VAT_QUAN_SU", "TONG_HOP_TOAN_KHOA"}
+        p1_ids_ok = p1_expected_ids.issubset(set(group_ids))
+        p1_counts_ok = all(g.get("question_count_available", 0) > 0 for g in groups)
+        self.record_result(
+            "P.1",
+            "Registry 5 Topic Groups & Available Question Counts",
+            p1_has_5 and p1_ids_ok and p1_counts_ok,
+            f"Total Groups: {len(groups)} | Expected IDs: {p1_ids_ok} | Question Counts: {[g['question_count_available'] for g in groups]}"
+        )
+
+        # P.2: Quiz Generation strictly adhering to KHANG_CHIEN_1
+        orig_api_key = gemini_client.api_key
+        orig_hf_client = gemini_client.hf_client
+        gemini_client.api_key = ""
+        gemini_client.hf_client = None
+        try:
+            q_kc1 = asyncio.run(gemini_client.generate_quiz(
+                topic_group_id="KHANG_CHIEN_1",
+                num_questions=3,
+                cognitive_level="Phân bổ ma trận"
+            ))
+            kc1_uids = set(CURRICULUM_TOPIC_GROUPS["KHANG_CHIEN_1"]["unit_ids"])
+            p2_ok = len(q_kc1) == 3 and all(q.topic_group_id == "KHANG_CHIEN_1" for q in q_kc1) and all(q.unit_id in kc1_uids for q in q_kc1 if q.unit_id)
+            self.record_result(
+                "P.2",
+                "AI Quiz Generation for Group 'KHANG_CHIEN_1' (1258)",
+                p2_ok,
+                f"Generated: {len(q_kc1)} | Group ID matched: True | Units: {[q.unit_id for q in q_kc1]}"
+            )
+
+            # P.3: Quiz Generation strictly adhering to KHANG_CHIEN_2
+            q_kc2 = asyncio.run(gemini_client.generate_quiz(
+                topic_group_id="KHANG_CHIEN_2",
+                num_questions=4,
+                cognitive_level="Phân bổ ma trận"
+            ))
+            kc2_uids = set(CURRICULUM_TOPIC_GROUPS["KHANG_CHIEN_2"]["unit_ids"])
+            p3_ok = len(q_kc2) == 4 and all(q.topic_group_id == "KHANG_CHIEN_2" for q in q_kc2) and all(q.unit_id in kc2_uids for q in q_kc2 if q.unit_id)
+            self.record_result(
+                "P.3",
+                "AI Quiz Generation for Group 'KHANG_CHIEN_2' (1285)",
+                p3_ok,
+                f"Generated: {len(q_kc2)} | Group ID matched: True | Units: {[q.unit_id for q in q_kc2]}"
+            )
+
+            # P.4: Quiz Generation strictly adhering to KHANG_CHIEN_3
+            q_kc3 = asyncio.run(gemini_client.generate_quiz(
+                topic_group_id="KHANG_CHIEN_3",
+                num_questions=3,
+                cognitive_level="Phân bổ ma trận"
+            ))
+            kc3_uids = set(CURRICULUM_TOPIC_GROUPS["KHANG_CHIEN_3"]["unit_ids"])
+            p4_ok = len(q_kc3) == 3 and all(q.topic_group_id == "KHANG_CHIEN_3" for q in q_kc3) and all(q.unit_id in kc3_uids for q in q_kc3 if q.unit_id)
+            self.record_result(
+                "P.4",
+                "AI Quiz Generation for Group 'KHANG_CHIEN_3' (1287-1288)",
+                p4_ok,
+                f"Generated: {len(q_kc3)} | Group ID matched: True | Units: {[q.unit_id for q in q_kc3]}"
+            )
+
+            # P.5: Bloom Matrix Distribution & Grounded Citations
+            q_matrix = asyncio.run(gemini_client.generate_quiz(
+                topic_group_id="TONG_HOP_TOAN_KHOA",
+                num_questions=3,
+                cognitive_level="Phân bổ ma trận"
+            ))
+            levels_present = {q.cognitive_level for q in q_matrix}
+            has_citations = all(len(q.curriculum_reference) > 0 for q in q_matrix)
+            has_explanations = all(len(q.explanation) > 0 for q in q_matrix)
+            has_4_options = all(len(q.options) == 4 and 0 <= q.correct_index <= 3 for q in q_matrix)
+            p5_ok = len(q_matrix) == 3 and len(levels_present) >= 2 and has_citations and has_explanations and has_4_options
+            self.record_result(
+                "P.5",
+                "Cognitive Bloom Matrix (Distributed Levels + 4-Options + Citations)",
+                p5_ok,
+                f"Levels present: {levels_present} | Citations: {has_citations} | Explanations: {has_explanations} | 4-Options Valid: {has_4_options}"
+            )
+        finally:
+            gemini_client.api_key = orig_api_key
+            gemini_client.hf_client = orig_hf_client
+
+    # ==========================================================================
+    # CATEGORY Q: ĐẠI VIỆT SỬ KÝ TOÀN THƯ PRIMARY-SOURCE CORPUS & CITATIONS
+    # ==========================================================================
+    def test_category_q_dvsktt_primary_sources(self):
+        print("\n" + "=" * 70)
+        print("▶ CATEGORY Q: ĐẠI VIỆT SỬ KÝ TOÀN THƯ PRIMARY-SOURCE CORPUS (2,546 PAGES)")
+        print("=" * 70)
+        import json
+        from pathlib import Path
+
+        dvsktt_cases = [
+            (
+                "Chuyện Trần Nhật Hiệu viết chữ Nhập Tống và Hoàng Cự Đà không được ăn xoài năm 1258 là như thế nào?",
+                "DVSKTT_TRAN_NHAT_HIEU_HOANG_CU_DA",
+                "nhập tống",
+                520
+            ),
+            (
+                "Sứ giả Đỗ Khắc Chung đã đối đáp với tướng Nguyên Ô Mã Nhi như thế nào năm 1285?",
+                "DVSKTT_DO_KHAC_CHUNG_SU_GIA",
+                "đỗ khắc chung",
+                569
+            ),
+            (
+                "Vì sao Trần Quốc Tuấn lại rút bỏ đầu sắt của chiếc gậy chống và lời bàn của Ngô Sĩ Liên là gì?",
+                "DVSKTT_TRAN_QUOC_TUAN_GAY_BIT_SAT",
+                "trần liễu",
+                572
+            ),
+            (
+                "Ai là người trực tiếp bắt sống Ô Mã Nhi và Tích Lệ Cơ Ngọc trong trận Bạch Đằng năm 1288?",
+                "DVSKTT_BACH_DANG_DO_HANH_NGUYEN_KHOAI",
+                "đỗ hành",
+                586
+            ),
+            (
+                "Kế Hoàng Tá Thốn dùi đắm thuyền Ô Mã Nhi năm 1289 và lời bàn của Sử thần Ngô Sĩ Liên như thế nào?",
+                "DVSKTT_HOANG_TA_THON_NGO_SI_LIEN_BAN",
+                "hoàng tá thốn",
+                590
+            ),
+            (
+                "Tấm gương liêm chính của Kiểm pháp quan Trần Thì Kiến móc họng mửa cỗ biếu thời Trần ra sao?",
+                "DVSKTT_TRAN_THI_KIEN_PHAP_LUAT",
+                "trần thì kiến",
+                612
+            ),
+            (
+                "Nhà Trần được thành lập như thế nào vào cuối năm 1225 đầu năm 1226 khi Lý Chiêu Hoàng nhường ngôi?",
+                "DVSKTT_THANH_LAP_NHA_TRAN_1225",
+                "trần cảnh",
+                479
+            ),
+            (
+                "Chế độ Thái thượng hoàng và bộ luật Quốc triều hình thư thời Trần được tổ chức ra sao?",
+                "DVSKTT_BO_MAY_PHAP_LUAT_QUOC_TRIEU_HINH_THU",
+                "quốc triều hình thư",
+                486
+            ),
+            (
+                "Việc đắp đê Đỉnh Nhĩ (Quai Vạc) năm 1248 và lập Điền trang Thái ấp năm 1266 thời Trần thế nào?",
+                "DVSKTT_KINH_TE_DIEN_TRANG_THAI_AP_DE_DINH_NHI",
+                "đỉnh nhĩ",
+                504
+            ),
+            (
+                "Khoa thi Thái học sinh năm 1247 đặt danh hiệu Tam khôi với Trạng nguyên Nguyễn Hiền và Lê Văn Hưu ra sao?",
+                "DVSKTT_KHOA_CU_THAI_HOC_SINH_NGUYEN_HIEN_MAC_DINH_CHI",
+                "nguyễn hiền",
+                503
+            ),
+            (
+                "Vì sao Quốc Tử Giám Tư nghiệp Chu Văn An dâng Thất trảm sớ xin chém 7 nịnh thần rồi từ quan?",
+                "DVSKTT_CHU_VAN_AN_THAT_TRAM_SO",
+                "thất trảm sớ",
+                765
+            ),
+            (
+                "Trương Hán Siêu với bài Bạch Đằng giang phú và Hàn Thuyên phát triển chữ Nôm thời Trần thế nào?",
+                "DVSKTT_TRUONG_HAN_SIEU_BACH_DANG_GIANG_PHU",
+                "trương hán siêu",
+                733
+            ),
+            (
+                "Chuyện thư sinh Đoàn Nhữ Hài 20 tuổi thảo biểu tạ tội ở phủ Thiên Trường năm 1299 diễn ra thế nào?",
+                "DVSKTT_DOAN_NHU_HAI_NGOAI_GIAO",
+                "đoàn nhữ hài",
+                616
+            ),
+            (
+                "Quốc sư Phù Vân trên núi Yên Tử đã nói câu gì với vua Trần Thái Tông và kiến trúc tháp Phổ Minh có gì đặc sắc?",
+                "DVSKTT_VAN_HOA_AN_NAM_TU_DAI_KHI_CHUA_PHAP_VAN",
+                "phù vân",
+                492
+            ),
+        ]
+
+        for idx, (query, exp_uid, kw, exp_page) in enumerate(dvsktt_cases, 1):
+            res = self.model.generate_natural_response(query, session_id=f"cat_q_{idx}")
+            sources = res.get("grounding_sources", [])
+            page_num = sources[0].get("page_number") if sources else None
+            passed = (
+                res["unit_id"] == exp_uid
+                and kw in res["answer"].lower()
+                and page_num == exp_page
+            )
+            self.record_result(
+                f"Q.{idx}",
+                f"DVSKTT Primary Source ({exp_uid}, p.{exp_page}): '{query}'",
+                passed,
+                f"Unit: {res['unit_id']} | Keyword '{kw}': {kw in res['answer'].lower()} | PDF Page: {page_num}"
+            )
+
+        # Q.15: Kiểm tra dữ liệu trích xuất toàn văn 419 trang Kỷ Nhà Trần (1.083 đoạn biên niên sử)
+        corpus_path = Path(__file__).parent / "data" / "dvsktt_tran_dynasty_corpus.json"
+        corpus_ok = False
+        corpus_detail = "Missing file"
+        if corpus_path.exists():
+            corpus_data = json.loads(corpus_path.read_text(encoding="utf-8"))
+            total_pages = corpus_data.get("total_pdf_pages", 0)
+            num_citations = len(corpus_data.get("unit_citations", {}))
+            num_commentaries = len(corpus_data.get("historian_commentaries", []))
+            num_passages = corpus_data.get("tran_dynasty_passages_count", 0)
+            corpus_ok = (total_pages == 2546 and num_citations >= 49 and num_commentaries >= 72 and num_passages >= 1000)
+            corpus_detail = f"PDF Pages: {total_pages} | Passages: {num_passages} | Citations: {num_citations} | Commentaries: {num_commentaries}"
+        self.record_result(
+            "Q.15",
+            "DVSKTT Full-Text Corpus Integrity (419 Tran Dynasty Pages -> 1,083 Passages)",
+            corpus_ok,
+            corpus_detail
+        )
+
+        # Q.16: Kiểm tra Full-Text Passage Search trực tiếp trên 1.083 đoạn sử liệu
+        hits = self.model.search_dvsktt_passages("Nội Minh tự Đỗ Hành bắt được Ô Mã Nhi trên sông Bạch Đằng", top_k=3)
+        q16_ok = len(hits) > 0 and any(h["pdf_page"] == 586 for h in hits)
+        self.record_result(
+            "Q.16",
+            "Full-Text Passage Search over 1,083 Chronicle Passages (`search_dvsktt_passages`)",
+            q16_ok,
+            f"Top hit pages: {[h['pdf_page'] for h in hits]}"
+        )
+
+    # ==========================================================================
     # RUN ALL SUITES & REPORT SUMMARY
     # ==========================================================================
     def run_all(self):
@@ -1035,6 +1433,10 @@ class RegressionTestRunner:
         self.test_category_k_mandatory_benchmarks()
         self.test_category_l_test3_audit_10_tests()
         self.test_category_m_adaptive_ai_and_new_units()
+        self.test_category_m_game_topics()
+        self.test_category_o_fullstack_api_contracts()
+        self.test_category_p_topic_groups_quiz()
+        self.test_category_q_dvsktt_primary_sources()
 
         total = self.passed_tests + self.failed_tests
         pass_rate = (self.passed_tests / total * 100) if total > 0 else 0.0

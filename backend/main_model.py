@@ -2,7 +2,7 @@
 FILE 4: ĐIỂM CHẠY CHÍNH & SUY LUẬN MODEL NGÔN NGỮ TỰ NHIÊN (MAIN NLP ENGINE)
 ================================================================================
 Chức năng độc lập (1 File Main riêng biệt theo đúng kiến trúc chuẩn):
-1. Quản lý vòng đời nạp Model đã huấn luyện (`backend/models/dong_a_nlp_model.joblib`).
+1. Quản lý vòng đời nạp Model đã huấn luyện (`ai/models/dong_a_nlp_model.joblib`).
 2. Nếu chưa có dữ liệu chia 8-2 hoặc chưa có file model `.joblib`, tự động kích hoạt
    `data_splitter.py` và `create_model.py` theo đúng luồng chuẩn.
 3. Cung cấp hàm giao diện chuẩn `ask_dong_a_ai()` cho cả FastAPI Server lẫn giao diện
@@ -19,6 +19,7 @@ if str(BASE_DIR) not in sys.path:
     sys.path.insert(0, str(BASE_DIR))
 
 from data_splitter import TRAIN_FILE, TEST_FILE, generate_and_split_dataset
+import create_model
 from create_model import MODEL_PATH, DongANLPModel, train_and_save_model
 
 
@@ -50,23 +51,31 @@ class MainNLPEngine:
         cls,
         query: str,
         character_id: Optional[str] = None,
-        session_id: str = "default"
+        session_id: str = "default",
+        student_id: Optional[str] = None
     ) -> Dict[str, Any]:
         model = cls.get_model()
         return model.generate_natural_response(
             query=query,
             character_id=character_id,
-            session_id=session_id
+            session_id=session_id,
+            student_id=student_id or session_id
         )
 
 
 def ask_dong_a_ai(
     query: str,
     character_id: Optional[str] = None,
-    session_id: str = "default"
+    session_id: str = "default",
+    student_id: Optional[str] = None
 ) -> Dict[str, Any]:
     """Hàm tiện ích gọi trực tiếp từ API hoặc từ chương trình chính."""
-    return MainNLPEngine.ask(query=query, character_id=character_id, session_id=session_id)
+    return MainNLPEngine.ask(
+        query=query,
+        character_id=character_id,
+        session_id=session_id,
+        student_id=student_id
+    )
 
 
 if __name__ == "__main__":

@@ -82,17 +82,25 @@ class GeneratedQuestion(BaseModel):
     cognitive_level: Literal["Nhận biết", "Thông hiểu", "Vận dụng", "Vận dụng cao"]
     explanation: str
     curriculum_reference: str
+    topic_group_id: Optional[str] = None
+    topic_group_name: Optional[str] = None
+    unit_id: Optional[str] = None
+    topic: Optional[str] = None
 
 
 class QuizGenerateRequest(BaseModel):
     topic: str = Field("Ba lần kháng chiến chống quân Mông - Nguyên (1258 - 1288)", description="Chủ đề trắc nghiệm")
+    topic_group_id: Optional[str] = Field("TONG_HOP_TOAN_KHOA", description="ID nhóm chủ đề (KHANG_CHIEN_1, KHANG_CHIEN_2, KHANG_CHIEN_3, NHAN_VAT_QUAN_SU, TONG_HOP_TOAN_KHOA)")
+    sub_topic: Optional[str] = Field(None, description="Chủ đề con chi tiết trong nhóm chủ đề")
     num_questions: int = Field(4, ge=1, le=20, description="Số lượng câu hỏi cần sinh")
-    cognitive_level: Optional[str] = Field("Tất cả mức độ", description="Mức độ nhận thức GDPT 2018")
-    source_preference: Optional[str] = Field("SGK Lịch sử 7 Kết nối tri thức", description="Nguồn sách ưu tiên")
+    cognitive_level: Optional[str] = Field("Phân bổ ma trận", description="Mức độ nhận thức GDPT 2018")
+    source_preference: Optional[str] = Field("SGK Lịch sử 7 Kết nối tri thức & Đại Việt Sử Ký Toàn Thư", description="Nguồn sách ưu tiên")
 
 
 class QuizGenerateResponse(BaseModel):
     topic: str
+    topic_group_id: Optional[str] = None
+    topic_group_name: Optional[str] = None
     total_generated: int
     questions: List[GeneratedQuestion]
     generation_notes: str

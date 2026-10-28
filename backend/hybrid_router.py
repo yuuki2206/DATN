@@ -15,7 +15,13 @@ import time
 import httpx
 from pathlib import Path
 from typing import Dict, Any, Optional
-from app.config import settings
+try:
+    from app.config import settings
+except ImportError:
+    class _FallbackSettings:
+        GEMINI_API_KEY = ""
+        GEMINI_MODEL = "gemini-flash-latest"
+    settings = _FallbackSettings()
 
 BASE_DIR = Path(__file__).resolve().parent
 
